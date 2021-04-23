@@ -1,0 +1,52 @@
+{
+    "data": [
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        }
+    ]
+}
