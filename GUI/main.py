@@ -27,11 +27,13 @@ class Application(tk.Frame):
         self.rightsubframe = tk.Frame(self)
         self.bottomsubframe = tk.Frame(self)
 
-        self.leftbuttonssubframe = tk.Frame(self.leftsubframe)
-        self.rightbuttonssubframe = tk.Frame(self.rightsubframe)
-        # button creation and options setting
+        self.leftbottomsubframe = tk.Frame(self.leftsubframe)
+        self.rightbottomsubframe = tk.Frame(self.rightsubframe)
+        self.leftbuttonssubframe = tk.Frame(self.leftbottomsubframe)
+        self.rightbuttonssubframe = tk.Frame(self.rightbottomsubframe)
 
-        #button commands
+        # button creation and options setting
+        # button commands
         self.prefer_left_command = lambda event=None: self.register_prefer_input("left")
         self.prefer_right_command = lambda event=None: self.register_prefer_input("right")
         self.left_like_command = lambda event=None: self.register_ordinal_input("left", "like")
@@ -41,25 +43,31 @@ class Application(tk.Frame):
         self.right_neutral_command = lambda event=None: self.register_ordinal_input("right", "neutral")
         self.right_dislike_command = lambda event=None: self.register_ordinal_input("right", "dislike")
 
+        # buttons
+        self.p = tk.IntVar()
+        self.lo = tk.IntVar()
+        self.ro = tk.IntVar()
+        self.response_to_int = {'like':1, 'neutral':2, 'dislike':3}
+
+        self.radio_integers = [self.p, self.lo, self.ro]
         self.preferleft = tk.Radiobutton(self.leftbuttonssubframe, text='Prefer Left (E)',
-                                    command=self.prefer_left_command, state='normal')
-        self.preferleft.flash()
+                                    command=self.prefer_left_command, variable=self.p, value=1)
         self.preferright = tk.Radiobutton(self.rightbuttonssubframe, text='Prefer Right (I)',
-                                     command=self.prefer_right_command)
+                                     command=self.prefer_right_command, variable=self.p, value=2)
 
         self.leftlike = tk.Radiobutton(self.leftbuttonssubframe, text='Like (F)',
-                                  command=self.left_like_command)
+                                  command=self.left_like_command, variable=self.lo, value=1)
         self.leftneutral = tk.Radiobutton(self.leftbuttonssubframe, text='Neutral (D)',
-                                     command=self.left_neutral_command)
+                                     command=self.left_neutral_command, variable=self.lo, value=2)
         self.leftdislike = tk.Radiobutton(self.leftbuttonssubframe, text='Dislike (S)',
-                                     command=self.left_dislike_command)
+                                     command=self.left_dislike_command, variable=self.lo, value=3)
 
         self.rightlike = tk.Radiobutton(self.rightbuttonssubframe, text='Like (J)',
-                                   command=self.right_like_command)
+                                   command=self.right_like_command, variable=self.ro, value=1)
         self.rightneutral = tk.Radiobutton(self.rightbuttonssubframe, text='Neutral (K)',
-                                      command=self.right_neutral_command)
+                                      command=self.right_neutral_command, variable=self.ro, value=2)
         self.rightdislike = tk.Radiobutton(self.rightbuttonssubframe, text='Dislike (L)',
-                                      command=self.right_dislike_command)
+                                      command=self.right_dislike_command, variable=self.ro, value=3)
 
         self.list_of_input_buttons = [self.preferleft, self.preferright, self.leftlike,
                                       self.leftneutral, self.leftdislike, self.rightlike,
@@ -89,18 +97,20 @@ class Application(tk.Frame):
         self.imagelabel = tk.Label(self)
 
         # all packing
-
         # imagelabel
         self.imagelabel.pack(side="top")
 
         # frames
         self.leftsubframe.pack(side="left")
         self.rightsubframe.pack(side="right")
+
+        self.leftbottomsubframe.pack(side="bottom")
+        self.rightbottomsubframe.pack(side="bottom")
+
+        self.rightbuttonssubframe.pack(side="left")
+        self.leftbuttonssubframe.pack(side="right")
+
         self.bottomsubframe.pack(side="bottom")
-
-        self.rightbuttonssubframe.pack(side="bottom")
-        self.leftbuttonssubframe.pack(side="bottom")
-
         self.leftimage, self.rightimage = image_generation.generate_random_images()
         image_generation.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
         # buttons
@@ -108,12 +118,12 @@ class Application(tk.Frame):
         self.preferright.pack(side="top", pady=20)
 
         self.leftdislike.pack(side="bottom", anchor="w")
-        self.leftneutral.pack(after=self.leftdislike, side="bottom")
-        self.leftlike.pack(after=self.leftneutral, side="bottom")
+        self.leftneutral.pack(after=self.leftdislike, side="bottom", anchor='w')
+        self.leftlike.pack(after=self.leftneutral, side="bottom", anchor='w')
 
         self.rightdislike.pack(side="bottom", anchor="w")
-        self.rightneutral.pack(after=self.rightdislike, side="bottom")
-        self.rightlike.pack(after=self.rightneutral, side="bottom")
+        self.rightneutral.pack(after=self.rightdislike, side="bottom", anchor='w')
+        self.rightlike.pack(after=self.rightneutral, side="bottom", anchor='w')
 
         self.clear.pack(side="left")
         self.submit.pack(after=self.clear, side="left")
@@ -164,34 +174,28 @@ class Application(tk.Frame):
 
     # button commands
     def register_prefer_input(self, response):
-        if not(self.registeredpreferinput):
-            self.preferinput = response
-            self.registeredpreferinput = True
-            # gray out appropriate buttons + make unresponsive
-            self.preferleft["state"] = "disabled"
-            self.preferright["state"] = "disabled"
+        self.preferinput = response
+        self.registeredpreferinput = True
 
-            # check if submit can be ungrayed
-            if self.ready_to_submit():
-                self.enable_submit()
+        if response == 'left':
+            self.p.set(1)
+        else:
+            self.p.set(2)
+        # check if submit can be ungrayed
+        if self.ready_to_submit():
+            self.enable_submit()
+
+
 
     def register_ordinal_input(self, image, response):
         if image == "left":
-            if not(self.registeredleftordinalinput):
-                self.leftordinalinput = response
-                self.registeredleftordinalinput = True
-                # gray out appropriate buttons + make unresponsive
-                self.leftlike["state"] = "disabled"
-                self.leftneutral["state"] = "disabled"
-                self.leftdislike["state"] = "disabled"
+            self.leftordinalinput = response
+            self.registeredleftordinalinput = True
+            self.lo.set(self.response_to_int[response])
         elif image == "right":
-            if not(self.registeredrightordinalinput):
-                self.rightordinalinput = response
-                self.registeredrightordinalinput = True
-                # gray out appropriate buttons + make unresponsive
-                self.rightlike["state"] = "disabled"
-                self.rightneutral["state"] = "disabled"
-                self.rightdislike["state"] = "disabled"
+            self.rightordinalinput = response
+            self.registeredrightordinalinput = True
+            self.ro.set(self.response_to_int[response])
         else:
             print("ERROR: invalid value for 'response'")
 
@@ -200,8 +204,6 @@ class Application(tk.Frame):
             self.enable_submit()
 
     def clear_command(self, event=None):
-        # print("registered clear_command!")
-
         # clear out inputs
         self.leftordinalinput = ""
         self.rightordinalinput = ""
@@ -211,9 +213,8 @@ class Application(tk.Frame):
         self.registeredleftordinalinput = False
         self.registeredrightordinalinput = False
 
-        # make buttons ungrayed out + responsive
-        for button in self.list_of_input_buttons:
-            button["state"] = "normal"
+        for int in self.radio_integers:
+            int.set(0)
         # gray out submit button + make unresponsive
         self.submit["state"] = "disabled"
 
