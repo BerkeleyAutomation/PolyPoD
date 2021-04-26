@@ -177,8 +177,6 @@ class Application(tk.Frame):
         if self.ready_to_submit():
             self.enable_submit()
 
-
-
     def register_ordinal_input(self, image, response):
         if image == "left":
             self.leftordinalinput = response

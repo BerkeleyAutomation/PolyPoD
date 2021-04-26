@@ -25,6 +25,7 @@ garden_dimensions = (garden_x_len, garden_y_len, garden_z_len)
 colors_of_plants = ["red", "yellow", "green", "blue"]
 num_plants = 4
 prob_of_plant = 0.05
+alpha = 1
 
 # Return random plant radius: for now, just 0.5, but later we can sample from a distribution
 # or something.
@@ -83,23 +84,62 @@ def plot_and_show_images(leftimage, rightimage, root):
                 color = get_plant_color(it)
 
                 # Cylinder
-                x_space = 100
-                z_step = 0.2
-                cyl_x = np.linspace(x - r, x + r, x_space)
+                x_num = 100
+                z_step = 1
+                rstride = 1
+                cstride = 1
+                cyl_x = np.linspace(x - r, x + r, x_num)
                 cyl_z = np.arange(0, z + z_step, z_step)
-                x_grid, z_grid = np.meshgrid(cyl_x, cyl_z)
+                x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
                 y_arc = np.sqrt(r ** 2 - (abs(x_grid - x)) ** 2)
                 y_grid_1 = y_arc + y
                 y_grid_2 = -y_arc + y
 
                 # Draw parameters
-                rstride = 20
-                cstride = 10
-                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=0.9, rstride=rstride, cstride=cstride,
+                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
                                 color=color)
-                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=0.9, rstride=rstride, cstride=cstride,
+                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
                                 color=color)
-        pack_images(root, figs)
+
+                # Top Circle
+                circ_x_num = 100
+                circ_r_num = 10
+                rstride = 1
+                cstride = 1
+                circ_x = []
+                circ_y_1 = []
+                circ_y_2 = []
+                for sub_r in np.linspace(0, r, circ_r_num):
+                    sub_x = np.linspace(x - sub_r, x + sub_r, circ_x_num)
+                    sub_y_arc = np.sqrt(sub_r ** 2 - (abs(sub_x - x)) ** 2)
+                    sub_y_1 = sub_y_arc + y
+                    sub_y_2 = -sub_y_arc + y
+                    circ_x.append(sub_x)
+                    circ_y_1.append(sub_y_1)
+                    circ_y_2.append(sub_y_2)
+                circ_x = np.array(circ_x)
+                circ_y_1 = np.array(circ_y_1)
+                circ_y_2 = np.array(circ_y_2)
+                circ_z_1 = np.full((circ_r_num, circ_x_num), z)
+                circ_z_2 = np.full((circ_r_num, circ_x_num), 0)
+
+                print('circ_x.shape, circ_y_1.shape, circ_z_1.shape')
+                print(circ_x.shape, circ_y_1.shape, circ_z_1.shape)
+                # draw
+                ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
+                                cstride=cstride, color=color)
+                ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=alpha, rstride=rstride,
+                                cstride=cstride, color=color)
+
+                ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=alpha, rstride=rstride,
+                                cstride=cstride, color=color)
+                ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=alpha, rstride=rstride,
+                                cstride=cstride, color=color)
+
+        if root:
+            pack_images(root, figs)
+        else:
+            plt.show()
 
 def pack_images(root, figs):
     for slave in root.pack_slaves():
