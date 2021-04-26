@@ -27,10 +27,8 @@ class Application(tk.Frame):
         self.rightsubframe = tk.Frame(self)
         self.bottomsubframe = tk.Frame(self)
 
-        self.leftbottomsubframe = tk.Frame(self.leftsubframe)
-        self.rightbottomsubframe = tk.Frame(self.rightsubframe)
-        self.leftbuttonssubframe = tk.Frame(self.leftbottomsubframe)
-        self.rightbuttonssubframe = tk.Frame(self.rightbottomsubframe)
+        self.leftbuttonssubframe = tk.Frame(self.leftsubframe)
+        self.rightbuttonssubframe = tk.Frame(self.rightsubframe)
 
         # button creation and options setting
         # button commands
@@ -89,8 +87,8 @@ class Application(tk.Frame):
         master.bind('l', self.right_dislike_command)
         master.bind('x', self.clear_command)
         master.bind('<space>', self.submit_command)
-        # image creation: using image_generation.py
 
+        # image creation: using image_generation.py
         self.old_left_image = tk.PhotoImage(file="~/Downloads/sparkle_house.gif")
         self.old_right_image = tk.PhotoImage(file="~/Downloads/sparkle_house.gif")
         # image-containing label creation
@@ -99,21 +97,17 @@ class Application(tk.Frame):
         # all packing
         # imagelabel
         self.imagelabel.pack(side="top")
-
-        # frames
-        self.leftsubframe.pack(side="left")
-        self.rightsubframe.pack(side="right")
-
-        self.leftbottomsubframe.pack(side="bottom")
-        self.rightbottomsubframe.pack(side="bottom")
-
-        self.rightbuttonssubframe.pack(side="left")
-        self.leftbuttonssubframe.pack(side="right")
-
-        self.bottomsubframe.pack(side="bottom")
         self.leftimage, self.rightimage = image_generation.generate_random_images()
         image_generation.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
-        # buttons
+
+        # frames
+        self.leftsubframe.pack(side="left", expand=True)
+        self.rightsubframe.pack(side="right", expand=True)
+
+        self.leftbuttonssubframe.pack(side="right")
+        self.rightbuttonssubframe.pack(side="left")
+
+        # input radio-buttons
         self.preferleft.pack(side="top", pady=20)
         self.preferright.pack(side="top", pady=20)
 
@@ -124,6 +118,9 @@ class Application(tk.Frame):
         self.rightdislike.pack(side="bottom", anchor="w")
         self.rightneutral.pack(after=self.rightdislike, side="bottom", anchor='w')
         self.rightlike.pack(after=self.rightneutral, side="bottom", anchor='w')
+
+        # bottom subframe and its 3 buttons
+        self.bottomsubframe.pack(side="bottom")
 
         self.clear.pack(side="left")
         self.submit.pack(after=self.clear, side="left")
