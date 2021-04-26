@@ -23,12 +23,10 @@ class Application(tk.Frame):
         self.pack()
         # all widget creation
         # subframes creation
-        self.leftsubframe = tk.Frame(self)
-        self.rightsubframe = tk.Frame(self)
-        self.bottomsubframe = tk.Frame(self)
-
-        self.leftbuttonssubframe = tk.Frame(self.leftsubframe)
-        self.rightbuttonssubframe = tk.Frame(self.rightsubframe)
+        self.buttonssubframe = tk.Frame(self)
+        self.leftsubframe = tk.Frame(self.buttonssubframe)
+        self.rightsubframe = tk.Frame(self.buttonssubframe)
+        self.bottomsubframe = tk.Frame(self.buttonssubframe)
 
         # button creation and options setting
         # button commands
@@ -48,23 +46,23 @@ class Application(tk.Frame):
         self.response_to_int = {'like':1, 'neutral':2, 'dislike':3}
 
         self.radio_integers = [self.p, self.lo, self.ro]
-        self.preferleft = tk.Radiobutton(self.leftbuttonssubframe, text='Prefer Left (E)',
+        self.preferleft = tk.Radiobutton(self.leftsubframe, text='Prefer Left (E)',
                                     command=self.prefer_left_command, variable=self.p, value=1)
-        self.preferright = tk.Radiobutton(self.rightbuttonssubframe, text='Prefer Right (I)',
+        self.preferright = tk.Radiobutton(self.rightsubframe, text='Prefer Right (I)',
                                      command=self.prefer_right_command, variable=self.p, value=2)
 
-        self.leftlike = tk.Radiobutton(self.leftbuttonssubframe, text='Like (F)',
+        self.leftlike = tk.Radiobutton(self.leftsubframe, text='Like (F)',
                                   command=self.left_like_command, variable=self.lo, value=1)
-        self.leftneutral = tk.Radiobutton(self.leftbuttonssubframe, text='Neutral (D)',
+        self.leftneutral = tk.Radiobutton(self.leftsubframe, text='Neutral (D)',
                                      command=self.left_neutral_command, variable=self.lo, value=2)
-        self.leftdislike = tk.Radiobutton(self.leftbuttonssubframe, text='Dislike (S)',
+        self.leftdislike = tk.Radiobutton(self.leftsubframe, text='Dislike (S)',
                                      command=self.left_dislike_command, variable=self.lo, value=3)
 
-        self.rightlike = tk.Radiobutton(self.rightbuttonssubframe, text='Like (J)',
+        self.rightlike = tk.Radiobutton(self.rightsubframe, text='Like (J)',
                                    command=self.right_like_command, variable=self.ro, value=1)
-        self.rightneutral = tk.Radiobutton(self.rightbuttonssubframe, text='Neutral (K)',
+        self.rightneutral = tk.Radiobutton(self.rightsubframe, text='Neutral (K)',
                                       command=self.right_neutral_command, variable=self.ro, value=2)
-        self.rightdislike = tk.Radiobutton(self.rightbuttonssubframe, text='Dislike (L)',
+        self.rightdislike = tk.Radiobutton(self.rightsubframe, text='Dislike (L)',
                                       command=self.right_dislike_command, variable=self.ro, value=3)
 
         self.list_of_input_buttons = [self.preferleft, self.preferright, self.leftlike,
@@ -101,11 +99,10 @@ class Application(tk.Frame):
         image_generation.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
 
         # frames
-        self.leftsubframe.pack(side="left", expand=True)
-        self.rightsubframe.pack(side="right", expand=True)
-
-        self.leftbuttonssubframe.pack(side="right")
-        self.rightbuttonssubframe.pack(side="left")
+        self.buttonssubframe.pack(side='bottom')
+        self.leftsubframe.pack(side='left')
+        self.bottomsubframe.pack(side='left', anchor='s')
+        self.rightsubframe.pack(side='left')
 
         # input radio-buttons
         self.preferleft.pack(side="top", pady=20)
@@ -119,12 +116,10 @@ class Application(tk.Frame):
         self.rightneutral.pack(after=self.rightdislike, side="bottom", anchor='w')
         self.rightlike.pack(after=self.rightneutral, side="bottom", anchor='w')
 
-        # bottom subframe and its 3 buttons
-        self.bottomsubframe.pack(side="bottom")
-
-        self.clear.pack(side="left")
-        self.submit.pack(after=self.clear, side="left")
-        self.quit.pack(after=self.submit, side="left")
+        # bottom  3 buttons
+        self.clear.pack(side="left", anchor='s')
+        self.submit.pack(after=self.clear, side="left", anchor='s')
+        self.quit.pack(after=self.submit, side="left", anchor='s')
 
         # data storage instance variables.
         # preferrecords is a list of dictionaries: "left" is left image name, "right"
