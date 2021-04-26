@@ -41,23 +41,24 @@ class Application(tk.Frame):
         self.right_neutral_command = lambda event=None: self.register_ordinal_input("right", "neutral")
         self.right_dislike_command = lambda event=None: self.register_ordinal_input("right", "dislike")
 
-        self.preferleft = tk.Button(self.leftbuttonssubframe, text='Prefer Left (E)',
-                                    command=self.prefer_left_command)
-        self.preferright = tk.Button(self.rightbuttonssubframe, text='Prefer Right (I)',
+        self.preferleft = tk.Radiobutton(self.leftbuttonssubframe, text='Prefer Left (E)',
+                                    command=self.prefer_left_command, state='normal')
+        self.preferleft.flash()
+        self.preferright = tk.Radiobutton(self.rightbuttonssubframe, text='Prefer Right (I)',
                                      command=self.prefer_right_command)
 
-        self.leftlike = tk.Button(self.leftbuttonssubframe, text='Like (F)',
+        self.leftlike = tk.Radiobutton(self.leftbuttonssubframe, text='Like (F)',
                                   command=self.left_like_command)
-        self.leftneutral = tk.Button(self.leftbuttonssubframe, text='Neutral (D)',
+        self.leftneutral = tk.Radiobutton(self.leftbuttonssubframe, text='Neutral (D)',
                                      command=self.left_neutral_command)
-        self.leftdislike = tk.Button(self.leftbuttonssubframe, text='Dislike (S)',
+        self.leftdislike = tk.Radiobutton(self.leftbuttonssubframe, text='Dislike (S)',
                                      command=self.left_dislike_command)
 
-        self.rightlike = tk.Button(self.rightbuttonssubframe, text='Like (J)',
+        self.rightlike = tk.Radiobutton(self.rightbuttonssubframe, text='Like (J)',
                                    command=self.right_like_command)
-        self.rightneutral = tk.Button(self.rightbuttonssubframe, text='Neutral (K)',
+        self.rightneutral = tk.Radiobutton(self.rightbuttonssubframe, text='Neutral (K)',
                                       command=self.right_neutral_command)
-        self.rightdislike = tk.Button(self.rightbuttonssubframe, text='Dislike (L)',
+        self.rightdislike = tk.Radiobutton(self.rightbuttonssubframe, text='Dislike (L)',
                                       command=self.right_dislike_command)
 
         self.list_of_input_buttons = [self.preferleft, self.preferright, self.leftlike,

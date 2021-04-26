@@ -6,35 +6,19 @@
         },
         {
             "image": "R",
-            "rating": "neutral"
+            "rating": "dislike"
         },
         {
             "image": "L",
-            "rating": "like"
+            "rating": "dislike"
         },
         {
             "image": "R",
-            "rating": "neutral"
-        },
-        {
-            "image": "L",
             "rating": "like"
         },
         {
-            "image": "R",
-            "rating": "neutral"
-        },
-        {
             "image": "L",
-            "rating": "neutral"
-        },
-        {
-            "image": "R",
-            "rating": "neutral"
-        },
-        {
-            "image": "L",
-            "rating": "like"
+            "rating": "dislike"
         },
         {
             "image": "R",
@@ -46,7 +30,231 @@
         },
         {
             "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
             "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }
