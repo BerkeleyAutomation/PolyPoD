@@ -13,6 +13,7 @@ matplotlib.use('tkagg')
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 from matplotlib.backend_bases import key_press_handler
+import mpl_toolkits
 
 # Generates random 4x10x10 (garden_z_len by g...) images of dots and cirles, representing a 10x10 garden with 4 different
 # plant species. the x dimension specifies plant type, the y and z specify the location of the plant,
@@ -62,7 +63,8 @@ def plot_and_show_images(leftimage, rightimage, root):
     figs = []
     axes = []
     for _ in range(len(images_to_process)):
-        fig = plt.figure()
+        #fig = Figure(figsize=(5, 4), dpi=100)
+        fig = 
         ax = fig.add_subplot(projection='3d')
         figs.append(fig)
         axes.append(ax)
@@ -123,8 +125,6 @@ def plot_and_show_images(leftimage, rightimage, root):
                 circ_z_1 = np.full((circ_r_num, circ_x_num), z)
                 circ_z_2 = np.full((circ_r_num, circ_x_num), 0)
 
-                print('circ_x.shape, circ_y_1.shape, circ_z_1.shape')
-                print(circ_x.shape, circ_y_1.shape, circ_z_1.shape)
                 # draw
                 ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
                                 cstride=cstride, color=color)
@@ -137,11 +137,11 @@ def plot_and_show_images(leftimage, rightimage, root):
                                 cstride=cstride, color=color)
 
         if root:
-            pack_images(root, figs)
+            pack_images(root, figs, ax)
         else:
             plt.show()
 
-def pack_images(root, figs):
+def pack_images(root, figs, ax):
     for slave in root.pack_slaves():
         slave.pack_forget()
 
@@ -155,3 +155,4 @@ def pack_images(root, figs):
             canvas.get_tk_widget().pack(side="left")
         else:
             canvas.get_tk_widget().pack(side="right")
+        ax.mouse_init()
