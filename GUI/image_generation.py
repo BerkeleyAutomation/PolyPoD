@@ -64,7 +64,7 @@ def plot_and_show_images(leftimage, rightimage, root):
     axes = []
     for _ in range(len(images_to_process)):
         #fig = Figure(figsize=(5, 4), dpi=100)
-        fig = 
+        fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         figs.append(fig)
         axes.append(ax)
@@ -86,10 +86,10 @@ def plot_and_show_images(leftimage, rightimage, root):
                 color = get_plant_color(it)
 
                 # Cylinder
-                x_num = 100
+                x_num = 50
                 z_step = 1
-                rstride = 1
-                cstride = 1
+                rstride = 20
+                cstride = 10
                 cyl_x = np.linspace(x - r, x + r, x_num)
                 cyl_z = np.arange(0, z + z_step, z_step)
                 x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
@@ -99,15 +99,15 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # Draw parameters
                 ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
-                                color=color)
+                                color=color, shade=False)
                 ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
-                                color=color)
+                                color=color, shade=False)
 
                 # Top Circle
-                circ_x_num = 100
-                circ_r_num = 10
-                rstride = 1
-                cstride = 1
+                circ_x_num = 10
+                circ_r_num = 2
+                rstride = 2
+                cstride = 2
                 circ_x = []
                 circ_y_1 = []
                 circ_y_2 = []
@@ -127,14 +127,14 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # draw
                 ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color)
+                                cstride=cstride, color=color, shade=False)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color)
+                                cstride=cstride, color=color, shade=False)
 
                 ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color)
+                                cstride=cstride, color=color, shade=False)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color)
+                                cstride=cstride, color=color, shade=False)
 
         if root:
             pack_images(root, figs, ax)
