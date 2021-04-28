@@ -34,7 +34,7 @@ def plant_radius():
     return rng.uniform(0.25, 1)
 
 def plant_height():
-    return rng.integers(garden_z_len)
+    return rng.uniform(1, garden_z_len)
 
 # Returns plant x, y, z, and radius from an iterator with multi-index, and the value returned by
 # the iterator.
@@ -97,8 +97,6 @@ def plot_and_show_images(leftimage, rightimage, root):
                 cyl_z = np.arange(0, z + z_step, z_step)
                 x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
                 y_arc = np.sqrt(np.abs(r ** 2 - (abs(x_grid - x)) ** 2))
-                print('r ** 2 - (abs(x_grid - x)) ** 2', r ** 2 - (abs(x_grid - x)) ** 2)
-                print('y_arc', y_arc)
                 y_grid_1 = y_arc + y
                 y_grid_2 = -y_arc + y
 
