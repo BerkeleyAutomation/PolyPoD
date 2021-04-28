@@ -104,9 +104,9 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # Draw parameters
                 ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
-                                color=color, shade=False)
+                                color=color, shade=True)
                 ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
-                                color=color, shade=False)
+                                color=color, shade=True)
 
                 # Top Circle
                 circ_x_num = 10
@@ -132,14 +132,14 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # draw
                 ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color, shade=False)
+                                cstride=cstride, color=color, shade=True)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color, shade=False)
+                                cstride=cstride, color=color, shade=True)
 
                 ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color, shade=False)
+                                cstride=cstride, color=color, shade=True)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=alpha, rstride=rstride,
-                                cstride=cstride, color=color, shade=False)
+                                cstride=cstride, color=color, shade=True)
     #pack_toolbars(root, canvases)
 
 def pack_images(root, figs):
