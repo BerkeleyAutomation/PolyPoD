@@ -31,7 +31,7 @@ alpha = 1
 # Return random plant radius: for now, just 0.5, but later we can sample from a distribution
 # or something.
 def plant_radius():
-    return rng.uniform(0.5, 1)
+    return rng.uniform(0.25, 1)
 
 def plant_height():
     return rng.integers(garden_z_len)
