@@ -27,6 +27,8 @@ colors_of_plants = ["red", "yellow", "green", "blue"]
 num_plants = 4
 prob_of_plant = 0.25
 alpha = 1
+top_height = 0.25
+stem_thickness = 0.125
 
 # Return random plant radius: for now, just 0.5, but later we can sample from a distribution
 # or something.
@@ -88,27 +90,25 @@ def plot_and_show_images(leftimage, rightimage, root):
                 x, y, z, r = get_plant_data(it, p)
                 color = get_plant_color(it)
 
-                # Cylinder
+                # Top
                 x_num = 50
-                z_step = 0.5
+                z_step = 0.1
                 rstride = 10
                 cstride = 5
                 cyl_x = np.linspace(x - r, x + r, x_num)
-                cyl_z = np.arange(0, z + z_step, z_step)
+                cyl_z = np.arange(z - top_height, z + z_step, z_step)
                 x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
                 y_arc = np.sqrt(np.abs(r ** 2 - (abs(x_grid - x)) ** 2))
-                print('r ** 2 - (abs(x_grid - x)) ** 2', r ** 2 - (abs(x_grid - x)) ** 2)
-                print('y_arc', y_arc)
                 y_grid_1 = y_arc + y
                 y_grid_2 = -y_arc + y
 
-                # Draw parameters
+                # Draw top
                 ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
                                 color=color, shade=True)
                 ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
                                 color=color, shade=True)
 
-                # Top Circle
+                # Top Circles
                 circ_x_num = 10
                 circ_r_num = 10
                 rstride = 2
@@ -128,9 +128,9 @@ def plot_and_show_images(leftimage, rightimage, root):
                 circ_y_1 = np.array(circ_y_1)
                 circ_y_2 = np.array(circ_y_2)
                 circ_z_1 = np.full((circ_r_num, circ_x_num), z)
-                circ_z_2 = np.full((circ_r_num, circ_x_num), 0)
+                circ_z_2 = np.full((circ_r_num, circ_x_num), z - top_height)
 
-                # draw
+                # draw top circles
                 ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=alpha, rstride=rstride,
@@ -140,7 +140,52 @@ def plot_and_show_images(leftimage, rightimage, root):
                                 cstride=cstride, color=color, shade=True)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
-    #pack_toolbars(root, canvases)
+
+                # Stem
+                x_num = 50
+                z_step = 0.1
+                rstride = 10
+                cstride = 5
+                cyl_x = np.linspace(x - stem_thickness, x + stem_thickness, x_num)
+                cyl_z = np.arange(0, z - top_height + z_step, z_step)
+                x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
+                y_arc = np.sqrt(np.abs(stem_thickness ** 2 - (abs(x_grid - x)) ** 2))
+                y_grid_1 = y_arc + y
+                y_grid_2 = -y_arc + y
+
+                # Draw stem
+                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
+                                color=color, shade=True)
+                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
+                                color=color, shade=True)
+
+                # stem Circle
+                circ_x_num = 10
+                circ_r_num = 10
+                rstride = 2
+                cstride = 2
+                circ_x = []
+                circ_y_1 = []
+                circ_y_2 = []
+                for sub_r in np.linspace(0, stem_thickness, circ_r_num):
+                    sub_x = np.linspace(x - sub_r, x + sub_r, circ_x_num)
+                    sub_y_arc = np.sqrt(np.abs(sub_r ** 2 - (abs(sub_x - x)) ** 2))
+                    sub_y_1 = sub_y_arc + y
+                    sub_y_2 = -sub_y_arc + y
+                    circ_x.append(sub_x)
+                    circ_y_1.append(sub_y_1)
+                    circ_y_2.append(sub_y_2)
+                circ_x = np.array(circ_x)
+                circ_y_1 = np.array(circ_y_1)
+                circ_y_2 = np.array(circ_y_2)
+                circ_z_1 = np.full((circ_r_num, circ_x_num), 0)
+
+                # draw top circles
+                ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
+                                cstride=cstride, color=color, shade=True)
+                ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=alpha, rstride=rstride,
+                                cstride=cstride, color=color, shade=True)
+
 
 def pack_images(root, figs):
     for slave in root.pack_slaves():
@@ -159,7 +204,3 @@ def pack_images(root, figs):
             canvas.get_tk_widget().pack(side="right")
     return canvases
 
-def pack_toolbars(root, canvases):
-    for canvas in canvases:
-        toolbar = NavigationToolbar2Tk(canvas, root)
-        toolbar.update()
