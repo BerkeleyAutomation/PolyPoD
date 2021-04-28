@@ -25,13 +25,16 @@ garden_z_len = 5
 garden_dimensions = (garden_x_len, garden_y_len, garden_z_len)
 colors_of_plants = ["red", "yellow", "green", "blue"]
 num_plants = 4
-prob_of_plant = 0.05
+prob_of_plant = 0.25
 alpha = 1
 
 # Return random plant radius: for now, just 0.5, but later we can sample from a distribution
 # or something.
 def plant_radius():
-    return 0.5
+    return rng.uniform(0.5, 1)
+
+def plant_height():
+    return rng.integers(garden_z_len)
 
 # Returns plant x, y, z, and radius from an iterator with multi-index, and the value returned by
 # the iterator.
@@ -54,7 +57,7 @@ def generate_random_images():
         for x in it:
             if x == 1:
                 plant_matrix[it.multi_index[0], it.multi_index[1], rng.integers(4)] = \
-                    rng.integers(garden_z_len)
+                    plant_height()
         r.append(plant_matrix)
     return r
 
@@ -87,13 +90,15 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # Cylinder
                 x_num = 50
-                z_step = 1
-                rstride = 20
-                cstride = 10
+                z_step = 0.5
+                rstride = 10
+                cstride = 5
                 cyl_x = np.linspace(x - r, x + r, x_num)
                 cyl_z = np.arange(0, z + z_step, z_step)
                 x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
-                y_arc = np.sqrt(r ** 2 - (abs(x_grid - x)) ** 2)
+                y_arc = np.sqrt(np.abs(r ** 2 - (abs(x_grid - x)) ** 2))
+                print('r ** 2 - (abs(x_grid - x)) ** 2', r ** 2 - (abs(x_grid - x)) ** 2)
+                print('y_arc', y_arc)
                 y_grid_1 = y_arc + y
                 y_grid_2 = -y_arc + y
 
@@ -105,7 +110,7 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # Top Circle
                 circ_x_num = 10
-                circ_r_num = 2
+                circ_r_num = 10
                 rstride = 2
                 cstride = 2
                 circ_x = []
@@ -113,7 +118,7 @@ def plot_and_show_images(leftimage, rightimage, root):
                 circ_y_2 = []
                 for sub_r in np.linspace(0, r, circ_r_num):
                     sub_x = np.linspace(x - sub_r, x + sub_r, circ_x_num)
-                    sub_y_arc = np.sqrt(sub_r ** 2 - (abs(sub_x - x)) ** 2)
+                    sub_y_arc = np.sqrt(np.abs(sub_r ** 2 - (abs(sub_x - x)) ** 2))
                     sub_y_1 = sub_y_arc + y
                     sub_y_2 = -sub_y_arc + y
                     circ_x.append(sub_x)
