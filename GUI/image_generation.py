@@ -36,7 +36,7 @@ def plant_radius():
     return rng.uniform(0.25, 1)
 
 def plant_height():
-    return rng.integers(garden_z_len)
+    return rng.uniform(1, garden_z_len)
 
 # Returns plant x, y, z, and radius from an iterator with multi-index, and the value returned by
 # the iterator.
