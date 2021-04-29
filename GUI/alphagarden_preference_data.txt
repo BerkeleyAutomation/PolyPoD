@@ -1,0 +1,9 @@
+{
+    "data": [
+        {
+            "left": "L",
+            "right": "R",
+            "preference": "left"
+        }
+    ]
+}

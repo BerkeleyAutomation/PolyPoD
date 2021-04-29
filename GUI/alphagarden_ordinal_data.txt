@@ -1,0 +1,12 @@
+{
+    "data": [
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        }
+    ]
+}
