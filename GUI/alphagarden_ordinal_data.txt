@@ -559,6 +559,14 @@
         {
             "image": "R",
             "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }
