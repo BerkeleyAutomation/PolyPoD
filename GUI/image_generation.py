@@ -22,13 +22,13 @@ import mpl_toolkits
 garden_x_len = 10
 garden_y_len = 10
 plant_max_height = 2
-plant_min_height = 0.25
+plant_min_height = 0.5
 garden_dimensions = (garden_x_len, garden_y_len, plant_max_height)
 colors_of_plants = ["gray", "yellow", "green", "blue", "orange", "black", "purple", "pink",
                     "brown", "red"]
 num_plants = 10
 prob_of_plant = 0.1
-alpha = 0.5
+alpha = 1
 plant_height_distribution_params = {}
 for p, r in enumerate(np.linspace(plant_min_height,plant_max_height,num_plants)):
     plant_height_distribution_params[p] = r
@@ -80,7 +80,10 @@ def plot_and_show_images(leftimage, rightimage, root):
     canvases = pack_images(root, figs)
     for fig in figs:
         ax = fig.add_subplot(projection='3d')
-
+        if garden_x_len > garden_y_len:
+            ax.pbaspect = [1.0, garden_y_len / garden_x_len, plant_max_height / garden_x_len]
+        else:
+            ax.pbaspect = [garden_x_len / garden_y_len, 1.0, plant_max_height / garden_x_len]
         """
         # Hide grid lines
         ax.grid(False)
@@ -157,6 +160,8 @@ def plot_and_show_images(leftimage, rightimage, root):
                                 cstride=cstride, color=color, shade=True)
                 ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
+    # scale axis
+    ax.auto_scale_xyz([0, 250], [0, garden_y_len], [0, garden_x_len])
     #pack_toolbars(root, canvases)
 
 def pack_images(root, figs):
