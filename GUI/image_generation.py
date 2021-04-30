@@ -22,29 +22,34 @@ import mpl_toolkits
 garden_x_len = 10
 garden_y_len = 10
 plant_max_height = 2
-plant_min_height = 0.5
+plant_min_height = 0.25
 garden_dimensions = (garden_x_len, garden_y_len, plant_max_height)
-colors_of_plants = ["red", "yellow", "green", "blue"]
+colors_of_plants = ["gray", "yellow", "green", "blue", "orange", "black", "purple", "pink",
+                    "brown", "red"]
 num_plants = 10
-prob_of_plant = 0.25
-alpha = 1
+prob_of_plant = 0.1
+alpha = 0.5
+plant_height_distribution_params = {}
+for p, r in enumerate(np.linspace(plant_min_height,plant_max_height,num_plants)):
+    plant_height_distribution_params[p] = r
 
 # Return random plant radius: for now, just 0.5, but later we can sample from a distribution
 # or something.
-def plant_radius():
-    return rng.uniform(0.25, 1)
+def plant_radius(plant_type, plant_height):
+    return plant_height
 
 def plant_height(plant_type):
-
-    return rng.uniform(plant_min_height, plant_max_height)
+    return plant_height_distribution_params[plant_type]
 
 # Returns plant x, y, z, and radius from an iterator with multi-index, and the value returned by
 # the iterator.
 def get_plant_data(it, p):
-    return it.multi_index[0], it.multi_index[1], p, plant_radius()
+    plant_type = it.multi_index[2]
+    return it.multi_index[0], it.multi_index[1], p, plant_radius(plant_type, p)
 
 # Return color of plant
 def get_plant_color(it):
+    print('plant_index', colors_of_plants[it.multi_index[2]])
     return colors_of_plants[it.multi_index[2]]
 
 def plant_present(p):
@@ -54,13 +59,14 @@ def generate_random_images():
     r = []
     for _ in range(2):
         plant_present = rng.binomial(1, prob_of_plant, [garden_x_len,garden_y_len])
-        plant_matrix = np.zeros((garden_x_len, garden_y_len, num_plants), dtype='int')
+        plant_matrix = np.zeros((garden_x_len, garden_y_len, num_plants), dtype='float')
         it = np.nditer(plant_present, flags=["multi_index"])
         for x in it:
             if x == 1:
                 plant_type = rng.integers(num_plants)
                 plant_matrix[it.multi_index[0], it.multi_index[1], plant_type] = \
                     plant_height(plant_type)
+        print('plant_matrix', plant_matrix)
         r.append(plant_matrix)
     return r
 
@@ -74,6 +80,8 @@ def plot_and_show_images(leftimage, rightimage, root):
     canvases = pack_images(root, figs)
     for fig in figs:
         ax = fig.add_subplot(projection='3d')
+
+        """
         # Hide grid lines
         ax.grid(False)
 
@@ -81,7 +89,7 @@ def plot_and_show_images(leftimage, rightimage, root):
         ax.set_xticks([])
         ax.set_yticks([])
         ax.set_zticks([])
-
+        """
         axes.append(ax)
     for ax in axes:
         #Axes3D only supports aspect arg 'auto'
@@ -101,11 +109,11 @@ def plot_and_show_images(leftimage, rightimage, root):
 
                 # Cylinder
                 x_num = 50
-                z_step = 0.5
+                z_num = 2
                 rstride = 10
                 cstride = 5
                 cyl_x = np.linspace(x - r, x + r, x_num)
-                cyl_z = np.arange(0, z + z_step, z_step)
+                cyl_z = np.linspace(0, z, z_num)
                 x_grid, z_grid = np.meshgrid(cyl_x, cyl_z, sparse=True)
                 y_arc = np.sqrt(np.abs(r ** 2 - (abs(x_grid - x)) ** 2))
                 y_grid_1 = y_arc + y
