@@ -2,7 +2,7 @@
     "data": [
         {
             "image": "L",
-            "rating": "like"
+            "rating": "neutral"
         },
         {
             "image": "R",
@@ -10,15 +10,7 @@
         },
         {
             "image": "L",
-            "rating": "like"
-        },
-        {
-            "image": "R",
             "rating": "neutral"
-        },
-        {
-            "image": "L",
-            "rating": "like"
         },
         {
             "image": "R",
@@ -34,11 +26,11 @@
         },
         {
             "image": "L",
-            "rating": "like"
+            "rating": "neutral"
         },
         {
             "image": "R",
-            "rating": "like"
+            "rating": "neutral"
         },
         {
             "image": "L",
@@ -46,7 +38,23 @@
         },
         {
             "image": "R",
-            "rating": "like"
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }

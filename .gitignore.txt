@@ -1,0 +1,2 @@
+*.txt
+GUI/__pycache__/*
