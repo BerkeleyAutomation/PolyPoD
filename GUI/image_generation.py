@@ -66,7 +66,6 @@ def generate_random_images():
                 plant_type = rng.integers(num_plants)
                 plant_matrix[it.multi_index[0], it.multi_index[1], plant_type] = \
                     plant_height(plant_type)
-        print('plant_matrix', plant_matrix)
         r.append(plant_matrix)
     return r
 
