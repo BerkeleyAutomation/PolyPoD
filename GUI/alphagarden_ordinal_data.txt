@@ -39,6 +39,22 @@
         {
             "image": "R",
             "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }
