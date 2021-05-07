@@ -6,55 +6,31 @@
         },
         {
             "image": "R",
-            "rating": "neutral"
+            "rating": "dislike"
         },
         {
             "image": "L",
-            "rating": "neutral"
+            "rating": "dislike"
         },
         {
             "image": "R",
-            "rating": "neutral"
+            "rating": "like"
         },
         {
             "image": "L",
-            "rating": "neutral"
+            "rating": "like"
         },
         {
             "image": "R",
-            "rating": "neutral"
+            "rating": "dislike"
         },
         {
             "image": "L",
-            "rating": "neutral"
+            "rating": "dislike"
         },
         {
             "image": "R",
-            "rating": "neutral"
-        },
-        {
-            "image": "L",
-            "rating": "neutral"
-        },
-        {
-            "image": "R",
-            "rating": "neutral"
-        },
-        {
-            "image": "L",
-            "rating": "neutral"
-        },
-        {
-            "image": "R",
-            "rating": "neutral"
-        },
-        {
-            "image": "L",
-            "rating": "neutral"
-        },
-        {
-            "image": "R",
-            "rating": "neutral"
+            "rating": "like"
         }
     ]
 }

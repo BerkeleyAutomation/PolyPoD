@@ -12,11 +12,12 @@ import pprint
 import numpy as np
 from numpy.random import default_rng
 rng = default_rng()
-import image_generation
+import display_gardens
 import matplotlib.pyplot as plt
+import sys
 
 class Application(tk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, spg_type):
         # super init and pack
         super().__init__(master)
         self.master = master
@@ -86,17 +87,14 @@ class Application(tk.Frame):
         master.bind('x', self.clear_command)
         master.bind('<space>', self.submit_command)
 
-        # image creation: using image_generation.py
-        self.old_left_image = tk.PhotoImage(file="~/Downloads/sparkle_house.gif")
-        self.old_right_image = tk.PhotoImage(file="~/Downloads/sparkle_house.gif")
+        # image creation: using display_gardens.py
         # image-containing label creation
         self.imagelabel = tk.Label(self)
 
         # all packing
         # imagelabel
         self.imagelabel.pack(side="top")
-        self.leftimage, self.rightimage = image_generation.generate_random_images()
-        image_generation.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
+        # Make the SeedPlacementGenerator and create images with it.
 
         # frames
         self.buttonssubframe.pack(side='bottom')
@@ -219,8 +217,8 @@ class Application(tk.Frame):
             self.prefer_input_to_records(self.preferinput)
             self.input_to_json()
             # pick new images from acquisition function
-            self.leftimage, self.rightimage = image_generation.generate_random_images()
-            image_generation.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
+            self.leftimage, self.rightimage = display_gardens.generate_random_images()
+            display_gardens.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
 
             # clear_command
             self.clear_command()
@@ -228,7 +226,6 @@ class Application(tk.Frame):
         else:
             print("ERROR: Not ready to submit!")
         """
-
 
     def prefer_input_to_records(self, response):
         # Todo: find suitable names for images
@@ -257,7 +254,13 @@ class Application(tk.Frame):
         with open('alphagarden_ordinal_data.txt', 'w') as outfile:
             json.dump(self.ordinalrecords, outfile, indent=4)
 
+    def generate_and_show_images(self, spg):
+        self.leftimage = spg.generate_seed_placement()
+        self.rightimage = spg.generate_seed_placement()
+        display_gardens.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
 
+print('sys.argv', sys.argv)
+spg_type = sys.argv[1]
 root = tk.Tk()
-app = Application(master=root)
+app = Application(master=root, spg_type)
 app.mainloop()

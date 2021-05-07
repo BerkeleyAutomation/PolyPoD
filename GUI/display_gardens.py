@@ -1,6 +1,6 @@
 """
 
-Code that generates images.
+Code that displays gardens
 
 """
 
@@ -20,55 +20,6 @@ import mpl_toolkits
 # plant species. the x dimension specifies plant type, the y and z specify the location of the plant,
 # and the value entry represents the height of the plant.
 
-garden_x_len = 10
-garden_y_len = 10
-plant_max_height = 2
-plant_min_height = 0.5
-garden_dimensions = (garden_x_len, garden_y_len, plant_max_height)
-colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
-                    "#7fae7e", "#455127"]
-num_plants = 10
-prob_of_plant = 0.25
-alpha = 1
-plant_height_distribution_params = {}
-for p, r in enumerate(np.linspace(plant_min_height,plant_max_height,num_plants)):
-    plant_height_distribution_params[p] = r
-
-# Return random plant radius: for now, just 0.5, but later we can sample from a distribution
-# or something.
-def plant_radius(plant_type, plant_height):
-    return plant_height
-
-def plant_height(plant_type):
-    return plant_height_distribution_params[plant_type]
-
-# Returns plant x, y, z, and radius from an iterator with multi-index, and the value returned by
-# the iterator.
-def get_plant_data(it, p):
-    plant_type = it.multi_index[2]
-    return it.multi_index[0], it.multi_index[1], p, plant_radius(plant_type, p)
-
-# Return color of plant
-def get_plant_color(it):
-    return colors_of_plants[it.multi_index[2]]
-
-def plant_present(p):
-    return not(p == 0)
-
-def generate_random_images():
-    r = []
-    for _ in range(2):
-        plant_present = rng.binomial(1, prob_of_plant, [garden_x_len,garden_y_len])
-        plant_matrix = np.zeros((garden_x_len, garden_y_len, num_plants), dtype='float')
-        it = np.nditer(plant_present, flags=["multi_index"])
-        for x in it:
-            if x == 1:
-                plant_type = rng.integers(num_plants)
-                plant_matrix[it.multi_index[0], it.multi_index[1], plant_type] = \
-                    plant_height(plant_type)
-        r.append(plant_matrix)
-    return r
-
 def plot_and_show_images(leftimage, rightimage, root):
     images_to_process = [leftimage, rightimage]
     figs = []
@@ -79,10 +30,12 @@ def plot_and_show_images(leftimage, rightimage, root):
     canvases = pack_images(root, figs)
     for fig in figs:
         ax = fig.add_subplot(projection='3d')
-        if garden_x_len > garden_y_len:
-            ax.pbaspect = [1.0, garden_y_len / garden_x_len, plant_max_height / garden_x_len]
+        if leftimage.garden_x_len > leftimage.garden_y_len:
+            ax.pbaspect = [1.0, leftimage.garden_y_len / leftimage.garden_x_len, 
+                           leftimage.plant_max_height / leftimage.garden_x_len]
         else:
-            ax.pbaspect = [garden_x_len / garden_y_len, 1.0, plant_max_height / garden_x_len]
+            ax.pbaspect = [leftimage.garden_x_len / leftimage.garden_y_len, 1.0, 
+                           leftimage.plant_max_height / leftimage.garden_x_len]
 
         # Hide grid lines
         ax.grid(False)
@@ -96,18 +49,18 @@ def plot_and_show_images(leftimage, rightimage, root):
     for ax in axes:
         #Axes3D only supports aspect arg 'auto'
         #ax.set_aspect(aspect=1)
-        ax.set_xlim(left=-1, right=garden_x_len)
-        ax.set_ylim(bottom=-1, top=garden_y_len)
-        ax.set_zlim(bottom=0, top=plant_max_height)
+        ax.set_xlim(left=-1, right=leftimage.garden_x_len)
+        ax.set_ylim(bottom=-1, top=leftimage.garden_y_len)
+        ax.set_zlim(bottom=0, top=leftimage.plant_max_height)
     for _ in range(len(images_to_process)):
-        img = images_to_process.pop()
+        img = images_to_process.pop().seed_placement
         ax = axes.pop()
 
         it = np.nditer(img, flags=["multi_index", "refs_ok"])
         for p in it:
-            if plant_present(p):
-                x, y, z, r = get_plant_data(it, p)
-                color = get_plant_color(it)
+            if leftimage.plant_present(p):
+                x, y, z, r = leftimage.get_plant_data(it, p)
+                color = leftimage.get_plant_color(it)
 
                 # Cylinder
                 x_num = 50
@@ -123,10 +76,10 @@ def plot_and_show_images(leftimage, rightimage, root):
 
 
                 # Draw parameters
-                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
-                                color=color, shade=True, antialiased=False)
-                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=alpha, rstride=rstride, cstride=cstride,
-                                color=color, shade=True, antialiased=False)
+                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=leftimage.alpha, rstride=rstride, 
+                                cstride=cstride, color=color, shade=True, antialiased=False)
+                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=leftimage.alpha, rstride=rstride, 
+                                cstride=cstride, color=color, shade=True, antialiased=False)
 
                 # Top Circle
                 circ_x_num = 10
@@ -151,17 +104,18 @@ def plot_and_show_images(leftimage, rightimage, root):
                 circ_z_2 = np.full((circ_r_num, circ_x_num), 0)
 
                 # draw
-                ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=leftimage.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
-                ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=leftimage.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
 
-                ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=leftimage.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
-                ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=leftimage.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
         # Plot the soil
-        vertices1 = [[(0,0,0), (garden_x_len, 0,0), (garden_x_len, garden_y_len, 0)]]
+        vertices1 = [[(0,0,0), (leftimage.garden_x_len, 0,0), (leftimage.garden_x_len,
+                                                               leftimage.garden_y_len, 0)]]
         poly1 = Poly3DCollection(vertices1, alpha=1, color="#7c5e42")
         ax.add_collection3d(poly1)
 
@@ -181,8 +135,3 @@ def pack_images(root, figs):
         else:
             canvas.get_tk_widget().pack(side="right")
     return canvases
-
-def pack_toolbars(root, canvases):
-    for canvas in canvases:
-        toolbar = NavigationToolbar2Tk(canvas, root)
-        toolbar.update()
