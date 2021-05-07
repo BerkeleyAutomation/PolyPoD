@@ -30,4 +30,3 @@ class RandomSeedPlacementGenerator(SeedPlacementGenerator.SeedPlacementGenerator
                     sp.plant_height(plant_type)
         sp.set_seed_placement(plant_matrix)
         return sp
-
