@@ -1,26 +1,45 @@
-import SeedPlacementGenerator
+from SeedPlacementGenerators import SeedPlacementGenerator
+import SeedPlacement
 import numpy as np
 from numpy.random import default_rng
 rng = default_rng()
+import garden_constants
+import argparse
 
 
-class RandomSeedPlacementGenerator(SeedPlacementGenerator):
+class RandomSeedPlacementGenerator(SeedPlacementGenerator.SeedPlacementGenerator):
+    default_prob_of_plant = 0.25
     def __init__(self, *args, **kwargs):
         super().__init__()
-        assert (len(kwargs) == 1)
-        assert ('prob_of_plant' in kwargs.keys())
-        self.prob_of_plant = kwargs['prob_of_plant']
+        print('in random spg init')
+        print('args', args)
+        print('kwargs', kwargs)
+        assert False
+        if 'prob_of_plant' in kwargs.keys():
+            self.prob_of_plant = kwargs['prob_of_plant']
+        else:
+            self.prob_of_plant = self.default_prob_of_plant
 
-    def generate_seed_placement(self, *args, **kwargs):
-        r = []
-        for _ in range(2):
-            plant_present = rng.binomial(1, self.prob_of_plant, [self.garden_x_len, self.garden_y_len])
-            plant_matrix = np.zeros((self.garden_x_len, self.garden_y_len, self.num_plants), dtype='float')
-            it = np.nditer(plant_present, flags=["multi_index"])
-            for x in it:
-                if x == 1:
-                    plant_type = rng.integers(self.num_plants)
-                    plant_matrix[it.multi_index[0], it.multi_index[1], plant_type] = \
-                        self.plant_height(plant_type)
-            r.append(SeedPlacementGenerator.SeedPlacementGenerator(plant_matrix))
-        return r
+    def generate_seed_placement(self):
+        sp = SeedPlacement.SeedPlacement()
+        plant_present = rng.binomial(1, self.prob_of_plant, [garden_constants.garden_x_len,
+                                                             garden_constants.garden_y_len])
+        plant_matrix = np.zeros((garden_constants.garden_x_len, garden_constants.garden_y_len,
+                                 garden_constants.num_plants), dtype='float')
+        it = np.nditer(plant_present, flags=["multi_index"])
+        for x in it:
+            if x == 1:
+                plant_type = rng.integers(garden_constants.num_plants)
+                plant_matrix[it.multi_index[0], it.multi_index[1], plant_type] = \
+                    sp.plant_height(plant_type)
+        sp.set_seed_placement(plant_matrix)
+        return sp
+
+    """
+    @classmethod
+    def unpack_args(cls, clargs):
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--prob_of_plant", "-p", help="probability of plant appearing in each vertex")
+        args = parser.parse_args(clargs)
+        return args
+    """

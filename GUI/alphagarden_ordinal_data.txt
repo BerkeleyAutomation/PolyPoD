@@ -31,6 +31,46 @@
         {
             "image": "R",
             "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "dislike"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "dislike"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }

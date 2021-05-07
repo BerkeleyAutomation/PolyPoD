@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib.backend_bases import key_press_handler
 import mpl_toolkits
+import garden_constants
 
 # Generates random 4x10x10 (plant_max_height by g...) images of dots and cirles, representing a 10x10 garden with 4 different
 # plant species. the x dimension specifies plant type, the y and z specify the location of the plant,
@@ -30,12 +31,12 @@ def plot_and_show_images(leftimage, rightimage, root):
     canvases = pack_images(root, figs)
     for fig in figs:
         ax = fig.add_subplot(projection='3d')
-        if leftimage.garden_x_len > leftimage.garden_y_len:
-            ax.pbaspect = [1.0, leftimage.garden_y_len / leftimage.garden_x_len, 
-                           leftimage.plant_max_height / leftimage.garden_x_len]
+        if garden_constants.garden_x_len > garden_constants.garden_y_len:
+            ax.pbaspect = [1.0, garden_constants.garden_y_len / garden_constants.garden_x_len,
+                           garden_constants.plant_max_height / garden_constants.garden_x_len]
         else:
-            ax.pbaspect = [leftimage.garden_x_len / leftimage.garden_y_len, 1.0, 
-                           leftimage.plant_max_height / leftimage.garden_x_len]
+            ax.pbaspect = [garden_constants.garden_x_len / garden_constants.garden_y_len, 1.0,
+                           garden_constants.plant_max_height / garden_constants.garden_x_len]
 
         # Hide grid lines
         ax.grid(False)
@@ -49,18 +50,21 @@ def plot_and_show_images(leftimage, rightimage, root):
     for ax in axes:
         #Axes3D only supports aspect arg 'auto'
         #ax.set_aspect(aspect=1)
-        ax.set_xlim(left=-1, right=leftimage.garden_x_len)
-        ax.set_ylim(bottom=-1, top=leftimage.garden_y_len)
-        ax.set_zlim(bottom=0, top=leftimage.plant_max_height)
+        ax.set_xlim(left=-1, right=garden_constants.garden_x_len)
+        ax.set_ylim(bottom=-1, top=garden_constants.garden_y_len)
+        ax.set_zlim(bottom=0, top=garden_constants.plant_max_height)
     for _ in range(len(images_to_process)):
-        img = images_to_process.pop().seed_placement
-        ax = axes.pop()
 
-        it = np.nditer(img, flags=["multi_index", "refs_ok"])
+        #print('images_to_process', images_to_process)
+        img = images_to_process.pop()
+        #print('img', img)
+        #print('images_to_process', images_to_process)
+        ax = axes.pop()
+        it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
         for p in it:
-            if leftimage.plant_present(p):
-                x, y, z, r = leftimage.get_plant_data(it, p)
-                color = leftimage.get_plant_color(it)
+            if img.plant_present(p):
+                x, y, z, r = img.get_plant_data(it, p)
+                color = img.get_plant_color(it)
 
                 # Cylinder
                 x_num = 50
@@ -74,11 +78,10 @@ def plot_and_show_images(leftimage, rightimage, root):
                 y_grid_1 = y_arc + y
                 y_grid_2 = -y_arc + y
 
-
                 # Draw parameters
-                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=leftimage.alpha, rstride=rstride, 
+                ax.plot_surface(x_grid, y_grid_1, z_grid, alpha=garden_constants.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True, antialiased=False)
-                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=leftimage.alpha, rstride=rstride, 
+                ax.plot_surface(x_grid, y_grid_2, z_grid, alpha=garden_constants.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True, antialiased=False)
 
                 # Top Circle
@@ -104,18 +107,18 @@ def plot_and_show_images(leftimage, rightimage, root):
                 circ_z_2 = np.full((circ_r_num, circ_x_num), 0)
 
                 # draw
-                ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=leftimage.alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_1, circ_z_1, alpha=garden_constants.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
-                ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=leftimage.alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_2, circ_z_1, alpha=garden_constants.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
 
-                ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=leftimage.alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_1, circ_z_2, alpha=garden_constants.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
-                ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=leftimage.alpha, rstride=rstride,
+                ax.plot_surface(circ_x, circ_y_2, circ_z_2, alpha=garden_constants.alpha, rstride=rstride,
                                 cstride=cstride, color=color, shade=True)
         # Plot the soil
-        vertices1 = [[(0,0,0), (leftimage.garden_x_len, 0,0), (leftimage.garden_x_len,
-                                                               leftimage.garden_y_len, 0)]]
+        vertices1 = [[(0,0,0), (garden_constants.garden_x_len, 0,0), (garden_constants.garden_x_len,
+                                                               garden_constants.garden_y_len, 0)]]
         poly1 = Poly3DCollection(vertices1, alpha=1, color="#7c5e42")
         ax.add_collection3d(poly1)
 

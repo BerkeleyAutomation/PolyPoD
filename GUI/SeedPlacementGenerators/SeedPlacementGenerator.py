@@ -1,11 +1,15 @@
-from abc import ABC, abstractmethod
 import SeedPlacement
 
-class SeedPlacementGenerator(ABC, SeedPlacement):
+class SeedPlacementGenerator:
     def __init__(self, *args, **kwargs):
         super().__init__()
 
-    @abstractmethod
-    def generate_seed_placement(self, *args, **kwargs):
-        pass
+    def generate_seed_placement(self):
+        print("This SPG didn't override generate_seed_placement!")
+        raise AttributeError
+
+    @classmethod
+    def unpack_args(cls, clargs):
+        print("This SPG didn't override unpack_args!")
+        raise AttributeError
 

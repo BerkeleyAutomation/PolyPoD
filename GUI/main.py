@@ -10,14 +10,17 @@ import json
 import os
 import pprint
 import numpy as np
-from numpy.random import default_rng
-rng = default_rng()
-import display_gardens
 import matplotlib.pyplot as plt
 import sys
+import display_gardens
+import SeedPlacementGenerators.RandomSeedPlacementGenerator as random_spg
+from numpy.random import default_rng
+rng = default_rng()
+import argparse
+
 
 class Application(tk.Frame):
-    def __init__(self, master=None, spg_type):
+    def __init__(self, spg_type, spg_args, master=None):
         # super init and pack
         super().__init__(master)
         self.master = master
@@ -95,7 +98,15 @@ class Application(tk.Frame):
         # imagelabel
         self.imagelabel.pack(side="top")
         # Make the SeedPlacementGenerator and create images with it.
+        self.spg_args = spg_args.split()
+        for x in self.spg_args:
+            print(x)
+        if spg_type == 'random':
+            self.spg = random_spg.RandomSeedPlacementGenerator(*self.spg_args)
+        else:
+            raise AttributeError("Invalid spg_type")
 
+        self.generate_and_show_images(self.spg, spg_args, spg_kwargs)
         # frames
         self.buttonssubframe.pack(side='bottom')
         self.leftsubframe.pack(side='left')
@@ -217,8 +228,7 @@ class Application(tk.Frame):
             self.prefer_input_to_records(self.preferinput)
             self.input_to_json()
             # pick new images from acquisition function
-            self.leftimage, self.rightimage = display_gardens.generate_random_images()
-            display_gardens.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
+            self.generate_and_show_images(self.spg, self.spg_args, self.spg_kwargs)
 
             # clear_command
             self.clear_command()
@@ -254,13 +264,24 @@ class Application(tk.Frame):
         with open('alphagarden_ordinal_data.txt', 'w') as outfile:
             json.dump(self.ordinalrecords, outfile, indent=4)
 
-    def generate_and_show_images(self, spg):
-        self.leftimage = spg.generate_seed_placement()
-        self.rightimage = spg.generate_seed_placement()
+    def generate_and_show_images(self, spg, spg_args, spg_kwargs):
+        self.leftimage = spg.generate_seed_placement(spg_args, spg_kwargs)
+        self.rightimage = spg.generate_seed_placement(spg_args, spg_kwargs)
         display_gardens.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
 
-print('sys.argv', sys.argv)
-spg_type = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("--spgtype", "-t", help="type of seed placement generator: random, old")
+parser.add_argument("--spgargs", "-a", help="args to input to seed placement generator, all input into"
+                                            "a string")
+# Read arguments from the command line
+args = parser.parse_args()
+
+print('in main.py')
+if args.spgtype:
+    print('spgtype', args.spgtype)
+if args.spgargs:
+    print('spgargs', args.spgargs)
+
 root = tk.Tk()
-app = Application(master=root, spg_type)
+app = Application(args.spgtype, args.spgargs, master=root)
 app.mainloop()
