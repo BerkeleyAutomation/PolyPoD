@@ -8,8 +8,4 @@ class SeedPlacementGenerator:
         print("This SPG didn't override generate_seed_placement!")
         raise AttributeError
 
-    @classmethod
-    def unpack_args(cls, clargs):
-        print("This SPG didn't override unpack_args!")
-        raise AttributeError
 

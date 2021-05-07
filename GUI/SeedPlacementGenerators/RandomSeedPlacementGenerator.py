@@ -11,10 +11,6 @@ class RandomSeedPlacementGenerator(SeedPlacementGenerator.SeedPlacementGenerator
     default_prob_of_plant = 0.25
     def __init__(self, *args, **kwargs):
         super().__init__()
-        print('in random spg init')
-        print('args', args)
-        print('kwargs', kwargs)
-        assert False
         if 'prob_of_plant' in kwargs.keys():
             self.prob_of_plant = kwargs['prob_of_plant']
         else:
@@ -35,11 +31,3 @@ class RandomSeedPlacementGenerator(SeedPlacementGenerator.SeedPlacementGenerator
         sp.set_seed_placement(plant_matrix)
         return sp
 
-    """
-    @classmethod
-    def unpack_args(cls, clargs):
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--prob_of_plant", "-p", help="probability of plant appearing in each vertex")
-        args = parser.parse_args(clargs)
-        return args
-    """
