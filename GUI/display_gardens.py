@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib.backend_bases import key_press_handler
 import mpl_toolkits
+import plotly.graph_objects as go
 import garden_constants
 
 # Generates random 4x10x10 (plant_max_height by g...) images of dots and cirles, representing a 10x10 garden with 4 different
@@ -54,11 +55,7 @@ def plot_and_show_images(leftimage, rightimage, root):
         ax.set_ylim(bottom=-1, top=garden_constants.garden_y_len)
         ax.set_zlim(bottom=0, top=garden_constants.plant_max_height)
     for _ in range(len(images_to_process)):
-
-        #print('images_to_process', images_to_process)
         img = images_to_process.pop()
-        #print('img', img)
-        #print('images_to_process', images_to_process)
         ax = axes.pop()
         it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
         for p in it:
@@ -119,7 +116,7 @@ def plot_and_show_images(leftimage, rightimage, root):
         # Plot the soil
         vertices1 = [[(0,0,0), (garden_constants.garden_x_len, 0,0), (garden_constants.garden_x_len,
                                                                garden_constants.garden_y_len, 0)]]
-        poly1 = Poly3DCollection(vertices1, alpha=1, color="#7c5e42")
+        poly1 = Poly3DCollection(vertices1, alpha=1, color=garden_constants.soil_color)
         ax.add_collection3d(poly1)
 
 def pack_images(root, figs):

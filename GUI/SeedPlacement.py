@@ -16,8 +16,8 @@ class SeedPlacement:
     def plant_height(self, plant_type):
         return garden_constants.plant_height_distribution_params[plant_type]
 
-    # Returns plant x, y, z, and radius from an iterator with multi-index, and the value returned by
-    # the iterator.
+    # Returns plant x, y, z, and radius from an iterator over the plant seed placement matrix
+    # with multi-index, and the value returned by the iterator.
     def get_plant_data(self, it, p):
         plant_type = it.multi_index[2]
         return it.multi_index[0], it.multi_index[1], p, self.plant_radius(plant_type, p)
