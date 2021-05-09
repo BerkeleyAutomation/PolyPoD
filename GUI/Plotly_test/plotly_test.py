@@ -37,6 +37,13 @@ to_plot = []
 spg = RandomSeedPlacementGenerator.RandomSeedPlacementGenerator(prob_of_plant=0.05)
 img = spg.generate_seed_placement()
 it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
+
+contours = go.surface.Contours(
+            x=go.surface.contours.X(highlight=False),
+            y=go.surface.contours.Y(highlight=False),
+            z=go.surface.contours.Z(highlight=False),
+        )
+
 for p in it:
     if img.plant_present(p):
         x, y, h, r = img.get_plant_data(it, p)
@@ -48,18 +55,25 @@ for p in it:
         xcircl, ycircl, zcircl = boundary_circle(r, 0, x, y)
         xcirch, ycirch, zcirch = boundary_circle(r, h, x, y)
 
+
         cyl = go.Surface(x=xc, y=yc, z=zc,
                          colorscale=colorscale,
                          showscale=False,
-                         opacity=1)
+                         opacity=1,
+                         hoverinfo='none',
+                         contours=contours)
         circl = go.Surface(x=xcircl, y=ycircl, z=zcircl,
                            colorscale=colorscale,
                            showscale=False,
-                           opacity=1)
+                           opacity=1,
+                           hoverinfo='none',
+                           contours=contours)
         circh = go.Surface(x=xcirch, y=ycirch, z=zcirch,
                            colorscale=colorscale,
                            showscale=False,
-                           opacity=1)
+                           opacity=1,
+                           hoverinfo='none',
+                           contours=contours)
         to_plot.extend([cyl, circl, circh])
 
 x_soil = np.array([[0, 10], [0, 10]])
@@ -68,15 +82,41 @@ z_soil = np.array([[0,0], [0,0]])
 soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
                  colorscale=colorscale,
                  showscale=False,
-                 opacity=1)
+                 opacity=1,
+                 hoverinfo='none',
+                  contours=contours)
 to_plot.append(soil)
 
-layout = go.Layout(scene_xaxis_visible=True,
+scene=go.layout.Scene(
+        xaxis=go.layout.scene.XAxis(
+            spikecolor='#1fe5bd',
+            showspikes=False,
+            spikethickness=0,
+        ),
+        yaxis=go.layout.scene.YAxis(
+            spikecolor='#1fe5bd',
+            showspikes=False,
+            spikethickness=0,
+        ),
+        zaxis=go.layout.scene.ZAxis(
+            spikecolor='#1fe5bd',
+            showspikes=False,
+            spikethickness=0,
+        )
+)
+layout = go.Layout(scene=scene,
+                   hovermode=False,
+                   scene_xaxis_visible=True,
                    scene_yaxis_visible=True,
                    scene_zaxis_visible=True)
 fig = go.Figure(data=to_plot, layout=layout)
-
-fig.update_layout(scene_camera_eye_z= 0.55)
+fig.update_traces(hoverinfo='none')
+fig.update_traces(contours_x_show=False)
+fig.update_traces(contours_y_show=False)
+fig.update_traces(contours_z_show=False)
+fig.update_layout(spikedistance=0)
+fig.update_layout(hoverdistance=0)
+fig.update_layout(scene_camera_eye_z=0.55)
 fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
 fig.show()
