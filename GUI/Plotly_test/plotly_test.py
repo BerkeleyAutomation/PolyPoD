@@ -80,7 +80,7 @@ x_soil = np.array([[0, 10], [0, 10]])
 y_soil = np.array([[0, 0], [10, 10]])
 z_soil = np.array([[0,0], [0,0]])
 soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
-                 colorscale=colorscale,
+                 colorscale=make_colorscale(garden_constants.soil_color),
                  showscale=False,
                  opacity=1,
                  hoverinfo='none',
@@ -105,17 +105,11 @@ scene=go.layout.Scene(
         )
 )
 layout = go.Layout(scene=scene,
-                   hovermode=False,
                    scene_xaxis_visible=True,
                    scene_yaxis_visible=True,
                    scene_zaxis_visible=True)
 fig = go.Figure(data=to_plot, layout=layout)
 fig.update_traces(hoverinfo='none')
-fig.update_traces(contours_x_show=False)
-fig.update_traces(contours_y_show=False)
-fig.update_traces(contours_z_show=False)
-fig.update_layout(spikedistance=0)
-fig.update_layout(hoverdistance=0)
 fig.update_layout(scene_camera_eye_z=0.55)
 fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
