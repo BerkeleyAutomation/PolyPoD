@@ -31,11 +31,18 @@ def hypersphere_surface_sample(center,radius,k=1):
     p = center + np.multiply(vec, radius)
     return p
 
+def uniform_sample(ndim, dims):
+    return np.random.uniform(np.zeros(ndim), dims)
 
 def squared_distance(p0, p1):
     return np.sum(np.square(p0-p1))
 
-def Bridson_sampling(dims=np.array([1.0,1.0]), radius=default_radius, k=30, hypersphere_sample=hypersphere_volume_sample):
+# returns (x, y) tuple and radius of plant
+def get_point_info(p):
+    return p[0], p[1]
+
+def Bridson_sampling(dims=np.array([1.0,1.0]), radius=default_radius, k=30,
+                     sample=uniform_sample):
     # References: Fast Poisson Disk Sampling in Arbitrary Dimensions
     #             Robert Bridson, SIGGRAPH, 2007
 
@@ -43,14 +50,6 @@ def Bridson_sampling(dims=np.array([1.0,1.0]), radius=default_radius, k=30, hype
 
     # size of the sphere from which the samples are drawn relative to the size of a disc (radius)
     sample_factor = 2
-    if hypersphere_sample == hypersphere_volume_sample:
-        sample_factor = 2
-        
-    # for the surface sampler, all new points are almost exactly 1 radius away from at least one existing sample
-    # eps to avoid rejection
-    if hypersphere_sample == hypersphere_surface_sample:
-        eps = 0.001
-        sample_factor = 1 + eps
     
     def in_limits(p):
         return np.all(np.zeros(ndim) <= p) and np.all(p < dims)
@@ -72,28 +71,19 @@ def Bridson_sampling(dims=np.array([1.0,1.0]), radius=default_radius, k=30, hype
     
     def add_point(p):
         points.append(p)
-        indices = (p/cellsize).astype(int)
-        P[tuple(indices)] = p
 
     cellsize = radius/np.sqrt(ndim)
     gridsize = (np.ceil(dims/cellsize)).astype(int)
 
-    # Squared radius because we'll compare squared distance
-    squared_radius = radius*radius
-
-    # Positions of cells
-    P = np.empty(np.append(gridsize, ndim), dtype=np.float32) #n-dim value for each grid cell
-    # Initialise empty cells with NaNs
-    P.fill(np.nan)
+    blocked = np.fill()
 
     points = []
-    add_point(np.random.uniform(np.zeros(ndim), dims))
+    add_point(uniform_sample(ndim, dims))
     while len(points):
         i = np.random.randint(len(points))
         p = points[i]
         del points[i]
-        Q = hypersphere_sample(np.array(p), radius * sample_factor, k)
-        for q in Q:
-            if in_limits(q) and not in_neighborhood(q):
-                add_point(q)
-    return P[~np.isnan(P).any(axis=ndim)]
+        q = sample(ndim, dims)
+        if in_limits(q) and not in_neighborhood(q):
+            add_point(q)
+    return points
