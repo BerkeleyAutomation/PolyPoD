@@ -102,15 +102,17 @@ scene=go.layout.Scene(
             spikecolor='#1fe5bd',
             showspikes=False,
             spikethickness=0,
-        )
+        ),
+        aspectmode='data'
 )
 layout = go.Layout(scene=scene,
-                   scene_xaxis_visible=True,
-                   scene_yaxis_visible=True,
-                   scene_zaxis_visible=True)
+                   scene_xaxis_visible=False,
+                   scene_yaxis_visible=False,
+                   scene_zaxis_visible=False)
 fig = go.Figure(data=to_plot, layout=layout)
 fig.update_traces(hoverinfo='none')
 fig.update_layout(scene_camera_eye_z=0.55)
+
 fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
 fig.show()
