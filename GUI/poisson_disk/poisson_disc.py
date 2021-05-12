@@ -8,9 +8,16 @@
 
 import numpy as np
 from scipy.special import gammainc
+import garden_constants
 
 default_radius = 0.05
-# Uniform sampling in a hyperspere
+num_of_each_plant = np.full(garden_constants.num_plants, 2)
+
+
+def plant_height(self, plant_type):
+    return garden_constants.plant_height_distribution_params[plant_type]
+
+# Uniform sampling in a hypersphere
 # Based on Matlab implementation by Roger Stafford
 # Can be optimized for Bridson algorithm by excluding all points within the r/2 sphere
 def hypersphere_volume_sample(center,radius,k=1):
@@ -69,20 +76,36 @@ def Bridson_sampling(dims=np.array([1.0,1.0]), radius=default_radius, k=30,
         if np.any(np.sum(np.square(p - P[tuple(a)]), axis=ndim) < squared_radius):
             return True
     
-    def add_point(p):
-        points.append(p)
+    def add_point(x, y, r):
+        points[x, y] = [1.0, x * cellsize, y * cellsize, r]
+
+    def next_point():
+        candidates = points[~np.isnan(points[:,:,0])][:,1:]
+        return candidates[np.random.randint(candidates.shape[0])]
 
     cellsize = radius/np.sqrt(ndim)
     gridsize = (np.ceil(dims/cellsize)).astype(int)
 
-    blocked = np.fill()
+    # points stores point locations:
+    # points[x, y] = [b, x, y, r]
+    # b = 1 if plant here, np.nan if not. cart_x, cart_y are location of plant in
+    # standard coordinates,
+    # r is inhibitive radius of plant. b, cart_x, cart_y, r are all False if there is no
+    # plant at x, y.
+    points = np.full(np.append(gridsize, ndim + 2), np.nan, dtype=np.float32) #n-dim value for each grid cell
 
-    points = []
-    add_point(uniform_sample(ndim, dims))
-    while len(points):
-        i = np.random.randint(len(points))
-        p = points[i]
-        del points[i]
+    it = np.nditer(points, flags=["multi_index", "refs_ok"])
+    for p in it:
+        if it.multi_index[2] == 1:
+            points[it.multi_index] = it.multi_index[0]
+        elif it.multi_index[2] == 2:
+            points[it.multi_index] = it.multi_index[1]
+    x, y = uniform_sample(ndim, dims)
+    plant_index = garden_constants.num_plants - 1
+    add_point(x, y, plant_height(plant_index))
+
+    while np.any(~np.isnan(points[:,:,0])) and plant_index >= 0:
+        i = next_point()
         q = sample(ndim, dims)
         if in_limits(q) and not in_neighborhood(q):
             add_point(q)
