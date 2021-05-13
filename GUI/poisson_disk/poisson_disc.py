@@ -9,12 +9,11 @@
 import numpy as np
 from scipy.special import gammainc
 import garden_constants
+import math
+from numpy.random import default_rng
+rng = default_rng()
 
-default_radius = 0.05
-num_of_each_plant = np.full(garden_constants.num_plants, 2)
-
-
-def plant_height(self, plant_type):
+def plant_radius(plant_type):
     return garden_constants.plant_height_distribution_params[plant_type]
 
 # Uniform sampling in a hypersphere
@@ -39,74 +38,79 @@ def hypersphere_surface_sample(center,radius,k=1):
     return p
 
 def uniform_sample(ndim, dims):
-    return np.random.uniform(np.zeros(ndim), dims)
+    s = rng.integers(dims)
+    return s
 
 def squared_distance(p0, p1):
     return np.sum(np.square(p0-p1))
 
-# returns (x, y) tuple and radius of plant
-def get_point_info(p):
-    return p[0], p[1]
 
-def Bridson_sampling(dims=np.array([1.0,1.0]), radius=default_radius, k=30,
-                     sample=uniform_sample):
-    # References: Fast Poisson Disk Sampling in Arbitrary Dimensions
-    #             Robert Bridson, SIGGRAPH, 2007
-
+def vrpd(dims, num_of_each_plant, plant_radii, cellsize):
+    dims = (dims / cellsize).astype(int)
     ndim=dims.size
-
-    # size of the sphere from which the samples are drawn relative to the size of a disc (radius)
-    sample_factor = 2
-    
-    def in_limits(p):
-        return np.all(np.zeros(ndim) <= p) and np.all(p < dims)
-
-    # Check if there are samples closer than "squared_radius" to the candidate "p"
-    def in_neighborhood(p, n=2):
-        indices = (p / cellsize).astype(int)
-        indmin = np.maximum(indices - n, np.zeros(ndim, dtype=int))
-        indmax = np.minimum(indices + n + 1, gridsize)
-        
-        # Check if the center cell is empty
-        if not np.isnan(P[tuple(indices)][0]):
-            return True
-        a = []
-        for i in range(ndim):
-            a.append(slice(indmin[i], indmax[i]))
-        if np.any(np.sum(np.square(p - P[tuple(a)]), axis=ndim) < squared_radius):
-            return True
-    
-    def add_point(x, y, r):
-        points[x, y] = [1.0, x * cellsize, y * cellsize, r]
-
-    def next_point():
-        candidates = points[~np.isnan(points[:,:,0])][:,1:]
-        return candidates[np.random.randint(candidates.shape[0])]
-
-    cellsize = radius/np.sqrt(ndim)
-    gridsize = (np.ceil(dims/cellsize)).astype(int)
+    def next_point(plant_type):
+        r = plant_radius(plant_type)
+        criteria = (np.isnan(plant_map(points)) & (cp_map(points) <= r))
+        candidates = points[criteria]
+        if len(candidates) == 0:
+            return False
+        choice = candidates[rng.integers(candidates.shape[0])]
+        add_point(point_coords(choice), r)
+        return True
+    def add_point(choice, r):
+        x, y = choice
+        pl = point_list(points)
+        for p in pl:
+            px, py = point_coords(p)
+            d = math.dist(choice, [px, py])
+            if d < cp(p):
+                set_cp(px, py, d)
+            if d < r:
+                mark_blocked(px, py)
+        mark_plant(x, y)
 
     # points stores point locations:
-    # points[x, y] = [b, x, y, r]
-    # b = 1 if plant here, np.nan if not. cart_x, cart_y are location of plant in
-    # standard coordinates,
-    # r is inhibitive radius of plant. b, cart_x, cart_y, r are all False if there is no
-    # plant at x, y.
-    points = np.full(np.append(gridsize, ndim + 2), np.nan, dtype=np.float32) #n-dim value for each grid cell
-
+    # points[x, y] = [b, x, y, cp]
+    # b = 1.0 if plant here, 2.0 if point is blocked, np.nan if no plant.
+    # x, y is loc of plant
+    # cp is distanct to closest plant
+    points = np.full(np.append(dims, ndim + 2), np.nan, dtype=np.float32)
     it = np.nditer(points, flags=["multi_index", "refs_ok"])
     for p in it:
         if it.multi_index[2] == 1:
             points[it.multi_index] = it.multi_index[0]
         elif it.multi_index[2] == 2:
             points[it.multi_index] = it.multi_index[1]
+    def plant_map(points):
+        return points[:,:,0]
+    def point_coords(p):
+        return p[1:3]
+    def cp(p):
+        return p[2]
+    def set_cp(x, y, cp):
+        points[int(x), int(y), 2] = cp
+    def mark_plant(x, y):
+        points[int(x), int(y), 0] = 1.0
+    def mark_blocked(x, y):
+        points[int(x), int(y), 0] = 2.0
+    def cp_map(points):
+        return points[:,:,3]
+    def point_list(points):
+        return points.reshape(points.shape[0] * points.shape[1], points.shape[2])
+
     x, y = uniform_sample(ndim, dims)
     plant_index = garden_constants.num_plants - 1
-    add_point(x, y, plant_height(plant_index))
+    add_point([x, y], plant_radius(plant_index))
+    while plant_index >= 0:
+        for _ in range(num_of_each_plant[plant_index]):
+            n = next_point(plant_index)
+            if not n:
+                break
+        plant_index -= 1
 
-    while np.any(~np.isnan(points[:,:,0])) and plant_index >= 0:
-        i = next_point()
-        q = sample(ndim, dims)
-        if in_limits(q) and not in_neighborhood(q):
-            add_point(q)
-    return points
+    # to cartesian
+    plant_map = plant_map(points)
+    final_points = points[plant_map == 1.0]
+    final_points = np.array([point_coords(x) for x in final_points]) * cellsize
+    return final_points
+
