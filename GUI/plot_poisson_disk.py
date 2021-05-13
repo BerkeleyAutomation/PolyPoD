@@ -13,7 +13,7 @@ ax = plt.gca()
 for p in data:
     loc, plant_index = p
     r = garden_constants.plant_height_distribution_params[plant_index]
-    color = garden_constants.colors_of_plants[int(plant_index)]
+    color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
     ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
 locdata = np.array([x[0] for x in data])
 datax, datay = locdata[:,0], locdata[:,1]
