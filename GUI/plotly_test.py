@@ -3,6 +3,8 @@ import numpy as np
 from SeedPlacementGenerators import RandomSeedPlacementGenerator
 import garden_constants
 
+plotly_prob_of_plant = 0.15
+
 def make_colorscale(color):
     return [[0, color], [1, color]]
 
@@ -34,7 +36,8 @@ def boundary_circle(r, h, x, y, nt=20, nr=2):
     return x_g, y_g, z_g
 
 to_plot = []
-spg = RandomSeedPlacementGenerator.RandomSeedPlacementGenerator(prob_of_plant=0.05)
+spg = RandomSeedPlacementGenerator.RandomSeedPlacementGenerator(
+    prob_of_plant=plotly_prob_of_plant)
 img = spg.generate_seed_placement()
 it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
 
@@ -111,7 +114,7 @@ layout = go.Layout(scene=scene,
                    scene_zaxis_visible=False)
 fig = go.Figure(data=to_plot, layout=layout)
 fig.update_traces(hoverinfo='none')
-fig.update_layout(scene_camera_eye_z=0.55)
+fig.update_layout(scene_camera_eye_z=1.2)
 
 fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
