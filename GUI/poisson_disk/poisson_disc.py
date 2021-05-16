@@ -29,19 +29,18 @@ def vrpd(dims, cellsize, x, a, beta):
     area_p = [math.pi * (inhibition_radius(p) ** 2)
               for p in range(garden_constants.num_plants)]
     num_p = est_tot_area_p / area_p
-    print('num_p before rounding', num_p)
+
     def random_round(x):
         return random.choice([math.ceil(x), math.floor(x)])
     num_p = np.array([random_round(n) for n in num_p], dtype=int)
-    print('num_p after rounding', num_p)
-    print('tot num plants', np.sum(num_p))
     def next_point(plant_type):
         r = inhibition_radius(plant_type)
         pm = plant_map(points)
         cpm = cp_map(points)
         c1 = np.isnan(pm)
         c2 = cpm >= r
-        criteria = (c1 & c2)
+        c3 = dist_to_border >= r
+        criteria = (c1 & c2 & c3)
         candidates = points[criteria]
         if len(candidates) == 0:
             return False
@@ -94,6 +93,13 @@ def vrpd(dims, cellsize, x, a, beta):
         return points[:,:,3]
     def point_list(points):
         return points.reshape(points.shape[0] * points.shape[1], points.shape[2])
+    dist_to_border = np.empty(dims)
+    it = np.nditer(dist_to_border, flags=["multi_index", "refs_ok"])
+    for p in it:
+        x, y = it.multi_index
+        dimx, dimy = dims
+        dtbs_list = [x, dimx - x, y, dimy - y]
+        dist_to_border[it.multi_index] = min(dtbs_list)
 
     x, y = uniform_sample(ndim, dims)
     plant_index = garden_constants.num_plants - 1
@@ -101,6 +107,7 @@ def vrpd(dims, cellsize, x, a, beta):
     num_p[plant_index] -= 1
 
     master_break = False
+    num_0 = 0
     while plant_index >= 0 and not master_break:
         if plant_index > 0:
             for _ in range(num_p[plant_index]):
@@ -116,6 +123,7 @@ def vrpd(dims, cellsize, x, a, beta):
                 pointlist = pointlist[np.array([p[0] == 1 for p in pointlist])]
                 if not n:
                     master_break = True
+                    break
 
     # to cartesian
     plant_map = plant_map(points)

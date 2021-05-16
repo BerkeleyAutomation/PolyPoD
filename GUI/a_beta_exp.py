@@ -15,6 +15,7 @@ def vrpd_scatter_and_area(a, beta, show=False, save=False):
     h = np.zeros(garden_constants.num_plants)
     for p in data:
         loc, plant_index = p
+        plant_index = int(plant_index)
         r = garden_constants.plant_radii[plant_index]
         color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
         ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
@@ -24,6 +25,10 @@ def vrpd_scatter_and_area(a, beta, show=False, save=False):
     locdata = np.array([p[0] for p in data])
     datax, datay = locdata[:,0], locdata[:,1]
     plt.scatter(datax, datay, s=1, color='k')
+    plt.plot([0,0], [10,0], color='k')
+    plt.plot([10, 0], [10, 10], color='k')
+    plt.plot([10, 10], [0, 10], color='k')
+    plt.plot([0, 10], [0, 0], color='k')
     titlename = "a/beta exp: a={0}, beta={1}".format(a, beta)
     plt.title(titlename)
     ax.set_aspect(1)
@@ -34,4 +39,4 @@ def vrpd_scatter_and_area(a, beta, show=False, save=False):
         plt.show()
     return h
 
-vrpd_scatter_and_area(1, 0, show=True, save=True)
+vrpd_scatter_and_area(a=1, beta=0, show=True, save=True)
