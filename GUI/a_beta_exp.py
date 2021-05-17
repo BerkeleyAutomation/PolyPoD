@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import garden_constants
 import numpy as np
 import math
+import re
 
 dims = np.array([garden_constants.garden_x_len, garden_constants.garden_y_len])
 cellsize=0.1
@@ -10,7 +11,7 @@ x = 2
 
 def vrpd_scatter_and_area(a, beta, show=False, save=False):
     data = poi.vrpd(dims=dims, cellsize=cellsize,
-                    x=x, beta=beta, a=a)
+                    beta=beta, a=a)
     ax = plt.gca()
     h = np.zeros(garden_constants.num_plants)
     for p in data:
@@ -29,14 +30,24 @@ def vrpd_scatter_and_area(a, beta, show=False, save=False):
     plt.plot([10, 0], [10, 10], color='k')
     plt.plot([10, 10], [0, 10], color='k')
     plt.plot([0, 10], [0, 0], color='k')
-    titlename = "a/beta exp: a={0}, beta={1}".format(a, beta)
+
+    str_a = str(a)
+    list_str_a = re.split(r'\.', str_a)
+    if len(list_str_a) == 2:
+        str_a = list_str_a[0] + "," + list_str_a[1]
+    str_beta = str(beta)
+    list_str_beta = re.split(r'\.', str_beta)
+    if len(list_str_beta) == 2:
+        str_beta = list_str_beta[0] + "," + list_str_beta[1]
+
+    titlename = "a/beta experiment: a={0}, beta={1}".format(a, beta)
     plt.title(titlename)
     ax.set_aspect(1)
     if save:
-        filename = "a_beta_exp/a_beta_exp_a{0}_beta{1}".format(a, beta)
+        filename = "a_beta_exp/a_beta_exp_a{0}_beta{1}".format(str_a, str_beta)
         plt.savefig(filename)
     if show:
         plt.show()
     return h
 
-vrpd_scatter_and_area(a=1, beta=0, show=True, save=True)
+vrpd_scatter_and_area(a=2, beta=0, show=True, save=True, num_p_selector=poi.weighted_round)

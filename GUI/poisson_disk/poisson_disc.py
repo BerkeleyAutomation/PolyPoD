@@ -17,7 +17,22 @@ def uniform_sample(ndim, dims):
     s = rng.integers(dims)
     return s
 
-def vrpd(dims, cellsize, x, a, beta):
+def flip(p):
+    if random.random() < p:
+        return 0
+    else:
+        return 1
+
+def random_round(x):
+    return random.choice([math.ceil(x), math.floor(x)])
+
+def weighted_round(x):
+    fx = math.floor(x)
+    p = x - fx
+    return fx + flip(p)
+
+
+def vrpd(dims, cellsize, a, beta, num_p_selector):
     ndim = dims.size
     dims = (dims / cellsize).astype(int)
     def inhibition_radius(plant_type):
@@ -29,10 +44,7 @@ def vrpd(dims, cellsize, x, a, beta):
     area_p = [math.pi * (inhibition_radius(p) ** 2)
               for p in range(garden_constants.num_plants)]
     num_p = est_tot_area_p / area_p
-
-    def random_round(x):
-        return random.choice([math.ceil(x), math.floor(x)])
-    num_p = np.array([random_round(n) for n in num_p], dtype=int)
+    num_p = np.array([num_p_selector(n) for n in num_p], dtype=int)
     def next_point(plant_type):
         r = inhibition_radius(plant_type)
         pm = plant_map(points)
@@ -101,10 +113,7 @@ def vrpd(dims, cellsize, x, a, beta):
         dtbs_list = [x, dimx - x, y, dimy - y]
         dist_to_border[it.multi_index] = min(dtbs_list)
 
-    x, y = uniform_sample(ndim, dims)
     plant_index = garden_constants.num_plants - 1
-    add_point([x, y], inhibition_radius(plant_index), plant_index)
-    num_p[plant_index] -= 1
 
     master_break = False
     num_0 = 0
