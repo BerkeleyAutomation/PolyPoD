@@ -1,8 +1,8 @@
 import numpy as np
 
 
-garden_x_len = 10
-garden_y_len = 10
+garden_x_len = 20
+garden_y_len = 20
 plant_max_height = 1.5
 plant_min_height = 0.5
 garden_dimensions = (garden_x_len, garden_y_len, plant_max_height)
