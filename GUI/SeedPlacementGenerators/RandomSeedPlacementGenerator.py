@@ -8,7 +8,7 @@ import argparse
 
 
 class RandomSeedPlacementGenerator(SeedPlacementGenerator.SeedPlacementGenerator):
-    default_prob_of_plant = 0.05
+    default_prob_of_plant = 0.2
     def __init__(self, **kwargs):
         super().__init__()
         if 'prob_of_plant' in kwargs.keys():
