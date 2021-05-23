@@ -19,9 +19,7 @@ def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=Fals
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
     for p in data:
-        loc, plant_index = p
-        plant_index = int(plant_index)
-        r = garden_constants.plant_radii[plant_index]
+        loc, plant_index, r = poi.point_unpacker(p)
         color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
         ax1.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
 
@@ -127,4 +125,4 @@ def num_to_str(num):
         str_a = list_str_a[0] + "," + list_str_a[1]
     return str_a
 
-a_beta_exp(beta_list, 10)
+a_beta_exp([0], 1)

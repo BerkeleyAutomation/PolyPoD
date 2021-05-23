@@ -156,3 +156,27 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector):
     final_points = get_plant_list(points)
     return np.array([np.array([get_point_coords(x) * cellsize, get_plant_type(x)], dtype=object)
                      for x in final_points])
+
+    # Util functions
+    def bounded_cluster(shape, radius):
+        if shape == 'circle':
+            def in_bounds(p):
+               loc, plant_index, r = point_unpacker(p)
+
+    def line_following(function, input_range):
+        pass
+
+    def shift_sample(data, x_shift, y_shift):
+        pass
+
+    def rotate_sample(data, theta):
+        pass
+
+def cart_to_polar(x, y):
+    return math.sqrt(x ** 2 + y ** 2), math.tan(y / x)
+
+def point_unpacker(p):
+    loc, plant_index = p
+    plant_index = int(plant_index)
+    r = garden_constants.plant_radii[plant_index]
+    return loc, plant_index, r
