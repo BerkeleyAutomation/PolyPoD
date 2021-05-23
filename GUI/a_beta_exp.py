@@ -34,7 +34,8 @@ def vrpd_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=Fal
     table_text = [plant_index_arr_txt, num_plants_arr_txt]
     row_labels = ['plant type', 'num plant']
     h_sum = np.sum(h)
-    h_sum_txt = "{:.4f}".format(h_sum)
+    actual_a = h_sum / garden_area
+    actual_a_txt = "{:.4f}".format(actual_a)
     h /= h_sum
     locdata = np.array([p[0] for p in data])
     datax, datay = locdata[:,0], locdata[:,1]
@@ -52,12 +53,14 @@ def vrpd_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=Fal
               rowLabels=row_labels,
               loc='bottom')
     ax2.set_ylabel('Fraction of total area')
-    ax2.set_title('Plant area distribution / num each plant\nActual total area used: {0}'.format(h_sum_txt))
+    ax2.set_title('Plant area distribution / num each plant\nActual total area used: {0}'
+                  .format(actual_a))
     plt.subplots_adjust(wspace=0.4)
 
-    str_a, str_beta = a_beta_to_str(a, beta)
+    str_beta = num_to_str(beta)
+    str_a = num_to_str(a)
 
-    titlename = "a/beta experiment: a={0}, beta={1}, trial {2}".format(a, beta, trialno)
+    titlename = "a/beta experiment: a={0}, beta={1}, trial {2}".format(a, str_beta, trialno)
     fig.suptitle(titlename, y=1.0)
     ax1.set_aspect(1)
     if save:
@@ -74,6 +77,7 @@ a_list = np.arange(0.5, 2.1, 0.1)
 beta_list = np.arange(0, 1.1, 0.1)
 notrials=10
 def a_beta_exp(beta_list, notrials):
+    final_a_arr = np.array([])
     for beta in beta_list:
         master_h = np.zeros(garden_constants.num_plants, dtype=np.float32)
         master_h_sum = 0
@@ -81,7 +85,7 @@ def a_beta_exp(beta_list, notrials):
         trials_arr = np.arange(notrials)
         master_num_plants_arr = np.zeros(garden_constants.num_plants)
         plant_index_arr, h, plant_index_arr_txt, h_sum, num_plants_arr = [None, None, None, None, None]
-        a = 1
+        a = 2
         for t in range(notrials):
             plant_index_arr, h, plant_index_arr_txt, h_sum, num_plants_arr = \
                 vrpd_scatter_and_area(a=a, beta=beta, trialno=t, show=False, save=True,
@@ -89,40 +93,38 @@ def a_beta_exp(beta_list, notrials):
             master_h += h
             master_h_sum += h_sum
             master_num_plants_arr += num_plants_arr
-            h_sum_arr = np.append(h_sum_arr, h_sum)
-            a = h_sum
+            h_sum_arr = np.append(h_sum_arr, h_sum / garden_area)
+            a = h_sum / garden_area
+        final_a_arr = np.append(final_a_arr, a)
         master_h /= notrials
         master_h_sum /= notrials
         master_h_sum_txt = "{:.4f}".format(master_h_sum)
         master_num_plants_arr /= notrials
-        
-        fig, ax = plt.subplots()
-        ax.bar(plant_index_arr, master_h)
-        ax.set_xticks([])
-        master_num_plants_arr_txt = np.array(["{:.2f}".format(x) for x in master_num_plants_arr])
-        table_text = [plant_index_arr_txt, master_num_plants_arr_txt]
-        row_labels = ['plant type', 'avg num plants']
-        ax.table(cellText=table_text,
-                  rowLabels=row_labels,
-                  loc='bottom')
-        ax.set_ylabel('Avg Fraction of total area')
-        ax.set_title('Avg Plant area distribution / avg num each plant for '
-                     'a={0}, beta={1}, {3} trials\nActual Avg total area used: {2}'
-                     .format(a, beta, master_h_sum_txt, notrials))
-        str_a, str_beta = a_beta_to_str(a, beta)
-        fig_filename = "a_beta_exp/avg_area_hists/a_beta_exp_avg_hist_a{0}_beta{1}"\
-            .format(str_a, str_beta)
-        plt.savefig(fig_filename, dpi=180, bbox_inches="tight", pad_inches=0.25)
 
-def a_beta_to_str(a, beta):
+        fig, ax = plt.subplots()
+        ax.scatter(trials_arr, h_sum_arr)
+        ax.set_ylabel('h_sum')
+        ax.set_title('h_sum [next a value] for each trial: '
+                     'beta={0}, {1} trials'
+                     .format(beta, notrials))
+        str_beta = num_to_str(beta)
+        fig_filename = "a_beta_exp/avg_area_hists/a_beta_exp_h_sum_hist_beta{0}"\
+            .format(str_beta)
+        plt.savefig(fig_filename, dpi=180, bbox_inches="tight", pad_inches=0.25)
+    fig, ax = plt.subplots()
+    ax.scatter(beta_list, final_a_arr)
+    ax.set_ylabel('final a')
+    ax.set_xlabel('beta')
+    ax.set_title('final a for each beta')
+    fig_filename = "a_beta_exp/avg_area_hists/final_a_hist"
+    plt.savefig(fig_filename, dpi=180, bbox_inches="tight", pad_inches=0.25)
+
+def num_to_str(num):
+    a = "{:.2f}".format(num)
     str_a = str(a)
     list_str_a = re.split(r'\.', str_a)
     if len(list_str_a) == 2:
         str_a = list_str_a[0] + "," + list_str_a[1]
-    str_beta = str(beta)
-    list_str_beta = re.split(r'\.', str_beta)
-    if len(list_str_beta) == 2:
-        str_beta = list_str_beta[0] + "," + list_str_beta[1]
-    return str_a, str_beta
+    return str_a
 
-a_beta_exp([0.7, 1.4], 4)
+a_beta_exp(beta_list, 10)
