@@ -10,8 +10,8 @@ garden_area = np.prod(dims)
 cellsize=0.1
 x = 2
 
-def vrpd_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=False):
-    data = poi.vrpd(dims=dims, cellsize=cellsize,
+def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=False):
+    data = poi.generate_garden(dims=dims, cellsize=cellsize,
                     beta=beta, a=a, num_p_selector=num_p_selector)
     ax = plt.gca()
     h = np.zeros(garden_constants.num_plants)
@@ -88,7 +88,7 @@ def a_beta_exp(beta_list, notrials):
         a = 2
         for t in range(notrials):
             plant_index_arr, h, plant_index_arr_txt, h_sum, num_plants_arr = \
-                vrpd_scatter_and_area(a=a, beta=beta, trialno=t, show=False, save=True,
+                generate_garden_scatter_and_area(a=a, beta=beta, trialno=t, show=False, save=True,
                                       num_p_selector=poi.weighted_round_or_one)
             master_h += h
             master_h_sum += h_sum

@@ -29,7 +29,7 @@ def weighted_round_or_one(x):
     return r
 
 
-def vrpd(dims, cellsize, a, beta, num_p_selector):
+def generate_garden(dims, cellsize, a, beta, num_p_selector):
     added_points = []
     ndim = dims.size
     dims = (dims / cellsize).astype(int)

@@ -84,6 +84,11 @@
             "left": "L",
             "right": "R",
             "preference": "left"
+        },
+        {
+            "left": "L",
+            "right": "R",
+            "preference": "left"
         }
     ]
 }

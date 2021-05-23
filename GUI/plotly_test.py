@@ -79,8 +79,8 @@ for p in it:
                            contours=contours)
         to_plot.extend([cyl, circl, circh])
 
-x_soil = np.array([[0, 10], [0, 10]])
-y_soil = np.array([[0, 0], [10, 10]])
+x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
+y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
 z_soil = np.array([[0,0], [0,0]])
 soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
                  colorscale=make_colorscale(garden_constants.soil_color),
