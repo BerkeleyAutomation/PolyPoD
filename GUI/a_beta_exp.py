@@ -5,13 +5,8 @@ import numpy as np
 import math
 import re
 
-dims = np.array([garden_constants.garden_x_len, garden_constants.garden_y_len])
-garden_area = np.prod(dims)
-cellsize=0.1
-x = 2
-
 def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=False):
-    data = poi.generate_garden(dims=dims, cellsize=cellsize,
+    data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                     beta=beta, a=a, num_p_selector=num_p_selector)
     ax = plt.gca()
     h = np.zeros(garden_constants.num_plants)
@@ -32,7 +27,7 @@ def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=Fals
     table_text = [plant_index_arr_txt, num_plants_arr_txt]
     row_labels = ['plant type', 'num plant']
     h_sum = np.sum(h)
-    actual_a = h_sum / garden_area
+    actual_a = h_sum / garden_constants.garden_area
     actual_a_txt = "{:.4f}".format(actual_a)
     h /= h_sum
     locdata = np.array([p[0] for p in data])
@@ -91,8 +86,8 @@ def a_beta_exp(beta_list, notrials):
             master_h += h
             master_h_sum += h_sum
             master_num_plants_arr += num_plants_arr
-            h_sum_arr = np.append(h_sum_arr, h_sum / garden_area)
-            a = h_sum / garden_area
+            h_sum_arr = np.append(h_sum_arr, h_sum / garden_constants.garden_area)
+            a = h_sum / garden_constants.garden_area
         final_a_arr = np.append(final_a_arr, a)
         master_h /= notrials
         master_h_sum /= notrials

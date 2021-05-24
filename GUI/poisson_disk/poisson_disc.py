@@ -29,7 +29,7 @@ def weighted_round_or_one(x):
     return r
 
 
-def generate_garden(dims, cellsize, a, beta, num_p_selector):
+def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_args):
     added_points = []
     ndim = dims.size
     dims = (dims / cellsize).astype(int)
@@ -46,37 +46,6 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector):
     num_p = est_tot_area_p / area_p
     num_p = np.array([num_p_selector(n) for n in num_p], dtype=int)
 
-    def next_point(plant_type):
-        r = inhibition_radius(plant_type)
-        crm = get_cr_map(points)
-        cbm = get_cb_map(points)
-        c1 = crm > ((1 - beta) * r)
-        c2 = cbm > r
-        c3 = dist_to_border >= r
-        criteria = (c1 & c2 & c3)
-        candidates = points[criteria]
-        if len(candidates) == 0:
-            return False
-        choice = candidates[rng.integers(candidates.shape[0])]
-        add_point(get_point_coords(choice), plant_type)
-        return True
-
-    def add_point(choice, plant_type):
-        xc, yc = choice
-        rc = inhibition_radius(plant_type)
-        pl = get_point_list(points)
-        for m in pl:
-            mx, my = get_point_coords(m)
-            d = math.dist([xc, yc], [mx, my])
-            dr = max(d - rc, 0)
-            db = max(d - ((1 - beta) * rc), 0)
-            if dr < get_cr(m):
-                set_cr(mx, my, dr)
-            if db < get_cb(m):
-                set_cb(mx, my, db)
-        mark_plant(xc, yc, plant_type)
-        added_points.append(choice)
-
     # points stores point locations:
     # points[x, y] = [x, y, cr, cb, t]
     # b = 1.0 if plant here, 2.0 if point is blocked, np.nan if no plant.
@@ -92,6 +61,14 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector):
             points[it.multi_index] = it.multi_index[1]
         elif it.multi_index[2] == 2 or it.multi_index[2] == 3:
             points[it.multi_index] = np.inf
+
+    dist_to_border = np.empty(dims)
+    it = np.nditer(dist_to_border, flags=["multi_index", "refs_ok"])
+    for _ in it:
+        xp, yp = it.multi_index
+        dimx, dimy = dims
+        dtbs_list = [xp, dimx - xp, yp, dimy - yp]
+        dist_to_border[it.multi_index] = min(dtbs_list)
 
     def get_point_coords(p):
         return p[0:2]
@@ -127,13 +104,76 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector):
         pointlist = get_point_list(pointsx)
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
-    dist_to_border = np.empty(dims)
-    it = np.nditer(dist_to_border, flags=["multi_index", "refs_ok"])
-    for _ in it:
-        xp, yp = it.multi_index
-        dimx, dimy = dims
-        dtbs_list = [xp, dimx - xp, yp, dimy - yp]
-        dist_to_border[it.multi_index] = min(dtbs_list)
+
+    # custom bounds functions
+    def line_following(function, input_range):
+        pass
+
+    def bounds_map_creator(upper, lower, bounds, num_checks, plant_type):
+        def in_bounds(p):
+            loc, plant_index, r = point_unpacker(p)
+            px, py = loc
+            low_bound, high_bound = bounds
+
+            def circ_up(i):
+                d_px_i = math.fabs(px - i)
+                return py + math.sqrt(r ** 2 - d_px_i ** 2)
+
+            def circ_low(i):
+                d_px_i = math.fabs(px - i)
+                return py - math.sqrt(r ** 2 - d_px_i ** 2)
+
+            upper_diff = [upper(i) - circ_up(i) for i in np.linspace(px - r, px + r, num_checks)]
+            lower_diff = [circ_low(i) - lower(i) for i in np.linspace(px - r, px + r, num_checks)]
+
+            in_left_right_bounds = (px - r) > low_bound and (px + r) < high_bound
+            return np.all(upper_diff) and np.all(lower_diff) and in_left_right_bounds
+
+        bounds_map = np.empty(dims)
+        it = np.nditer(bounds_map, flags=["multi_index", "refs_ok"])
+        for _ in it:
+            bounds_map[it.multi_index] = in_bounds([it.multi_index, plant_type])
+        return bounds_map
+
+    def standard_criteria(plant_type):
+        r = inhibition_radius(plant_type)
+        crm = get_cr_map(points)
+        cbm = get_cb_map(points)
+        c1 = crm > ((1 - beta) * r)
+        c2 = cbm > r
+        c3 = dist_to_border >= r
+        criteria = (c1 & c2 & c3)
+        return criteria
+
+    def next_point(plant_type):
+        if bounds_map_creator_args == None:
+            bounds_map = np.full(dims, True)
+        else:
+            upper, lower, bounds, num_checks = bounds_map_creator_args
+            bounds_map = bounds_map_creator(upper, lower, bounds, num_checks, plant_type)
+        criteria = standard_criteria(plant_type) and bounds_map
+        candidates = points[criteria]
+        if len(candidates) == 0:
+            return False
+        choice = candidates[rng.integers(candidates.shape[0])]
+        add_point(get_point_coords(choice), plant_type)
+        return True
+
+    def add_point(choice, plant_type):
+        xc, yc = choice
+        rc = inhibition_radius(plant_type)
+        pl = get_point_list(points)
+        for m in pl:
+            mx, my = get_point_coords(m)
+            d = math.dist([xc, yc], [mx, my])
+            dr = max(d - rc, 0)
+            db = max(d - ((1 - beta) * rc), 0)
+            if dr < get_cr(m):
+                set_cr(mx, my, dr)
+            if db < get_cb(m):
+                set_cb(mx, my, db)
+        mark_plant(xc, yc, plant_type)
+        added_points.append(choice)
 
     plant_index = garden_constants.num_plants - 1
 
@@ -157,26 +197,21 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector):
     return np.array([np.array([get_point_coords(x) * cellsize, get_plant_type(x)], dtype=object)
                      for x in final_points])
 
-    # Util functions
-    def bounded_cluster(shape, radius):
-        if shape == 'circle':
-            def in_bounds(p):
-               loc, plant_index, r = point_unpacker(p)
-
-    def line_following(function, input_range):
-        pass
-
-    def shift_sample(data, x_shift, y_shift):
-        pass
-
-    def rotate_sample(data, theta):
-        pass
 
 def cart_to_polar(x, y):
     return math.sqrt(x ** 2 + y ** 2), math.tan(y / x)
+
 
 def point_unpacker(p):
     loc, plant_index = p
     plant_index = int(plant_index)
     r = garden_constants.plant_radii[plant_index]
     return loc, plant_index, r
+
+
+def shift_sample(data, x_shift, y_shift):
+    pass
+
+
+def rotate_sample(data, theta):
+    pass
