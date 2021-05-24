@@ -2,12 +2,19 @@ import poisson_disk.poisson_disc as poi
 import matplotlib.pyplot as plt
 import garden_constants
 import numpy as np
-import math
-import re
 
-def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=False):
+"""
+
+garden_constants.dims, garden_constants.cellsize,
+                beta=0.5, a=0.95, num_p_selector=poi.weighted_round_or_one,
+                bounds_map_creator_args=[u, l, bounds, num_checks]
+                
+"""
+def generate_garden_scatter_and_area(a, beta, num_p_selector, bounds_map_creator_args,
+                                     show=False, save=False):
     data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
-                    beta=beta, a=a, num_p_selector=num_p_selector)
+                               beta=beta, a=a, num_p_selector=num_p_selector,
+                               bounds_map_creator_args=bounds_map_creator_args)
     ax = plt.gca()
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)
@@ -35,3 +42,4 @@ def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=Fals
         np.save(data_filename, data)
     if show:
         plt.show()
+    return fig, (ax1, ax2)

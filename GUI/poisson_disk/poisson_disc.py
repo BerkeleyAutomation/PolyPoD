@@ -129,7 +129,7 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_
             in_left_right_bounds = (px - r) > low_bound and (px + r) < high_bound
             return np.all(upper_diff) and np.all(lower_diff) and in_left_right_bounds
 
-        bounds_map = np.empty(dims)
+        bounds_map = np.empty(dims, dtype=np.float32)
         it = np.nditer(bounds_map, flags=["multi_index", "refs_ok"])
         for _ in it:
             bounds_map[it.multi_index] = in_bounds([it.multi_index, plant_type])
@@ -151,7 +151,7 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_
         else:
             upper, lower, bounds, num_checks = bounds_map_creator_args
             bounds_map = bounds_map_creator(upper, lower, bounds, num_checks, plant_type)
-        criteria = standard_criteria(plant_type) and bounds_map
+        criteria = standard_criteria(plant_type) & bounds_map
         candidates = points[criteria]
         if len(candidates) == 0:
             return False
