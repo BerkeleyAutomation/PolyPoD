@@ -104,36 +104,43 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_
         pointlist = get_point_list(pointsx)
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
-
+    def point_unpacker_internal(p):
+        loc, plant_index = p
+        plant_index = int(plant_index)
+        r = inhibition_radius(plant_index)
+        return loc, plant_index, r
     # custom bounds functions
     def line_following(function, input_range):
         pass
 
     def bounds_map_creator(upper, lower, bounds, num_checks, plant_type):
         def in_bounds(p):
-            loc, plant_index, r = point_unpacker(p)
+            loc, plant_index, r = point_unpacker_internal(p)
             px, py = loc
             low_bound, high_bound = bounds
 
             def circ_up(i):
                 d_px_i = math.fabs(px - i)
-                return py + math.sqrt(r ** 2 - d_px_i ** 2)
+                return py + math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
 
             def circ_low(i):
                 d_px_i = math.fabs(px - i)
-                return py - math.sqrt(r ** 2 - d_px_i ** 2)
+                return py - math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
 
-            upper_diff = [upper(i) - circ_up(i) for i in np.linspace(px - r, px + r, num_checks)]
-            lower_diff = [circ_low(i) - lower(i) for i in np.linspace(px - r, px + r, num_checks)]
+            upper_diff = [(upper(i) - circ_up(i)) > 0 for i in np.linspace(px - r, px + r, num_checks)]
+            lower_diff = [(circ_low(i) - lower(i)) > 0 for i in np.linspace(px - r, px + r, num_checks)]
 
             in_left_right_bounds = (px - r) > low_bound and (px + r) < high_bound
-            return np.all(upper_diff) and np.all(lower_diff) and in_left_right_bounds
+            return_val = np.all(upper_diff) and np.all(lower_diff) and in_left_right_bounds
+            return return_val
 
-        bounds_map = np.empty(dims, dtype=np.float32)
+        bounds_map = np.zeros(dims, dtype=np.float32)
         it = np.nditer(bounds_map, flags=["multi_index", "refs_ok"])
         for _ in it:
-            bounds_map[it.multi_index] = in_bounds([it.multi_index, plant_type])
-        return bounds_map
+            i_b = in_bounds([it.multi_index, plant_type])
+            bounds_map[it.multi_index] = i_b
+        bounds_map_bool = bounds_map > 0
+        return bounds_map_bool
 
     def standard_criteria(plant_type):
         r = inhibition_radius(plant_type)
@@ -150,8 +157,12 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_
             bounds_map = np.full(dims, True)
         else:
             upper, lower, bounds, num_checks = bounds_map_creator_args
-            bounds_map = bounds_map_creator(upper, lower, bounds, num_checks, plant_type)
-        criteria = standard_criteria(plant_type) & bounds_map
+            upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
+            lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
+            bounds = [num / cellsize for num in bounds]
+            bounds_map = bounds_map_creator(upper_grid, lower_grid, bounds, num_checks, plant_type)
+        scm = standard_criteria(plant_type)
+        criteria = scm & bounds_map
         candidates = points[criteria]
         if len(candidates) == 0:
             return False
@@ -201,12 +212,6 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_
 def cart_to_polar(x, y):
     return math.sqrt(x ** 2 + y ** 2), math.tan(y / x)
 
-
-def point_unpacker(p):
-    loc, plant_index = p
-    plant_index = int(plant_index)
-    r = garden_constants.plant_radii[plant_index]
-    return loc, plant_index, r
 
 
 def shift_sample(data, x_shift, y_shift):

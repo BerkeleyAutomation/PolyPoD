@@ -19,5 +19,5 @@ def generate_garden_scatter_and_area(a, beta, num_p_selector, bounds_map_creator
                                      
 """
 plotting_utils.generate_garden_scatter_and_area(beta=0.5, a=0.95, num_p_selector=poi.weighted_round_or_one,
-                bounds_map_creator_args=[u, l, bounds, num_checks], show=True, save=False)
+                bounds_map_creator_args=[u, l, bounds, num_checks], show=True, save=True)
 
