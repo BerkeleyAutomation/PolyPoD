@@ -8,7 +8,7 @@ plant_min_radius = 0.5
 garden_dimensions = (garden_x_len, garden_y_len, plant_max_radius)
 dims = np.array([garden_x_len, garden_y_len])
 garden_area = np.prod(dims)
-cellsize=2
+cellsize = 0.2
 colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
                     "#7fae7e", "#455127"]
 colors_of_plants_hi_contrast = ['black', 'brown', 'darkviolet', 'blue', 'darkgreen', 'lime',

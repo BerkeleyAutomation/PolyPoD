@@ -4,7 +4,7 @@ import garden_constants
 import math
 from numpy.random import default_rng
 rng = default_rng()
-
+import time
 
 def flip(p):
     r = random.random()
@@ -30,6 +30,7 @@ def weighted_round_or_one(x):
 
 
 def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_args):
+    start = time.time()
     added_points = []
     ndim = dims.size
     dims = (dims / cellsize).astype(int)
@@ -205,13 +206,15 @@ def generate_garden(dims, cellsize, a, beta, num_p_selector, bounds_map_creator_
 
     # to cartesian
     final_points = get_plant_list(points)
-    return np.array([np.array([get_point_coords(x) * cellsize, get_plant_type(x)], dtype=object)
+    return_val = np.array([np.array([get_point_coords(x) * cellsize, get_plant_type(x)], dtype=object)
                      for x in final_points])
+    stop = time.time()
+    time_elapsed = stop - start
+    return return_val, time_elapsed
 
 
 def cart_to_polar(x, y):
     return math.sqrt(x ** 2 + y ** 2), math.tan(y / x)
-
 
 
 def shift_sample(data, x_shift, y_shift):

@@ -14,7 +14,7 @@ garden_constants.dims, garden_constants.cellsize,
 """
 def generate_garden_scatter_and_area(a, beta, num_p_selector, bounds_map_creator_args,
                                      show=False, save=False):
-    data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
+    data, elapsed_time = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                beta=beta, a=a, num_p_selector=num_p_selector,
                                bounds_map_creator_args=bounds_map_creator_args)
     h = np.zeros(garden_constants.num_plants)
@@ -36,6 +36,7 @@ def generate_garden_scatter_and_area(a, beta, num_p_selector, bounds_map_creator
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
+    plt.title('num plants: {0}; time to generate: {1}s'.format(data.size, "{:.4f}".format(elapsed_time)))
     if save:
         fig_filename = "test_plots/plotted_graph_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
