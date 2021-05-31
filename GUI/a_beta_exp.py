@@ -8,7 +8,7 @@ import re
 # Note: this file has produced the data it was intended to, and may not work exactly as intended anymore!
 
 def generate_garden_scatter_and_area(a, beta, num_p_selector, trialno, show=False, save=False):
-    data, elapsed_time = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
+    data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                     beta=beta, a=a, num_p_selector=num_p_selector)
     ax = plt.gca()
     h = np.zeros(garden_constants.num_plants)

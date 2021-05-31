@@ -8,6 +8,9 @@ class SeedPlacement:
 
     def set_seed_placement(self, plant_matrix):
         self.seed_placement = plant_matrix
+
+    def get_seed_placement(self):
+        return self.seed_placement
     # Return random plant radius: for now, just 0.5, but later we can sample from a distribution
     # or something.
     def plant_radius(self, plant_type, plant_height):
