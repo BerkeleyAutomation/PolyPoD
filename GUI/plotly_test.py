@@ -10,6 +10,19 @@ from datetime import datetime
 best_values = {'y_eye_mult':1, 'h_mult':0.43,
                'z_ratio':0.42}
 colors_dicts = [garden_constants.colors_of_plants_hcl_v2]
+num_cols = 3
+num_rows = (garden_constants.num_plants - 1) // num_cols + 1
+shuffle_colors = True
+if shuffle_colors:
+    for colors_dict in colors_dicts:
+        copy = [_ for x in range(colors_dict)]
+        for r in num_rows:
+            to_swap = colors_dict[num_cols * r: num_cols * (r + 1)]
+
+            for n in to_swap:
+                copy[]
+
+
 hms = [0.25, 0.3, 0.35]
 z_ratios = [0.375, 0.44, 0.5]
 plant_labels = [True, False]
