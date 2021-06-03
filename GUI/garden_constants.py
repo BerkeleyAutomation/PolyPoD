@@ -14,10 +14,20 @@ a_func_offset = 0.663
 a_func_exp_base = 3.71
 
 colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
-                    "#7fae7e", "#455127"]
+                    "#7fae7e", "#455127", '#32C822']
 colors_of_plants_hi_contrast = ['black', 'brown', 'darkviolet', 'blue', 'darkgreen', 'lime',
                                 'gold', 'orange', 'fuchsia', 'red']
-soil_color = "#7c5e42"
+
+colors_of_plants_shibui = ['#00af42', '#00a265', '#00B146',
+                           '#068b2e', '#00601D', '#2Ab500',
+                           '#13b510', '#006806', '#11A011',
+                           '#10b060']
+
+colors_of_plants_hcl_v2 = ["#004800", "#005100", "#005A00",
+                           "#006300", "#026D00", "#107600",
+                           "#1C7F00", "#278900", "#33921E",
+                           "#3E9B24"]
+soil_color = "#50371f"
 num_plants = 10
 alpha = 1
 plant_radii = {}

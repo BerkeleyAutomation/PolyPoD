@@ -4,7 +4,17 @@ from SeedPlacementGenerators import RandomSeedPlacementGenerator
 import garden_constants
 from datetime import datetime
 
-def plotly_test(x_eye_mult, z_ratio, save):
+# best y_eye_mult: doesn't make a difference if above 1
+# best z_ratio: 0.375
+# best h_hult: 0.43
+best_values = {'y_eye_mult':1, 'h_mult':0.43,
+               'z_ratio':0.42}
+colors_dicts = [garden_constants.colors_of_plants_hcl_v2]
+hms = [0.25, 0.3, 0.35]
+z_ratios = [0.375, 0.44, 0.5]
+plant_labels = [True, False]
+text_offset = 0.3
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, plant_labels=True, save=True):
     plotly_prob_of_plant = 0.02
 
     def make_colorscale(color):
@@ -40,8 +50,8 @@ def plotly_test(x_eye_mult, z_ratio, save):
     to_plot = []
     spg = RandomSeedPlacementGenerator.RandomSeedPlacementGenerator(
         prob_of_plant=plotly_prob_of_plant)
-    img = spg.generate_seed_placement()
-    it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
+    img = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
+    #it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
 
     contours = go.surface.Contours(
                 x=go.surface.contours.X(highlight=False),
@@ -49,37 +59,37 @@ def plotly_test(x_eye_mult, z_ratio, save):
                 z=go.surface.contours.Z(highlight=False),
             )
 
-    for p in it:
-        if img.plant_present(p):
-            x, y, h, r = img.get_plant_data(it, p)
-            color = img.get_plant_color(it)
-            colorscale = make_colorscale(color)
+    for p in img:
+        loc, plant_index, r = garden_constants.point_unpacker(p)
+        x, y = loc
+        color = colors_dict[plant_index]
+        colorscale = make_colorscale(color)
 
-            xc, yc, zc = cylinder(r, h, x, y)
+        xc, yc, zc = cylinder(r, h_mult * r, x, y)
 
-            xcircl, ycircl, zcircl = boundary_circle(r, 0, x, y)
-            xcirch, ycirch, zcirch = boundary_circle(r, h, x, y)
+        xcircl, ycircl, zcircl = boundary_circle(r, 0, x, y)
+        xcirch, ycirch, zcirch = boundary_circle(r, h_mult * r, x, y)
 
 
-            cyl = go.Surface(x=xc, y=yc, z=zc,
-                             colorscale=colorscale,
-                             showscale=False,
-                             opacity=1,
-                             hoverinfo='none',
-                             contours=contours)
-            circl = go.Surface(x=xcircl, y=ycircl, z=zcircl,
-                               colorscale=colorscale,
-                               showscale=False,
-                               opacity=1,
-                               hoverinfo='none',
-                               contours=contours)
-            circh = go.Surface(x=xcirch, y=ycirch, z=zcirch,
-                               colorscale=colorscale,
-                               showscale=False,
-                               opacity=1,
-                               hoverinfo='none',
-                               contours=contours)
-            to_plot.extend([cyl, circl, circh])
+        cyl = go.Surface(x=xc, y=yc, z=zc,
+                         colorscale=colorscale,
+                         showscale=False,
+                         opacity=1,
+                         hoverinfo='none',
+                         contours=contours)
+        circl = go.Surface(x=xcircl, y=ycircl, z=zcircl,
+                           colorscale=colorscale,
+                           showscale=False,
+                           opacity=1,
+                           hoverinfo='none',
+                           contours=contours)
+        circh = go.Surface(x=xcirch, y=ycirch, z=zcirch,
+                           colorscale=colorscale,
+                           showscale=False,
+                           opacity=1,
+                           hoverinfo='none',
+                           contours=contours)
+        to_plot.extend([cyl, circl, circh])
 
     x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
     y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
@@ -115,16 +125,48 @@ def plotly_test(x_eye_mult, z_ratio, save):
                        scene_yaxis_visible=False,
                        scene_zaxis_visible=False)
 
-    x_eye = x_eye_mult * garden_constants.garden_x_len
-    z_eye = x_eye * z_ratio
+    y_eye = y_eye_mult * garden_constants.garden_x_len
+    z_eye = y_eye * z_ratio
     camera = dict(
         up=dict(x=0, y=0, z=1),
         center=dict(x=0, y=0, z=0),
-        eye=dict(x=x_eye, y=0, z=z_eye)
+        eye=dict(x=0, y=-y_eye, z=z_eye)
     )
+    title_text = "z ratio: {0}; h_mult: {1}".format(z_ratio, h_mult)
     fig = go.Figure(data=to_plot, layout=layout)
+
+    if plant_labels:
+        def get_x_labels(img):
+            return [p[0][0] for p in img]
+
+        def get_y_labels(img):
+            return [p[0][1] for p in img]
+
+        def get_z_labels(img):
+            return [garden_constants.plant_radii[p[1]] * h_mult + text_offset for p in img]
+
+        def get_text_labels(img):
+            return [str(p[1]) for p in img]
+        x_data = get_x_labels(img)
+        y_data = get_y_labels(img)
+        z_data = get_z_labels(img)
+        text_labels = get_text_labels(img)
+        fig.add_trace(go.Scatter3d(
+            x=x_data,
+            y=y_data,
+            z=z_data,
+            mode="text",
+            text=text_labels,
+            textposition="middle center",
+            textfont=dict(
+                family="sans serif",
+                size=12,
+                color="red"
+            )
+        ))
+
     fig.update_traces(hoverinfo='none')
-    fig.update_layout(scene_camera=camera)
+    fig.update_layout(scene_camera=camera, title_text=title_text)
 
     fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
@@ -133,7 +175,16 @@ def plotly_test(x_eye_mult, z_ratio, save):
     else:
         fig.show()
 
-#plotly_test(0.5)
-plotly_test(1, 0.25, save=True)
-plotly_test(0.001, 0.25, save=True)
-#plotly_test(0.1, 0.25)
+def main(mode):
+    if mode == 'cross':
+        for hm in hms:
+            for z_ratio in z_ratios:
+                for colors_dict in colors_dicts:
+                    for plant_label in plant_labels:
+                        plotly_test(1, z_ratio, hm, colors_dict, plant_label, save=True)
+    elif mode == 'single':
+        plotly_test(best_values['y_eye_mult'],
+                    best_values['z_ratio'],
+                    best_values['h_mult'])
+
+main('single')
