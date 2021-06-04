@@ -26,7 +26,7 @@ colors_of_plants_shibui = ['#00af42', '#00a265', '#00B146',
 colors_of_plants_hcl_v2 = ["#004800", "#005100", "#005A00",
                            "#006300", "#026D00", "#107600",
                            "#1C7F00", "#278900", "#33921E",
-                           "#3E9B24"]
+                           "#3E9B1F"]
 soil_color = "#50371f"
 num_plants = 10
 alpha = 1

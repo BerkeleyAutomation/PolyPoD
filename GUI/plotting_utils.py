@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import garden_constants
 import numpy as np
 from datetime import datetime
+import plotly_test as pt
 
 
 """
@@ -13,11 +14,12 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     show=False, save=False):
-    data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
-                               beta=beta, num_p_selector=num_p_selector,
-                               bounds_map_creator_args=bounds_map_creator_args,
-                               fill_final=fill_final)
+                                     data=False, save_plotly=True, show=False, save=True):
+    if data == False:
+        data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
+                                   beta=beta, num_p_selector=num_p_selector,
+                                   bounds_map_creator_args=bounds_map_creator_args,
+                                   fill_final=fill_final)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)
@@ -40,10 +42,17 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     ax.set_aspect(1)
     plt.title('num plants: {0}; time to generate: {1}s'.format(data.shape[0], "{:.4f}".format(time_elapsed)))
     if save:
-        fig_filename = "test_plots/plotted_graph_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+        fig_filename = "french_plots/2d_plot_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
-        data_filename = "test_plots/plotted_graph_data_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+        data_filename = "french_plots/data_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         np.save(data_filename, data)
     if show:
         plt.show()
+    if save_plotly:
+        pt.plotly_test(pt.single_values['y_eye_mult'],
+                       pt.single_values['z_ratio'],
+                       pt.single_values['h_mult'],
+                       pt.single_values['color_dict'],
+                       data=data, plant_labels=False, save=True)
     return fig, ax
+

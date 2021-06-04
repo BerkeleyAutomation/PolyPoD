@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import garden_constants
+from datetime import datetime
 
 fig, ax = plt.subplots()
 color_dicts = [garden_constants.colors_of_plants_hcl_v2]
@@ -16,7 +17,7 @@ def color_palette(color_dict):
 
     plt.xlim(0, 3)
     plt.ylim(0, y_len)
-    fig_filename = "color_palette/color_palette_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+    fig_filename = "color_palette_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
     plt.savefig(fig_filename, dpi=200)
 
 def main():

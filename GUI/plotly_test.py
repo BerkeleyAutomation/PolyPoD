@@ -7,28 +7,29 @@ from datetime import datetime
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
 # best h_hult: 0.43
-best_values = {'y_eye_mult':1, 'h_mult':0.43,
-               'z_ratio':0.42}
-colors_dicts = [garden_constants.colors_of_plants_hcl_v2]
-num_cols = 3
-num_rows = (garden_constants.num_plants - 1) // num_cols + 1
-shuffle_colors = True
-if shuffle_colors:
-    for colors_dict in colors_dicts:
-        copy = [_ for x in range(colors_dict)]
-        for r in num_rows:
-            to_swap = colors_dict[num_cols * r: num_cols * (r + 1)]
-
-            for n in to_swap:
-                copy[]
-
-
-hms = [0.25, 0.3, 0.35]
-z_ratios = [0.375, 0.44, 0.5]
+single_values = {'y_eye_mult':1, 'h_mult':0.43,
+               'z_ratio':0.42, 'plant_labels':False,
+               'color_dict':garden_constants.colors_of_plants_hcl_v2}
+hms = [single_values['h_mult']]
+z_ratios = [single_values['z_ratio']]
 plant_labels = [True, False]
 text_offset = 0.3
-def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, plant_labels=True, save=True):
-    plotly_prob_of_plant = 0.02
+colors_dicts = [single_values['color_dict']]
+shuffle_colors = True
+if shuffle_colors:
+    new_colors_dicts = []
+    for colors_dict in colors_dicts:
+        copy = [x for x in range(len(colors_dict))]
+        for r in range(3):
+            for c in range(3):
+                new_c = 2 - r
+                new_r = c
+                copy[3 * new_r + new_c] = colors_dict[3 * r + c]
+        copy[9] = colors_dict[9]
+        new_colors_dicts.append(copy)
+    colors_dicts = new_colors_dicts
+
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_labels=True, save=True):
 
     def make_colorscale(color):
         return [[0, color], [1, color]]
@@ -61,10 +62,9 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, plant_labels=True, sav
         return x_g, y_g, z_g
 
     to_plot = []
-    spg = RandomSeedPlacementGenerator.RandomSeedPlacementGenerator(
-        prob_of_plant=plotly_prob_of_plant)
-    img = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
-    #it = np.nditer(img.seed_placement, flags=["multi_index", "refs_ok"])
+    if data == None:
+        data = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
+    #it = np.nditer(data.seed_placement, flags=["multi_index", "refs_ok"])
 
     contours = go.surface.Contours(
                 x=go.surface.contours.X(highlight=False),
@@ -72,7 +72,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, plant_labels=True, sav
                 z=go.surface.contours.Z(highlight=False),
             )
 
-    for p in img:
+    for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         x, y = loc
         color = colors_dict[plant_index]
@@ -145,25 +145,24 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, plant_labels=True, sav
         center=dict(x=0, y=0, z=0),
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
-    title_text = "z ratio: {0}; h_mult: {1}".format(z_ratio, h_mult)
     fig = go.Figure(data=to_plot, layout=layout)
 
     if plant_labels:
-        def get_x_labels(img):
-            return [p[0][0] for p in img]
+        def get_x_labels(data):
+            return [p[0][0] for p in data]
 
-        def get_y_labels(img):
-            return [p[0][1] for p in img]
+        def get_y_labels(data):
+            return [p[0][1] for p in data]
 
-        def get_z_labels(img):
-            return [garden_constants.plant_radii[p[1]] * h_mult + text_offset for p in img]
+        def get_z_labels(data):
+            return [garden_constants.plant_radii[p[1]] * h_mult + text_offset for p in data]
 
-        def get_text_labels(img):
-            return [str(p[1]) for p in img]
-        x_data = get_x_labels(img)
-        y_data = get_y_labels(img)
-        z_data = get_z_labels(img)
-        text_labels = get_text_labels(img)
+        def get_text_labels(data):
+            return [str(p[1]) for p in data]
+        x_data = get_x_labels(data)
+        y_data = get_y_labels(data)
+        z_data = get_z_labels(data)
+        text_labels = get_text_labels(data)
         fig.add_trace(go.Scatter3d(
             x=x_data,
             y=y_data,
@@ -179,12 +178,12 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, plant_labels=True, sav
         ))
 
     fig.update_traces(hoverinfo='none')
-    fig.update_layout(scene_camera=camera, title_text=title_text)
+    fig.update_layout(scene_camera=camera)
 
     fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
     if save:
-        fig.write_image("3d_plots/plotted_graph_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
+        fig.write_image("french_plots/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
     else:
         fig.show()
 
@@ -196,8 +195,8 @@ def main(mode):
                     for plant_label in plant_labels:
                         plotly_test(1, z_ratio, hm, colors_dict, plant_label, save=True)
     elif mode == 'single':
-        plotly_test(best_values['y_eye_mult'],
-                    best_values['z_ratio'],
-                    best_values['h_mult'])
+        plotly_test(single_values['y_eye_mult'],
+                    single_values['z_ratio'],
+                    single_values['h_mult'],
+                    single_values['color_dict'])
 
-main('single')
