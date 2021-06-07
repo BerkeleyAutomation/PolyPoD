@@ -1,9 +1,9 @@
-import french_gardens
+import french_gardens_utils
 import numpy as np
 import matplotlib.pyplot as plt
 
-b = french_gardens.bounds_map_creator_args
-step = 5
+b = french_gardens_utils.bounds_map_creator_args
+step = 0.1
 datax = []
 datay = []
 for bmca in b:

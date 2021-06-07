@@ -7,6 +7,8 @@ from datetime import datetime
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
 # best h_hult: 0.43
+data_to_load = ["french_plots/french_1_data.npy", "french_plots/french_2_data.npy"]
+where_to_save = 'french_plots'
 single_values = {'y_eye_mult':1, 'h_mult':0.43,
                'z_ratio':0.42, 'plant_labels':False,
                'color_dict':garden_constants.colors_of_plants_hcl_v2}
@@ -29,8 +31,8 @@ if shuffle_colors:
         new_colors_dicts.append(copy)
     colors_dicts = new_colors_dicts
 
-def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_labels=True, save=True):
-
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_labels=True, save=True,
+                where_to_save=False):
     def make_colorscale(color):
         return [[0, color], [1, color]]
 
@@ -62,7 +64,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
         return x_g, y_g, z_g
 
     to_plot = []
-    if data == None:
+    if data is None:
         data = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
     #it = np.nditer(data.seed_placement, flags=["multi_index", "refs_ok"])
 
@@ -183,7 +185,10 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
     fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
     if save:
-        fig.write_image("french_plots/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
+        if where_to_save:
+            fig.write_image(where_to_save + "/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
+        else:
+            fig.write_image("3d_plots/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
     else:
         fig.show()
 
@@ -195,8 +200,15 @@ def main(mode):
                     for plant_label in plant_labels:
                         plotly_test(1, z_ratio, hm, colors_dict, plant_label, save=True)
     elif mode == 'single':
-        plotly_test(single_values['y_eye_mult'],
-                    single_values['z_ratio'],
-                    single_values['h_mult'],
-                    single_values['color_dict'])
+        for d in data_to_load:
+            loaded_data = np.load(d, allow_pickle=True)
+            plotly_test(single_values['y_eye_mult'],
+                        single_values['z_ratio'],
+                        single_values['h_mult'],
+                        single_values['color_dict'],
+                        plant_labels=False,
+                        data=loaded_data,
+                        where_to_save=where_to_save)
 
+if True:
+    main('single')
