@@ -209,6 +209,3 @@ def main(mode):
                         plant_labels=False,
                         data=loaded_data,
                         where_to_save=where_to_save)
-
-if True:
-    main('single')

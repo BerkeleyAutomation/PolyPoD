@@ -40,7 +40,7 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
-    #plt.title('num plants: {0}; time to generate: {1}s'.format(data.shape[0], "{:.4f}".format(time_elapsed)))
+    plt.title('num plants: {0}; time to generate: {1}s'.format(data.shape[0], "{:.4f}".format(time_elapsed)))
     if save:
         fig_filename = "french_plots/2d_plot_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)

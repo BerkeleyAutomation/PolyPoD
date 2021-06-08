@@ -1,6 +1,5 @@
 import numpy as np
 
-
 garden_x_len = 20
 garden_y_len = 20
 plant_max_radius = 1.5
@@ -9,6 +8,7 @@ garden_dimensions = (garden_x_len, garden_y_len, plant_max_radius)
 dims = np.array([garden_x_len, garden_y_len])
 garden_area = np.prod(dims)
 cellsize = 0.2
+assert plant_min_radius / cellsize >= 2.5
 a_func_multiplier = 0.328
 a_func_offset = 0.663
 a_func_exp_base = 3.71

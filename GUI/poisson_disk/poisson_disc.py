@@ -25,6 +25,14 @@ def weighted_round_or_one(x):
     r = max(weighted_round(x), 1)
     return r
 
+def memoize(f):
+    memo = {}
+    def helper(x):
+        if x not in memo:
+            memo[x] = f(x)
+        return memo[x]
+    return helper
+
 global_time_elapsed = 0
 def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final):
     # Preprocessing / Setup
@@ -93,12 +101,15 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         plant_index = int(plant_index)
         r = inhibition_radius(plant_index)
         return loc, plant_index, r
+
     # Main Helper Function
     def generate_garden_cluster(beta, bmca, starting_plants, points):
         if bmca == False:
             bounds_map = np.full(dims, True)
         else:
             upper, lower, bounds, num_checks = bmca
+            upper = memoize(upper)
+            lower = memoize(lower)
             upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
             lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
             bounds = [num / cellsize for num in bounds]
@@ -231,17 +242,3 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         b_garden_points, new_points_arr = generate_garden_cluster(
             beta, False, b_garden_points, points)
     return b_garden_points
-
-
-
-
-def cart_to_polar(x, y):
-    return math.sqrt(x ** 2 + y ** 2), math.tan(y / x)
-
-
-def shift_sample(data, x_shift, y_shift):
-    pass
-
-
-def rotate_sample(data, theta):
-    pass
