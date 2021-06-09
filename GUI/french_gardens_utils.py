@@ -13,7 +13,6 @@ circle_radius = 3
 rectangle_width = 4
 rectangle_length = 10 - rectangle_width / 2
 rectangle_indent = 0
-num_checks = 5
 
 def french_demo_bac():
     bounds_map_creator_args = []
@@ -68,13 +67,13 @@ def french_demo_bac():
         def ln4(a):
             return flip(un1(flip(a)))
 
-        bounds_map_creator_args.append([un1, ln1, bn1, num_checks])
+        bounds_map_creator_args.append([un1, ln1, bn1])
         if not only_vertical:
-            bounds_map_creator_args.append([un2, ln2, bn2, num_checks])
+            bounds_map_creator_args.append([un2, ln2, bn2])
         if not only_horizontal:
-            bounds_map_creator_args.append([un3, ln3, bn3, num_checks])
+            bounds_map_creator_args.append([un3, ln3, bn3])
         if not only_vertical and not only_horizontal:
-            bounds_map_creator_args.append([un4, ln4, bn4, num_checks])
+            bounds_map_creator_args.append([un4, ln4, bn4])
     four_reflections(b_corner1, u_corner1, l_corner1)
     four_reflections(b_circle1, u_circle1, l_circle1)
     four_reflections(b_rectl, u_rectl, l_rectl, only_horizontal=True)

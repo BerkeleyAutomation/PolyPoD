@@ -104,10 +104,8 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
 
     # Main Helper Function
     def generate_garden_cluster(beta, bmca, starting_plants, points):
-        if bmca == False:
-            bounds_map = np.full(dims, True)
-        else:
-            upper, lower, bounds, num_checks = bmca
+        if not bmca == False:
+            upper, lower, bounds = bmca
             upper = memoize(upper)
             lower = memoize(lower)
             upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
@@ -136,7 +134,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         def line_following(function, input_range):
             pass
 
-        def bounds_map_creator(upper, lower, num_checks, plant_type):
+        def bounds_map_creator(upper, lower, plant_type):
             def in_bounds(p):
                 loc, plant_index, r = point_unpacker_internal(p)
                 px = loc[0]
@@ -160,18 +158,11 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                     return False
                 return True
 
-            bounds_map = np.full(dims, -1, dtype=np.float32)
-            bounds_map[math.ceil(low_x_bound):math.floor(high_x_bound),
-                       math.ceil(low_y_bound):math.floor(high_y_bound)] = np.array(
-                [list(map(lambda x: in_bounds(x, plant_type), r)) for r in
-                 bounds_map[math.ceil(low_x_bound):math.floor(high_x_bound),
-                            math.ceil(low_y_bound):math.floor(high_y_bound)]])
-            it = np.nditer(bounds_map[math.ceil(low_x_bound):math.floor(high_x_bound),
-                           math.ceil(low_y_bound):math.floor(high_y_bound)],
-                           flags=["multi_index", "refs_ok"])
-            for _ in it:
-                bounds_map[it.multi_index] = in_bounds([it.multi_index, plant_type])
-            return bounds_map_bool
+            bounds_map = np.full(dims, 0, dtype=bool)
+            for x in range(math.ceil(low_x_bound), math.floor(high_x_bound)):
+                for y in range(math.ceil(low_y_bound), math.floor(high_y_bound)):
+                    bounds_map[x, y] = in_bounds([[x, y], plant_type])
+            return bounds_map
 
         def standard_criteria(plant_type):
             r = inhibition_radius(plant_type)
@@ -184,9 +175,12 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             return criteria
 
         def next_point(plant_type):
-            bounds_map = bounds_map_creator(upper_grid, lower_grid, num_checks, plant_type)
             scm = standard_criteria(plant_type)
-            criteria = scm & bounds_map
+            if bmca == False:
+                criteria = scm
+            else:
+                bounds_map = bounds_map_creator(upper_grid, lower_grid, plant_type)
+                criteria = scm & bounds_map
             candidates = points[criteria]
             if len(candidates) == 0:
                 return False
