@@ -19,7 +19,7 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
-                                   fill_final=fill_final)
+                                   fill_final=fill_final, utility_func=None)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)

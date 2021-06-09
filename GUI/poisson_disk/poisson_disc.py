@@ -35,6 +35,54 @@ def memoize(f):
     return helper
 
 global_time_elapsed = 0
+class Points:
+    def __init__(self, dims, ndim):
+        self.points = np.full(np.append(dims, ndim + 3), np.nan, dtype=np.float32)
+        it = np.nditer(self.points, flags=["multi_index", "refs_ok"])
+        for _ in it:
+            if it.multi_index[2] == 0:
+                self.points[it.multi_index] = it.multi_index[0]
+            elif it.multi_index[2] == 1:
+                self.points[it.multi_index] = it.multi_index[1]
+            elif it.multi_index[2] == 2 or it.multi_index[2] == 3:
+                self.points[it.multi_index] = np.inf
+
+    def get_points_array(self):
+        return self.points
+    def get_point_coords(self, p):
+        return p[0:2]
+
+    def get_cr(self, p):
+        return p[2]
+
+    def get_cb(self, p):
+        return p[3]
+
+    def get_plant_type(self, p):
+        return p[4]
+
+    def set_cr(self, x, y, cr):
+        self.points[int(x), int(y), 2] = cr
+
+    def set_cb(self, x, y, cb):
+        self.points[int(x), int(y), 3] = cb
+
+    def mark_plant(self, x, y, t):
+        self.points[int(x), int(y), 4] = t
+
+    def get_cr_map(self):
+        return self.points[:, :, 2]
+
+    def get_cb_map(self):
+        return self.points[:, :, 3]
+
+    def get_point_list(self):
+        return self.points.reshape(self.points.shape[0] * self.points.shape[1], self.points.shape[2])
+
+    def get_plant_list(self):
+        pointlist = self.get_point_list()
+        return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
+
 def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final,
                     utility_func):
     # Preprocessing / Setup
@@ -51,50 +99,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         dtbs_list = [xp, dimx - xp, yp, dimy - yp]
         dist_to_border[it.multi_index] = min(dtbs_list)
 
-    points = np.full(np.append(dims, ndim + 3), np.nan, dtype=np.float32)
-    it = np.nditer(points, flags=["multi_index", "refs_ok"])
-    for _ in it:
-        if it.multi_index[2] == 0:
-            points[it.multi_index] = it.multi_index[0]
-        elif it.multi_index[2] == 1:
-            points[it.multi_index] = it.multi_index[1]
-        elif it.multi_index[2] == 2 or it.multi_index[2] == 3:
-            points[it.multi_index] = np.inf
-
-    def get_point_coords(p):
-        return p[0:2]
-
-    def get_cr(p):
-        return p[2]
-
-    def get_cb(p):
-        return p[3]
-
-    def get_plant_type(p):
-        return p[4]
-
-    def set_cr(x, y, cr):
-        points[int(x), int(y), 2] = cr
-
-    def set_cb(x, y, cb):
-        points[int(x), int(y), 3] = cb
-
-    def mark_plant(x, y, t):
-        points[int(x), int(y), 4] = t
-
-    def get_cr_map(pointsx):
-        return pointsx[:, :, 2]
-
-    def get_cb_map(pointsx):
-        return pointsx[:, :, 3]
-
-    def get_point_list(pointsx):
-        return pointsx.reshape(pointsx.shape[0] * pointsx.shape[1], pointsx.shape[2])
-
-    def get_plant_list(pointsx):
-        pointlist = get_point_list(pointsx)
-        return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
-
+    points = Points(dims, ndim)
     def inhibition_radius(plant_type):
         return garden_constants.plant_radii[plant_type] / cellsize
 
@@ -168,8 +173,8 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
 
         def standard_criteria(plant_type):
             r = inhibition_radius(plant_type)
-            crm = get_cr_map(points)
-            cbm = get_cb_map(points)
+            crm = points.get_cr_map()
+            cbm = points.get_cb_map()
             c1 = crm > ((1 - beta) * r)
             c2 = cbm > r
             c3 = dist_to_border >= r
@@ -183,29 +188,33 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             else:
                 bounds_map = bounds_map_creator(upper_grid, lower_grid, plant_type)
                 criteria = scm & bounds_map
-            candidates = points[criteria]
+            candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            probability_distribution =
+            '''
+            probability_distribution = 
             draw = choice(candidates, 1,
                           p=probability_distribution)
-            add_point(get_point_coords(choice), plant_type)
+            '''
+            draw = candidates[rng.integers(candidates.shape[0])]
+
+            add_point(points.get_point_coords(draw), plant_type)
             return True
 
         def add_point(choice, plant_type):
             xc, yc = choice
             rc = inhibition_radius(plant_type)
-            pl = get_point_list(points)
+            pl = points.get_point_list()
             for m in pl:
-                mx, my = get_point_coords(m)
+                mx, my = points.get_point_coords(m)
                 d = math.dist([xc, yc], [mx, my])
                 dr = max(d - rc, 0)
                 db = max(d - ((1 - beta) * rc), 0)
-                if dr < get_cr(m):
-                    set_cr(mx, my, dr)
-                if db < get_cb(m):
-                    set_cb(mx, my, db)
-            mark_plant(xc, yc, plant_type)
+                if dr < points.get_cr(m):
+                    points.set_cr(mx, my, dr)
+                if db < points.get_cb(m):
+                    points.set_cb(mx, my, db)
+            points.mark_plant(xc, yc, plant_type)
             added_points.append([choice, plant_type])
 
         plant_index = garden_constants.num_plants - 1
@@ -247,8 +256,9 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                         break
 
         # to cartesian
-        final_points = get_plant_list(points)
-        return_val = np.array([np.array([get_point_coords(x) * cellsize, get_plant_type(x)], dtype=object)
+        final_points = points.get_plant_list()
+        return_val = np.array([np.array([points.get_point_coords(x) * cellsize,
+                                         points.get_plant_type(x)], dtype=object)
                                for x in final_points])
         return return_val, points
 
