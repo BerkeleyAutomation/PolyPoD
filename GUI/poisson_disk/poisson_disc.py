@@ -6,7 +6,7 @@ from numpy.random import default_rng
 rng = default_rng()
 import time
 
-def flip(p):
+def coin_flip(p):
     r = random.random()
     if r < p:
         return 1
@@ -19,7 +19,7 @@ def random_round(x):
 def weighted_round(x):
     fx = math.floor(x)
     p = x - fx
-    return fx + flip(p)
+    return fx + coin_flip(p)
 
 def weighted_round_or_one(x):
     r = max(weighted_round(x), 1)
@@ -113,6 +113,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
             lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
             bounds = [num / cellsize for num in bounds]
+            low_x_bound, high_x_bound, low_y_bound, high_y_bound = bounds
 
         def a_func(beta_arg):
             o = garden_constants.a_func_offset
@@ -135,33 +136,41 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         def line_following(function, input_range):
             pass
 
-        def bounds_map_creator(upper, lower, bounds, num_checks, plant_type):
+        def bounds_map_creator(upper, lower, num_checks, plant_type):
             def in_bounds(p):
                 loc, plant_index, r = point_unpacker_internal(p)
-                px, py = loc
-                low_bound, high_bound = bounds
+                px = loc[0]
+                py = loc[1]
 
-                def circ_up(i):
-                    d_px_i = math.fabs(px - i)
-                    return py + math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
+                circ_up = ucv + py
+                circ_low = lcv + py
 
-                def circ_low(i):
-                    d_px_i = math.fabs(px - i)
-                    return py - math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
+                adjusted_cv = cvx + px
+                upper_at_cv = np.array([upper(i) for i in adjusted_cv])
+                lower_at_cv = np.array([lower(i) for i in adjusted_cv])
 
-                upper_diff = [(upper(i) - circ_up(i)) > 0 for i in np.linspace(px - r, px + r, num_checks)]
-                lower_diff = [(circ_low(i) - lower(i)) > 0 for i in np.linspace(px - r, px + r, num_checks)]
+                upper_diff = upper_at_cv - circ_up
+                if np.amin(upper_diff) < 0:
+                    return False
+                lower_diff = circ_low - lower_at_cv
+                if np.amin(lower_diff) < 0:
+                    return False
+                in_left_right_bounds = (px - r) > low_x_bound and (px + r) < high_x_bound
+                if not in_left_right_bounds:
+                    return False
+                return True
 
-                in_left_right_bounds = (px - r) > low_bound and (px + r) < high_bound
-                return_val = np.all(upper_diff) and np.all(lower_diff) and in_left_right_bounds
-                return return_val
-
-            bounds_map = np.zeros(dims, dtype=np.float32)
-            it = np.nditer(bounds_map, flags=["multi_index", "refs_ok"])
+            bounds_map = np.full(dims, -1, dtype=np.float32)
+            bounds_map[math.ceil(low_x_bound):math.floor(high_x_bound),
+                       math.ceil(low_y_bound):math.floor(high_y_bound)] = np.array(
+                [list(map(lambda x: in_bounds(x, plant_type), r)) for r in
+                 bounds_map[math.ceil(low_x_bound):math.floor(high_x_bound),
+                            math.ceil(low_y_bound):math.floor(high_y_bound)]])
+            it = np.nditer(bounds_map[math.ceil(low_x_bound):math.floor(high_x_bound),
+                           math.ceil(low_y_bound):math.floor(high_y_bound)],
+                           flags=["multi_index", "refs_ok"])
             for _ in it:
-                i_b = in_bounds([it.multi_index, plant_type])
-                bounds_map[it.multi_index] = i_b
-            bounds_map_bool = bounds_map > 0
+                bounds_map[it.multi_index] = in_bounds([it.multi_index, plant_type])
             return bounds_map_bool
 
         def standard_criteria(plant_type):
@@ -175,7 +184,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             return criteria
 
         def next_point(plant_type):
-            bounds_map = bounds_map_creator(upper_grid, lower_grid, bounds, num_checks, plant_type)
+            bounds_map = bounds_map_creator(upper_grid, lower_grid, num_checks, plant_type)
             scm = standard_criteria(plant_type)
             criteria = scm & bounds_map
             candidates = points[criteria]
@@ -203,8 +212,29 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
 
         plant_index = garden_constants.num_plants - 1
 
+        # Inner Control (Plant Adding) Loop
         master_break = False
         while plant_index >= 0 and not master_break:
+            r = inhibition_radius(plant_index)
+            def circ_up_helper(d_px_i, r):
+                return math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
+
+            def circ_low_helper(d_px_i, r):
+                return -circ_up_helper(d_px_i, r)
+
+            def checking_values_x(r):
+                c = [0, -r, r]
+                if r == 3:
+                    c.extend([2, -2])
+                else:
+                    mid = r / math.sqrt(2)
+                    mf, mc =math.floor(mid), math.ceil(mid)
+                    c.extend([mf, mc, -mf, -mc])
+                return np.array(c)
+            cvx = checking_values_x(r)
+            ucv = np.array([circ_up_helper(cv, r) for cv in cvx])
+            lcv = np.array([circ_low_helper(cv, r) for cv in cvx])
+
             if plant_index > 0:
                 for _ in range(num_p[plant_index]):
                     n = next_point(plant_index)
@@ -222,16 +252,10 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         final_points = get_plant_list(points)
         return_val = np.array([np.array([get_point_coords(x) * cellsize, get_plant_type(x)], dtype=object)
                                for x in final_points])
-        stop = time.time()
-        time_elapsed = stop - start
-        global global_time_elapsed
-        global_time_elapsed = time_elapsed
         return return_val, points
 
     # Master Control Loop
-    final_return = False
     b_garden_points = None
-    new_points_arr = None
     if bounds_map_creator_args == False:
         fill_final = True
     else:
@@ -241,4 +265,9 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
     if fill_final:
         b_garden_points, new_points_arr = generate_garden_cluster(
             beta, False, b_garden_points, points)
+    # Timing
+    stop = time.time()
+    time_elapsed = stop - start
+    global global_time_elapsed
+    global_time_elapsed = time_elapsed
     return b_garden_points

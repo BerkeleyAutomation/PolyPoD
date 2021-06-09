@@ -5,7 +5,7 @@ import poisson_disk.poisson_disc as poi
 beta = 1
 num_p_selector = poi.weighted_round_or_one
 fill_final = False
-data = None
+data = False
 save_plotly=False
 show=False
 save=True
