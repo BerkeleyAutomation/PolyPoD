@@ -3,6 +3,7 @@ import random
 import garden_constants
 import math
 from numpy.random import default_rng
+from numpy.random import choice
 rng = default_rng()
 import time
 
@@ -34,7 +35,8 @@ def memoize(f):
     return helper
 
 global_time_elapsed = 0
-def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final):
+def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final,
+                    utility_func):
     # Preprocessing / Setup
     start = time.time()
     added_points = []
@@ -184,7 +186,9 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             candidates = points[criteria]
             if len(candidates) == 0:
                 return False
-            choice = candidates[rng.integers(candidates.shape[0])]
+            probability_distribution =
+            draw = choice(candidates, 1,
+                          p=probability_distribution)
             add_point(get_point_coords(choice), plant_type)
             return True
 
@@ -202,7 +206,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                 if db < get_cb(m):
                     set_cb(mx, my, db)
             mark_plant(xc, yc, plant_type)
-            added_points.append(choice)
+            added_points.append([choice, plant_type])
 
         plant_index = garden_constants.num_plants - 1
 
