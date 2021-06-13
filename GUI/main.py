@@ -270,7 +270,7 @@ class Application(tk.Frame):
         self.rightimage = spg.generate_seed_placement()
         '''
         self.leftimage = 'full.png'
-        self.right = 'abstract.png'
+        self.rightimage = 'abstract.png'
         display_gardens.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
 
 root = tk.Tk()

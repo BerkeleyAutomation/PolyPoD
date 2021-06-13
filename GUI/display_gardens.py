@@ -23,13 +23,18 @@ import garden_constants
 # and the value entry represents the height of the plant.
 
 def plot_and_show_images(leftimage, rightimage, root):
-    images_to_process = [leftimage, rightimage]
-    figs = []
-    axes = []
-    for _ in range(len(images_to_process)):
-        fig = Figure(figsize=(5, 4), dpi=100)
-        figs.append(fig)
-    canvases = pack_images(root, figs)
+    for slave in root.pack_slaves():
+        slave.pack_forget()
+    leftimage = tk.PhotoImage(file='pretty.png')
+    canvas.create_image(10, 10, image=myimg, anchor='nw')
+    left_canvas = FigureCanvasTkAgg(leftimage, master=root)  # A tk.DrawingArea.
+    right_canvas = FigureCanvasTkAgg(rightimage, master=root)  # A tk.DrawingArea.
+
+    left_canvas.draw()
+    right_canvas.draw()
+
+    left_canvas.get_tk_widget().pack(side="left")
+    right_canvas.get_tk_widget().pack(side="right")
     # this was for back when we had to draw it in matplotlib and show interactive figure.
     '''
     for fig in figs:
@@ -122,19 +127,3 @@ def plot_and_show_images(leftimage, rightimage, root):
         ax.add_collection3d(poly1)
         '''
 
-def pack_images(root, figs):
-    for slave in root.pack_slaves():
-        slave.pack_forget()
-    canvases = []
-    for count, fig in enumerate(figs):
-        canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-        canvas.draw()
-        canvases.append(canvas)
-
-        # a somewhat hack-y solution to get the left image to pack on the left and the right image to
-        # pack on the right.
-        if count == 0:
-            canvas.get_tk_widget().pack(side="left")
-        else:
-            canvas.get_tk_widget().pack(side="right")
-    return canvases
