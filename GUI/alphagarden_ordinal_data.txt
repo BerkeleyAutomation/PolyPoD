@@ -143,6 +143,14 @@
         {
             "image": "R",
             "rating": "dislike"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }

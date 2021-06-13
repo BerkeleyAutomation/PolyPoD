@@ -18,7 +18,7 @@ import mpl_toolkits
 import plotly.graph_objects as go
 import garden_constants
 
-# Generates random 4x10x10 (plant_max_height by g...) images of dots and cirles, representing a 10x10 garden with 4 different
+# Generates random 4x10x10 (plant_max_radius by g...) images of dots and cirles, representing a 10x10 garden with 4 different
 # plant species. the x dimension specifies plant type, the y and z specify the location of the plant,
 # and the value entry represents the height of the plant.
 
@@ -30,14 +30,16 @@ def plot_and_show_images(leftimage, rightimage, root):
         fig = Figure(figsize=(5, 4), dpi=100)
         figs.append(fig)
     canvases = pack_images(root, figs)
+    # this was for back when we had to draw it in matplotlib and show interactive figure.
+    '''
     for fig in figs:
         ax = fig.add_subplot(projection='3d')
         if garden_constants.garden_x_len > garden_constants.garden_y_len:
             ax.pbaspect = [1.0, garden_constants.garden_y_len / garden_constants.garden_x_len,
-                           garden_constants.plant_max_height / garden_constants.garden_x_len]
+                           garden_constants.plant_max_radius / garden_constants.garden_x_len]
         else:
             ax.pbaspect = [garden_constants.garden_x_len / garden_constants.garden_y_len, 1.0,
-                           garden_constants.plant_max_height / garden_constants.garden_x_len]
+                           garden_constants.plant_max_radius / garden_constants.garden_x_len]
 
         # Hide grid lines
         ax.grid(False)
@@ -53,7 +55,7 @@ def plot_and_show_images(leftimage, rightimage, root):
         #ax.set_aspect(aspect=1)
         ax.set_xlim(left=-1, right=garden_constants.garden_x_len)
         ax.set_ylim(bottom=-1, top=garden_constants.garden_y_len)
-        ax.set_zlim(bottom=0, top=garden_constants.plant_max_height)
+        ax.set_zlim(bottom=0, top=garden_constants.plant_max_radius)
     for _ in range(len(images_to_process)):
         img = images_to_process.pop()
         ax = axes.pop()
@@ -118,6 +120,7 @@ def plot_and_show_images(leftimage, rightimage, root):
                                                                garden_constants.garden_y_len, 0)]]
         poly1 = Poly3DCollection(vertices1, alpha=1, color=garden_constants.soil_color)
         ax.add_collection3d(poly1)
+        '''
 
 def pack_images(root, figs):
     for slave in root.pack_slaves():

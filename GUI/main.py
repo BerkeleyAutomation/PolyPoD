@@ -103,7 +103,9 @@ class Application(tk.Frame):
         else:
             raise AttributeError("Invalid spg_type")
 
+        # generate and show images
         self.generate_and_show_images(self.spg)
+
         # frames
         self.buttonssubframe.pack(side='bottom')
         self.leftsubframe.pack(side='left')
@@ -262,8 +264,13 @@ class Application(tk.Frame):
             json.dump(self.ordinalrecords, outfile, indent=4)
 
     def generate_and_show_images(self, spg):
+        # todo change back to actually generating new images
+        '''
         self.leftimage = spg.generate_seed_placement()
         self.rightimage = spg.generate_seed_placement()
+        '''
+        self.leftimage = 'full.png'
+        self.right = 'abstract.png'
         display_gardens.plot_and_show_images(self.leftimage, self.rightimage, self.imagelabel)
 
 root = tk.Tk()

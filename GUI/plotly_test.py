@@ -7,20 +7,21 @@ from datetime import datetime
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
 # best h_hult: 0.43
-data_to_load = ["french_plots/french_1_data.npy", "french_plots/french_2_data.npy"]
+data_to_load = ['data_06-08-21_19-18-07-814772.npy']
 where_to_save = 'french_plots'
 single_values = {'y_eye_mult':1, 'h_mult':0.43,
                'z_ratio':0.42, 'plant_labels':False,
                'color_dict':garden_constants.colors_of_plants_hcl_v2}
 hms = [single_values['h_mult']]
 z_ratios = [single_values['z_ratio']]
-plant_labels = [True, False]
+plant_labels = [False]
 text_offset = 0.3
 colors_dicts = [single_values['color_dict']]
 shuffle_colors = True
-if shuffle_colors:
-    new_colors_dicts = []
-    for colors_dict in colors_dicts:
+
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labels=True, save=True,
+                where_to_save=False):
+    if shuffle_colors:
         copy = [x for x in range(len(colors_dict))]
         for r in range(3):
             for c in range(3):
@@ -28,11 +29,7 @@ if shuffle_colors:
                 new_r = c
                 copy[3 * new_r + new_c] = colors_dict[3 * r + c]
         copy[9] = colors_dict[9]
-        new_colors_dicts.append(copy)
-    colors_dicts = new_colors_dicts
-
-def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_labels=True, save=True,
-                where_to_save=False):
+        colors_dict = copy
     def make_colorscale(color):
         return [[0, color], [1, color]]
 
@@ -64,7 +61,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
         return x_g, y_g, z_g
 
     to_plot = []
-    if data is None:
+    if data == False:
         data = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
     #it = np.nditer(data.seed_placement, flags=["multi_index", "refs_ok"])
 

@@ -50,7 +50,7 @@ class Points:
     def get_points_array(self):
         return self.points
     def get_point_coords(self, p):
-        return p[0:2]
+        return [p[0], p[1]]
 
     def get_cr(self, p):
         return p[2]
@@ -87,7 +87,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                     utility_func):
     # Preprocessing / Setup
     start = time.time()
-    added_points = []
+    added_points = [[] for _ in range(garden_constants.num_plants)]
     ndim = dims.size
     dims = (dims / cellsize).astype(int)
 
@@ -191,14 +191,18 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            '''
-            probability_distribution = 
-            draw = choice(candidates, 1,
-                          p=probability_distribution)
-            '''
-            draw = candidates[rng.integers(candidates.shape[0])]
-
-            add_point(points.get_point_coords(draw), plant_type)
+            if utility_func:
+                probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
+                                                     points, added_points) for p in candidates])
+                probability_distribution = probability_distribution/probability_distribution.sum()
+                selection_array = np.arange(len(candidates))
+                draw_num = choice(selection_array, 1,
+                              p=probability_distribution)
+                draw = candidates[draw_num]
+            else:
+                draw = candidates[rng.integers(candidates.shape[0])]
+            to_add = [draw[0][0], draw[0][1]]
+            add_point(to_add, plant_type)
             return True
 
         def add_point(choice, plant_type):
@@ -215,7 +219,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                 if db < points.get_cb(m):
                     points.set_cb(mx, my, db)
             points.mark_plant(xc, yc, plant_type)
-            added_points.append([choice, plant_type])
+            added_points[plant_type].append([choice, plant_type])
 
         plant_index = garden_constants.num_plants - 1
 
@@ -257,7 +261,8 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
 
         # to cartesian
         final_points = points.get_plant_list()
-        return_val = np.array([np.array([points.get_point_coords(x) * cellsize,
+        return_val = np.array([np.array([[points.get_point_coords(x)[0] * cellsize,
+                                          points.get_point_coords(x)[1] * cellsize],
                                          points.get_plant_type(x)], dtype=object)
                                for x in final_points])
         return return_val, points

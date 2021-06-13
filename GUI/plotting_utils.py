@@ -14,12 +14,13 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
+                                     utility_func, test_util_exp=0,
                                      data=False, save_plotly=True, show=False, save=True):
     if data == False:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
-                                   fill_final=fill_final, utility_func=None)
+                                   fill_final=fill_final, utility_func=utility_func)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)
@@ -40,7 +41,8 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
-    plt.title('num plants: {0}; time to generate: {1}s'.format(data.shape[0], "{:.4f}".format(time_elapsed)))
+    plt.title('num plants: {0}; time to generate: {1}s; test_util_exp: {2}'.format(
+        data.shape[0], "{:.4f}".format(time_elapsed), test_util_exp))
     if save:
         fig_filename = "french_plots/2d_plot_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
