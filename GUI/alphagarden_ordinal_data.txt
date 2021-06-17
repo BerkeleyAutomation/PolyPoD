@@ -151,6 +151,46 @@
         {
             "image": "R",
             "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "neutral"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
+        },
+        {
+            "image": "L",
+            "rating": "dislike"
+        },
+        {
+            "image": "R",
+            "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "like"
         }
     ]
 }

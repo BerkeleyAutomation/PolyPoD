@@ -17,6 +17,8 @@ from matplotlib.backend_bases import key_press_handler
 import mpl_toolkits
 import plotly.graph_objects as go
 import garden_constants
+import tkinter as tk
+from PIL import ImageTk,Image
 
 # Generates random 4x10x10 (plant_max_radius by g...) images of dots and cirles, representing a 10x10 garden with 4 different
 # plant species. the x dimension specifies plant type, the y and z specify the location of the plant,
@@ -25,16 +27,29 @@ import garden_constants
 def plot_and_show_images(leftimage, rightimage, root):
     for slave in root.pack_slaves():
         slave.pack_forget()
-    leftimage = tk.PhotoImage(file='pretty.png')
-    canvas.create_image(10, 10, image=myimg, anchor='nw')
-    left_canvas = FigureCanvasTkAgg(leftimage, master=root)  # A tk.DrawingArea.
-    right_canvas = FigureCanvasTkAgg(rightimage, master=root)  # A tk.DrawingArea.
+    leftimage_tk = ImageTk.PhotoImage(Image.open(leftimage))
+    rightimage_tk = ImageTk.PhotoImage(Image.open(rightimage))
 
-    left_canvas.draw()
-    right_canvas.draw()
+    # Make the new image half the width and half the height of the original image
+    #leftimage_resized = leftimage_tk.resize((round(leftimage_tk.size[0] * 0.5),
+    #                                         round(leftimage_tk.size[1] * 0.5))
+    left_label = tk.Label(root, image=leftimage_tk)
+    left_label.image = leftimage_tk
+    left_label.pack(side='left')
 
-    left_canvas.get_tk_widget().pack(side="left")
-    right_canvas.get_tk_widget().pack(side="right")
+    right_label = tk.Label(root, image=rightimage_tk)
+    right_label.image = rightimage_tk
+    right_label.pack(side='left')
+
+    '''
+    left_canvas = tk.Canvas(root)
+    right_canvas = tk.Canvas(root)
+    left_canvas.create_image(20, 20, image=leftimage_tk)
+    right_canvas.create_image(0, 0, image=rightimage_tk)
+    left_canvas.pack(side="left")
+    right_canvas.pack(side="right")
+    '''
+
     # this was for back when we had to draw it in matplotlib and show interactive figure.
     '''
     for fig in figs:
