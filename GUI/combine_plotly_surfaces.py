@@ -14,7 +14,7 @@ def norm_v_in_range(v, start, end):
 
     return (v - v_min) / (v_max - v_min) * range_length + start
 
-def combine_all_surfaces_in_one(X, Y, *Z):
+def combine_all_surfaces_in_one(*XYZ):
     # prepare colors and ranges for diffrent surfaces
     colors = ['rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
               'rgb(180, 180,  20)', 'rgb( 20, 180, 180)', 'rgb(180, 20, 180)',
@@ -22,10 +22,14 @@ def combine_all_surfaces_in_one(X, Y, *Z):
               'rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
               'rgb(255, 127, 127)', 'rgb(127, 255, 127)']
 
-    N = len(Z)
+    N = len(XYZ)
     points = np.linspace(0, 1, N + 1)
     custom_colorscale = []
     ranges = []
+
+    X0 = XYZ[0][0]
+    Y0 = XYZ[0][1]
+    Z0 = XYZ[0][2]
 
     for i in range(1, N + 1):
         ranges.append([points[i - 1], points[i] - 0.05])
@@ -34,27 +38,30 @@ def combine_all_surfaces_in_one(X, Y, *Z):
     custom_colorscale.append([1, colors[i]])
 
     # transparent connection between grahps: np.nan in z prevent ploting points
-    transparen_link = np.empty_like(X[0], dtype=object)
+    transparen_link = np.empty_like(X0[0], dtype=object)
     transparen_link.fill(np.nan)
 
     # include first graph
-    combined_X = X
-    combined_Y = Y
-    combined_Z = Z[0]
+    combined_X = X0
+    combined_Y = Y0
+    combined_Z = Z0
 
     # prepare collor matrix for first graph (Z[0])
     start = ranges[0][0]
     end = ranges[0][1]
 
-    custom_surfacecolor = norm_v_in_range(Z[0], start, end)
+    custom_surfacecolor = norm_v_in_range(Z0, start, end)
 
     range_index = 1
 
-    for next_Z in Z[1:]:
+    for next_surf in XYZ[1:]:
+        X = next_surf[0]
+        Y = next_surf[1]
+        Z = next_surf[2]
         combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
         combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
         combined_Z = np.vstack(
-            [combined_Z, combined_Z[-1], transparen_link, next_Z[0], next_Z])
+            [combined_Z, combined_Z[-1], transparen_link, Z[0], Z])
 
         # prepare collors for next Z_
         start = ranges[range_index][0]
