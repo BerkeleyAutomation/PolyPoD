@@ -10,7 +10,7 @@ num_p_selector = poi.weighted_round_or_one
 fill_final = False
 data = np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
 generate_plotly=True
-save_plotly=False
+save_plotly=True
 save=True
 util_exp = -3
 test_util_exps = [1]

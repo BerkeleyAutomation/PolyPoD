@@ -53,15 +53,17 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         x, y - centerpoint
         returns the circle parameterization
         """
+        if nr == 3:
+            r = [0, 0.01, r]
+        else:
+            r = np.linspace(0, r, nr)
         theta = np.linspace(0, 2 * np.pi, nt)
-        r = np.linspace(0, r, nr)
         theta, r = np.meshgrid(theta, r)
         x_g = (r * np.cos(theta)) + x
         y_g = (r * np.sin(theta)) + y
         z_g = h*np.ones(theta.shape)
         return x_g, y_g, z_g
 
-    to_plot = []
     if data is None:
         data = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
     #it = np.nditer(data.seed_placement, flags=["multi_index", "refs_ok"])
@@ -72,6 +74,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
                 z=go.surface.contours.Z(highlight=False),
             )
 
+    to_plot = [[] for _ in range(10)]
     for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         x, y = loc
@@ -103,7 +106,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
                            hoverinfo='none',
                            contours=contours)
         '''
-        to_plot.extend([[xcircl, ycircl, zcircl, color], [xcirch, ycirch, zcirch, color]]) # [xc, yc, zc, color],
+        to_plot[plant_index].extend([[xc, yc, zc], [xcircl, ycircl, zcircl], [xcirch, ycirch, zcirch]])
 
     x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
     y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
@@ -146,16 +149,22 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         center=dict(x=0, y=0, z=0),
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
-    x, y, z, custom_colorscale = \
-        combine_plotly_surfaces.combine_all_surfaces_in_one(to_plot, '#CC0000')
+    surfaces = [soil]
+    etp = list(enumerate(to_plot))
+    print(colors_dict)
+    for i, t in etp:
+        x, y, z, custom_colorscale = \
+            combine_plotly_surfaces.combine_all_surfaces_in_one(t, colors_dict[i])
+        print('ccs', custom_colorscale)
+        surfaces.append(go.Surface(x=x, y=y, z=z, cmin=0, cmax=1,
+                                 colorscale=custom_colorscale, showscale=False,
+                                 opacity=1,
+                                 hoverinfo='none',
+                                 contours=contours
+                                 ))
 
     # opacity =0.9 - many overlaped areas, better witot it
-    fig = go.Figure(data=[go.Surface(x=x, y=y, z=z, cmin=0, cmax=1,
-                                     colorscale=custom_colorscale, showscale=False,
-                                     opacity=1,
-                                     hoverinfo='none',
-                                     contours=contours
-                                     )])
+    fig = go.Figure(data=surfaces, layout=layout)
 
     if plant_labels:
         def get_x_labels(data):
