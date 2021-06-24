@@ -14,7 +14,33 @@ def norm_v_in_range(v, start, end):
 
     return (v - v_min) / (v_max - v_min) * range_length + start
 
-def combine_all_surfaces_in_one(*XYZ):
+def make_square(XYZ):
+    x_max = 0
+    y_max = 0
+    z_max = 0
+    for s in XYZ:
+        x_max = max(len(s[0]), x_max)
+        y_max = max(len(s[1]), y_max)
+        z_max = max(len(s[2]), z_max)
+    def fix_z(z):
+        print('z.shape first', z.shape)
+        z = np.array([np.append(r, np.full(x_max - len(r), np.nan)) for r in z])
+        print('z.shape second', z.shape)
+        print('y_max - z.shape[1], x_max', y_max - z.shape[0], x_max)
+        to_add = np.full((y_max - z.shape[0], x_max), 0)
+        z = np.concatenate((z, to_add), axis=0)
+        print('z.shape third', z.shape)
+        return z
+
+    XYZ = [[np.append(s[0], np.full(x_max - len(s[0]), np.nan)),
+            np.append(s[1], np.full(y_max - len(s[1]), np.nan)),
+            fix_z(s[2])] for s in XYZ]
+
+
+    return XYZ
+
+
+def combine_all_surfaces_in_one(XYZ):
     # prepare colors and ranges for diffrent surfaces
     colors = ['rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
               'rgb(180, 180,  20)', 'rgb( 20, 180, 180)', 'rgb(180, 20, 180)',
@@ -23,12 +49,14 @@ def combine_all_surfaces_in_one(*XYZ):
               'rgb(255, 127, 127)', 'rgb(127, 255, 127)']
 
     N = len(XYZ)
+    XYZ = make_square(XYZ)
     points = np.linspace(0, 1, N + 1)
     custom_colorscale = []
     ranges = []
 
     X0 = XYZ[0][0]
     Y0 = XYZ[0][1]
+    X0, Y0 = np.meshgrid(X0, Y0)
     Z0 = XYZ[0][2]
 
     for i in range(1, N + 1):
@@ -57,6 +85,7 @@ def combine_all_surfaces_in_one(*XYZ):
     for next_surf in XYZ[1:]:
         X = next_surf[0]
         Y = next_surf[1]
+        X, Y = np.meshgrid(X, Y)
         Z = next_surf[2]
         combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
         combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
@@ -66,7 +95,7 @@ def combine_all_surfaces_in_one(*XYZ):
         # prepare collors for next Z_
         start = ranges[range_index][0]
         end = ranges[range_index][1]
-        next_surfacecolor = norm_v_in_range(next_Z, start, end)
+        next_surfacecolor = norm_v_in_range(Z, start, end)
         custom_surfacecolor = np.vstack(
             [custom_surfacecolor, custom_surfacecolor[-1], transparen_link, next_surfacecolor[0],
              next_surfacecolor])
@@ -77,17 +106,22 @@ def combine_all_surfaces_in_one(*XYZ):
     return combined_X, combined_Y, combined_Z, custom_surfacecolor, custom_colorscale
 
 
-X = np.arange(-1.2, 1.06, 0.1)
-Y = np.arange(0.2, 1.06, 0.1)
-X, Y = np.meshgrid(X, Y)
+X_nongrid = np.arange(-1.2, 1.06, 0.1)
+Y_nongrid = np.arange(0.2, 1.06, 0.1)
+X, Y = np.meshgrid(X_nongrid, Y_nongrid)
+
+X2_nongrid = np.arange(-0.2, 2, 0.1)
+Y2_nongrid = np.arange(-1, 2, 0.1)
+X2, Y2 = np.meshgrid(X2_nongrid, Y2_nongrid)
 
 Z1 = 2 * np.sin(np.sqrt(20 * X ** 2 + 20 * Y ** 2))
-Z2 = 2 * np.cos(np.sqrt(20 * X ** 2 + 20 * Y ** 2))
+Z2 = 2 * np.cos(np.sqrt(20 * X2 ** 2 + 20 * Y2 ** 2))
 Z3 = X * 2 + 0.5
 Z4 = Y * 0 + 1.0
 Z5 = Y * 0 - 1.0
 Z6 = Y * 1 + 10
-x, y, z, custom_surfacecolor, custom_colorscale = combine_all_surfaces_in_one(X, Y, Z1, Z2, Z3, Z4, Z5, Z6)
+inputs = [[X_nongrid, Y_nongrid, Z1], [X2_nongrid, Y2_nongrid, Z2], [X_nongrid, Y_nongrid, Z3], [X_nongrid, Y_nongrid, Z4], [X_nongrid, Y_nongrid, Z5], [X_nongrid, Y_nongrid, Z6]]
+x, y, z, custom_surfacecolor, custom_colorscale = combine_all_surfaces_in_one(inputs)
 
 # opacity =0.9 - many overlaped areas, better witot it
 fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,

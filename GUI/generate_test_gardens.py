@@ -10,10 +10,10 @@ num_p_selector = poi.weighted_round_or_one
 fill_final = False
 data = False #np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
 save_plotly=False
-show=False
-save=True
+show=True
+save=False
 util_exp = -3
-test_util_exps = np.arange(-8, -5, 1)
+test_util_exps = [1]
 
 #bounds_map_creator_args = french_gardens_utils.french_demo_bac()
 #bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]
@@ -30,6 +30,6 @@ for test_util_exp in test_util_exps:
         else:
             return cum_dist ** test_util_exp
     plotting_utils.generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                                    utility_func=similar_clustering_utility_func,
+                                                    utility_func=False,
                                                     test_util_exp=test_util_exp,
                                                     data=data, save_plotly=save_plotly, show=show, save=save)
