@@ -34,17 +34,9 @@ def make_square(XYZ):
 
     return XYZ
 
-def combine_all_surfaces_in_one(XYZC, colors):
+def combine_all_surfaces_in_one(XYZ, color):
     # prepare colors and ranges for diffrent surfaces
-    N = len(colors)
-    color_to_colorscale = {}
-    for i, color in enumerate(colors):
-        color_to_colorscale[color] = i
-    points = np.linspace(0, 1, N + 1)
-    custom_colorscale = []
-    for i in range(0, N):
-        custom_colorscale.append([points[i], colors[i]])
-    #custom_colorscale.append([1, XYZC[i - 1][3]]) # todo did commenting this screw something up?
+    custom_colorscale = [[0, color], [1, color]]
 
     X0 = XYZC[0][0]
     Y0 = XYZC[0][1]
@@ -62,7 +54,6 @@ def combine_all_surfaces_in_one(XYZC, colors):
     combined_Z = Z0
 
 
-    custom_surfacecolor = np.full(Z0.shape, color_to_colorscale[C0])
 
     for next_surf in XYZC[1:]:
         X = next_surf[0]
