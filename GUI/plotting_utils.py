@@ -14,9 +14,9 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     utility_func, test_util_exp=0,
-                                     data=False, save_plotly=True, show=False, save=True):
-    if data == False:
+                                     utility_func, generate_plotly, test_util_exp=0,
+                                     data=False, save_plotly=True, save=True):
+    if data is None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
@@ -48,13 +48,13 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
         plt.savefig(fig_filename, dpi=200)
         data_filename = "french_plots/data_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         np.save(data_filename, data)
-    if show:
-        plt.show()
-    if save_plotly:
+    if generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],
                        pt.single_values['h_mult'],
                        pt.single_values['color_dict'],
-                       data=data, plant_labels=False, save=True)
+                       data=data, plant_labels=False, save=save_plotly)
+    else:
+        plt.show()
     return fig, ax
 

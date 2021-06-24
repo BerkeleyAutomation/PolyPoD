@@ -19,17 +19,13 @@ def make_square(XYZ):
     y_max = 0
     z_max = 0
     for s in XYZ:
-        x_max = max(len(s[0]), x_max)
-        y_max = max(len(s[1]), y_max)
-        z_max = max(len(s[2]), z_max)
+        x_max = max(len(s[0][0]), x_max)
+        y_max = max(len(s[1][0]), y_max)
+        z_max = max(len(s[2][0]), z_max)
     def fix_z(z):
-        print('z.shape first', z.shape)
         z = np.array([np.append(r, np.full(x_max - len(r), np.nan)) for r in z])
-        print('z.shape second', z.shape)
-        print('y_max - z.shape[1], x_max', y_max - z.shape[0], x_max)
         to_add = np.full((y_max - z.shape[0], x_max), 0)
         z = np.concatenate((z, to_add), axis=0)
-        print('z.shape third', z.shape)
         return z
 
     XYZ = [[np.append(s[0], np.full(x_max - len(s[0]), np.nan)),
@@ -40,30 +36,30 @@ def make_square(XYZ):
     return XYZ
 
 
-def combine_all_surfaces_in_one(XYZ):
+def combine_all_surfaces_in_one(XYZC):
     # prepare colors and ranges for diffrent surfaces
     colors = ['rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
               'rgb(180, 180,  20)', 'rgb( 20, 180, 180)', 'rgb(180, 20, 180)',
               'rgb(180,  20,  20)', 'rgb( 20, 180,  20)', 'rgb( 20, 20, 180)',
               'rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
               'rgb(255, 127, 127)', 'rgb(127, 255, 127)']
-
+    XYZ = [a[:3] for a in XYZC]
     N = len(XYZ)
-    XYZ = make_square(XYZ)
+    #XYZ = make_square(XYZ)
     points = np.linspace(0, 1, N + 1)
     custom_colorscale = []
     ranges = []
 
     X0 = XYZ[0][0]
     Y0 = XYZ[0][1]
-    X0, Y0 = np.meshgrid(X0, Y0)
+    #X0, Y0 = np.meshgrid(X0, Y0)
     Z0 = XYZ[0][2]
-
+    C0 = XYZC[3]
     for i in range(1, N + 1):
         ranges.append([points[i - 1], points[i] - 0.05])
-        custom_colorscale.append([points[i - 1], colors[i]])
-        custom_colorscale.append([points[i] - 0.05, colors[i]])
-    custom_colorscale.append([1, colors[i]])
+        custom_colorscale.append([points[i - 1], XYZC[i - 1][3]])
+        custom_colorscale.append([points[i] - 0.05, XYZC[i - 1][3]])
+    #custom_colorscale.append([1, XYZC[i - 1][3]]) # todo did commenting this screw something up?
 
     # transparent connection between grahps: np.nan in z prevent ploting points
     transparen_link = np.empty_like(X0[0], dtype=object)
@@ -85,8 +81,9 @@ def combine_all_surfaces_in_one(XYZ):
     for next_surf in XYZ[1:]:
         X = next_surf[0]
         Y = next_surf[1]
-        X, Y = np.meshgrid(X, Y)
+        #X, Y = np.meshgrid(X, Y)
         Z = next_surf[2]
+        #print('X\n', X, '\nY\n', Y, '\nZ\n', Z)
         combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
         combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
         combined_Z = np.vstack(
@@ -95,7 +92,7 @@ def combine_all_surfaces_in_one(XYZ):
         # prepare collors for next Z_
         start = ranges[range_index][0]
         end = ranges[range_index][1]
-        next_surfacecolor = norm_v_in_range(Z, start, end)
+        next_surfacecolor = np.full
         custom_surfacecolor = np.vstack(
             [custom_surfacecolor, custom_surfacecolor[-1], transparen_link, next_surfacecolor[0],
              next_surfacecolor])
@@ -121,12 +118,15 @@ Z4 = Y * 0 + 1.0
 Z5 = Y * 0 - 1.0
 Z6 = Y * 1 + 10
 inputs = [[X_nongrid, Y_nongrid, Z1], [X2_nongrid, Y2_nongrid, Z2], [X_nongrid, Y_nongrid, Z3], [X_nongrid, Y_nongrid, Z4], [X_nongrid, Y_nongrid, Z5], [X_nongrid, Y_nongrid, Z6]]
-x, y, z, custom_surfacecolor, custom_colorscale = combine_all_surfaces_in_one(inputs)
 
-# opacity =0.9 - many overlaped areas, better witot it
-fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,
-                                 surfacecolor=custom_surfacecolor, cmin=0, cmax=1,
-                                 colorscale=custom_colorscale, showscale=False,
-                                 )])
+if __name__ == '__main__':
+    x, y, z, custom_surfacecolor, custom_colorscale = combine_all_surfaces_in_one(inputs)
 
-fig.show()
+
+    # opacity =0.9 - many overlaped areas, better witot it
+    fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,
+                                     surfacecolor=custom_surfacecolor, cmin=0, cmax=1,
+                                     colorscale=custom_colorscale, showscale=False,
+                                     )])
+
+    fig.show()

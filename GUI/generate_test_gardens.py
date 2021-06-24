@@ -8,10 +8,10 @@ import numpy as np
 beta = 1
 num_p_selector = poi.weighted_round_or_one
 fill_final = False
-data = False #np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
+data = np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
+generate_plotly=True
 save_plotly=False
-show=True
-save=False
+save=True
 util_exp = -3
 test_util_exps = [1]
 
@@ -32,4 +32,5 @@ for test_util_exp in test_util_exps:
     plotting_utils.generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
                                                     utility_func=False,
                                                     test_util_exp=test_util_exp,
-                                                    data=data, save_plotly=save_plotly, show=show, save=save)
+                                                    data=data, generate_plotly=generate_plotly,
+                                                    save_plotly=save_plotly, save=save)

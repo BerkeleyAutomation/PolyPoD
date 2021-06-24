@@ -3,6 +3,7 @@ import numpy as np
 from SeedPlacementGenerators import RandomSeedPlacementGenerator
 import garden_constants
 from datetime import datetime
+import combine_plotly_surfaces
 
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
@@ -61,7 +62,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         return x_g, y_g, z_g
 
     to_plot = []
-    if data == False:
+    if data is None:
         data = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
     #it = np.nditer(data.seed_placement, flags=["multi_index", "refs_ok"])
 
@@ -101,18 +102,18 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
                            opacity=1,
                            hoverinfo='none',
                            contours=contours)
-        to_plot.extend([xc, yc, zc], [xcircl, ycircl, zcircl], [xcirch, ycirch, zcirch])
+        to_plot.extend([[xc, yc, zc, color], [xcircl, ycircl, zcircl, color], [xcirch, ycirch, zcirch, color]])
 
     x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
     y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
     z_soil = np.array([[0,0], [0,0]])
+
     soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
                      colorscale=make_colorscale(garden_constants.soil_color),
                      showscale=False,
                      opacity=1,
                      hoverinfo='none',
                       contours=contours)
-    to_plot.append(soil)
 
     scene=go.layout.Scene(
             xaxis=go.layout.scene.XAxis(
@@ -144,7 +145,14 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         center=dict(x=0, y=0, z=0),
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
-    fig = go.Figure(data=to_plot, layout=layout)
+    x, y, z, custom_surfacecolor, custom_colorscale = \
+        combine_plotly_surfaces.combine_all_surfaces_in_one(to_plot)
+
+    # opacity =0.9 - many overlaped areas, better witot it
+    fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,
+                                     surfacecolor=custom_surfacecolor, cmin=0, cmax=1,
+                                     colorscale='rainbow', showscale=False,
+                                     )])
 
     if plant_labels:
         def get_x_labels(data):

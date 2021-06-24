@@ -199,9 +199,10 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                 draw_num = choice(selection_array, 1,
                               p=probability_distribution)
                 draw = candidates[draw_num]
+                to_add = [draw[0][0], draw[0][1]]
             else:
                 draw = candidates[rng.integers(candidates.shape[0])]
-            to_add = [draw[0][0], draw[0][1]]
+                to_add = [draw[0], draw[1]]
             add_point(to_add, plant_type)
             return True
 
