@@ -1,5 +1,6 @@
 import numpy as np
 import plotly.graph_objs as go
+import plotly_test as pt
 
 # normalize values to range [start,end] for getting color from cmap
 def norm_v_in_range(v, start, end):
@@ -29,8 +30,8 @@ def combine_all_surfaces_in_one(X, Y, *Z):
     for i in range(1, N + 1):
         ranges.append([points[i - 1], points[i] - 0.05])
         custom_colorscale.append([points[i - 1], colors[i]])
-        custom_colorscale.append([points[i] - 0.05, 'rgb(255, 250, 220)'])
-    custom_colorscale.append([1, 'rgb(220, 250, 220)'])
+        custom_colorscale.append([points[i] - 0.05, colors[i]])
+    custom_colorscale.append([1, colors[i]])
 
     # transparent connection between grahps: np.nan in z prevent ploting points
     transparen_link = np.empty_like(X[0], dtype=object)
@@ -83,7 +84,7 @@ Z2 = 2 * np.cos(np.sqrt(20 * X ** 2 + 20 * Y ** 2))
 Z3 = X * 2 + 0.5
 Z4 = Y * 0 + 1.0
 Z5 = Y * 0 - 1.0
-Z6 = Y * 0 + 10
+Z6 = Y * 1 + 10
 x, y, z, custom_surfacecolor, custom_colorscale = combine_all_surfaces_in_one(X, Y, Z1, Z2, Z3, Z4, Z5, Z6)
 
 # opacity =0.9 - many overlaped areas, better witot it
