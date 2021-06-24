@@ -151,7 +151,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
     # opacity =0.9 - many overlaped areas, better witot it
     fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,
                                      surfacecolor=custom_surfacecolor, cmin=0, cmax=1,
-                                     colorscale='rainbow', showscale=False,
+                                     colorscale=custom_colorscale, showscale=False,
                                      )])
 
     if plant_labels:

@@ -32,26 +32,25 @@ def make_square(XYZ):
             np.append(s[1], np.full(y_max - len(s[1]), np.nan)),
             fix_z(s[2])] for s in XYZ]
 
-
     return XYZ
-
 
 def combine_all_surfaces_in_one(XYZC, colors):
     # prepare colors and ranges for diffrent surfaces
-    XYZ = [a[:3] for a in XYZC]
     N = len(colors)
+    color_to_colorscale = {}
+    for i, color in enumerate(colors):
+        color_to_colorscale[color] = i
     points = np.linspace(0, 1, N + 1)
     custom_colorscale = []
-    ranges = []
-
-    X0 = XYZ[0][0]
-    Y0 = XYZ[0][1]
-    #X0, Y0 = np.meshgrid(X0, Y0)
-    Z0 = XYZ[0][2]
-    C0 = XYZC[3]
     for i in range(0, N):
         custom_colorscale.append([points[i], colors[i]])
     #custom_colorscale.append([1, XYZC[i - 1][3]]) # todo did commenting this screw something up?
+
+    X0 = XYZC[0][0]
+    Y0 = XYZC[0][1]
+    #X0, Y0 = np.meshgrid(X0, Y0)
+    Z0 = XYZC[0][2]
+    C0 = XYZC[0][3]
 
     # transparent connection between grahps: np.nan in z prevent ploting points
     transparen_link = np.empty_like(X0[0], dtype=object)
@@ -62,19 +61,14 @@ def combine_all_surfaces_in_one(XYZC, colors):
     combined_Y = Y0
     combined_Z = Z0
 
-    # prepare collor matrix for first graph (Z[0])
-    start = ranges[0][0]
-    end = ranges[0][1]
 
-    custom_surfacecolor = norm_v_in_range(Z0, start, end)
+    custom_surfacecolor = np.full(Z0.shape, color_to_colorscale[C0])
 
-    range_index = 1
-
-    for next_surf in XYZ[1:]:
+    for next_surf in XYZC[1:]:
         X = next_surf[0]
         Y = next_surf[1]
-        #X, Y = np.meshgrid(X, Y)
         Z = next_surf[2]
+        C = next_surf[3]
         #print('X\n', X, '\nY\n', Y, '\nZ\n', Z)
         combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
         combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
@@ -82,15 +76,10 @@ def combine_all_surfaces_in_one(XYZC, colors):
             [combined_Z, combined_Z[-1], transparen_link, Z[0], Z])
 
         # prepare collors for next Z_
-        start = ranges[range_index][0]
-        end = ranges[range_index][1]
-        next_surfacecolor = np.full
+        next_surfacecolor = np.full(Z.shape, color_to_colorscale[C])
         custom_surfacecolor = np.vstack(
             [custom_surfacecolor, custom_surfacecolor[-1], transparen_link, next_surfacecolor[0],
              next_surfacecolor])
-
-
-        range_index += 1
 
     return combined_X, combined_Y, combined_Z, custom_surfacecolor, custom_colorscale
 
