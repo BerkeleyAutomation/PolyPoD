@@ -36,16 +36,10 @@ def make_square(XYZ):
     return XYZ
 
 
-def combine_all_surfaces_in_one(XYZC):
+def combine_all_surfaces_in_one(XYZC, colors):
     # prepare colors and ranges for diffrent surfaces
-    colors = ['rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
-              'rgb(180, 180,  20)', 'rgb( 20, 180, 180)', 'rgb(180, 20, 180)',
-              'rgb(180,  20,  20)', 'rgb( 20, 180,  20)', 'rgb( 20, 20, 180)',
-              'rgb(180, 110,  20)', 'rgb( 20, 180, 110)', 'rgb(110, 20, 180)',
-              'rgb(255, 127, 127)', 'rgb(127, 255, 127)']
     XYZ = [a[:3] for a in XYZC]
-    N = len(XYZ)
-    #XYZ = make_square(XYZ)
+    N = len(colors)
     points = np.linspace(0, 1, N + 1)
     custom_colorscale = []
     ranges = []
@@ -55,10 +49,8 @@ def combine_all_surfaces_in_one(XYZC):
     #X0, Y0 = np.meshgrid(X0, Y0)
     Z0 = XYZ[0][2]
     C0 = XYZC[3]
-    for i in range(1, N + 1):
-        ranges.append([points[i - 1], points[i] - 0.05])
-        custom_colorscale.append([points[i - 1], XYZC[i - 1][3]])
-        custom_colorscale.append([points[i] - 0.05, XYZC[i - 1][3]])
+    for i in range(0, N):
+        custom_colorscale.append([points[i], colors[i]])
     #custom_colorscale.append([1, XYZC[i - 1][3]]) # todo did commenting this screw something up?
 
     # transparent connection between grahps: np.nan in z prevent ploting points

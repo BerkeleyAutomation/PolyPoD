@@ -146,7 +146,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
     x, y, z, custom_surfacecolor, custom_colorscale = \
-        combine_plotly_surfaces.combine_all_surfaces_in_one(to_plot)
+        combine_plotly_surfaces.combine_all_surfaces_in_one(to_plot, colors_dict)
 
     # opacity =0.9 - many overlaped areas, better witot it
     fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,
