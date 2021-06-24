@@ -106,7 +106,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
                            hoverinfo='none',
                            contours=contours)
         '''
-        to_plot[plant_index].extend([[xc, yc, zc], [xcircl, ycircl, zcircl], [xcirch, ycirch, zcirch]])
+        to_plot[plant_index].extend([[xcircl, ycircl, zcircl], [xc, yc, zc], [xcirch, ycirch, zcirch]])
 
     x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
     y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])

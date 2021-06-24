@@ -51,15 +51,21 @@ def combine_all_surfaces_in_one(XYZ, color):
     combined_Y = Y0
     combined_Z = Z0
 
-    for next_surf in XYZ[1:]:
+    for i, next_surf in enumerate(XYZ[1:]):
         X = next_surf[0]
         Y = next_surf[1]
         Z = next_surf[2]
-        #print('X\n', X, '\nY\n', Y, '\nZ\n', Z)
-        combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
-        combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
-        combined_Z = np.vstack(
-            [combined_Z, combined_Z[-1], transparen_link, Z[0], Z])
+        if i < 10:
+            print('i', i)
+            print('X\n', X, '\nY\n', Y, '\nZ\n', Z)
+        if i % 3 == 2:
+            combined_X = np.vstack([combined_X, combined_X[-1], X[0], X])
+            combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y])
+            combined_Z = np.vstack([combined_Z, transparen_link, combined_Z[-1], Z])
+        else:
+            combined_X = np.vstack([combined_X, X])
+            combined_Y = np.vstack([combined_Y, Y])
+            combined_Z = np.vstack([combined_Z, Z])
 
     return combined_X, combined_Y, combined_Z, custom_colorscale
 
