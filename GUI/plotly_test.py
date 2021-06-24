@@ -155,7 +155,6 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
     for i, t in etp:
         x, y, z, custom_colorscale = \
             combine_plotly_surfaces.combine_all_surfaces_in_one(t, colors_dict[i])
-        print('ccs', custom_colorscale)
         surfaces.append(go.Surface(x=x, y=y, z=z, cmin=0, cmax=1,
                                  colorscale=custom_colorscale, showscale=False,
                                  opacity=1,
