@@ -80,10 +80,10 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
 
         xc, yc, zc = cylinder(r, h_mult * r, x, y)
 
-        xcircl, ycircl, zcircl = boundary_circle(r, 0, x, y)
-        xcirch, ycirch, zcirch = boundary_circle(r, h_mult * r, x, y)
+        xcircl, ycircl, zcircl = boundary_circle(r, 0, x, y, nr=3)
+        xcirch, ycirch, zcirch = boundary_circle(r, h_mult * r, x, y, nr=3)
 
-
+        '''
         cyl = go.Surface(x=xc, y=yc, z=zc,
                          colorscale=colorscale,
                          showscale=False,
@@ -102,7 +102,8 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
                            opacity=1,
                            hoverinfo='none',
                            contours=contours)
-        to_plot.extend([[xc, yc, zc, color], [xcircl, ycircl, zcircl, color], [xcirch, ycirch, zcirch, color]])
+        '''
+        to_plot.extend([[xcircl, ycircl, zcircl, color], [xcirch, ycirch, zcirch, color]]) # [xc, yc, zc, color],
 
     x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
     y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
@@ -145,13 +146,15 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         center=dict(x=0, y=0, z=0),
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
-    x, y, z, custom_surfacecolor, custom_colorscale = \
-        combine_plotly_surfaces.combine_all_surfaces_in_one(to_plot, colors_dict)
+    x, y, z, custom_colorscale = \
+        combine_plotly_surfaces.combine_all_surfaces_in_one(to_plot, '#CC0000')
 
     # opacity =0.9 - many overlaped areas, better witot it
-    fig = go.Figure(data=[go.Surface(x=x, y=y, z=z,
-                                     surfacecolor=custom_surfacecolor, cmin=0, cmax=1,
+    fig = go.Figure(data=[go.Surface(x=x, y=y, z=z, cmin=0, cmax=1,
                                      colorscale=custom_colorscale, showscale=False,
+                                     opacity=1,
+                                     hoverinfo='none',
+                                     contours=contours
                                      )])
 
     if plant_labels:
