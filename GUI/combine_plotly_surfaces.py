@@ -48,27 +48,22 @@ def combine_all_surfaces_in_one(X, Y, *Z):
 
     custom_surfacecolor = norm_v_in_range(Z[0], start, end)
 
-    # second aray combined with first in backward direction, so connection would on one side of graphs, not intersect them
-    direction = -1
-
     range_index = 1
 
     for next_Z in Z[1:]:
-        combined_X = np.vstack([combined_X, combined_X[-1], X[::direction][0], X[::direction][0], X[::direction]])
-        combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[::direction][0], Y[::direction][0], Y[::direction]])
+        combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
+        combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
         combined_Z = np.vstack(
-            [combined_Z, combined_Z[-1], transparen_link, next_Z[::direction][0], next_Z[::direction]])
+            [combined_Z, combined_Z[-1], transparen_link, next_Z[0], next_Z])
 
         # prepare collors for next Z_
         start = ranges[range_index][0]
         end = ranges[range_index][1]
         next_surfacecolor = norm_v_in_range(next_Z, start, end)
         custom_surfacecolor = np.vstack(
-            [custom_surfacecolor, custom_surfacecolor[-1], transparen_link, next_surfacecolor[::direction][0],
-             next_surfacecolor[::direction]])
+            [custom_surfacecolor, custom_surfacecolor[-1], transparen_link, next_surfacecolor[0],
+             next_surfacecolor])
 
-        # change direction
-        direction *= -1
 
         range_index += 1
 
