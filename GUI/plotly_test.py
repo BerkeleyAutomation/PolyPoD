@@ -8,7 +8,7 @@ import combine_plotly_surfaces
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
 # best h_hult: 0.43
-data_to_load = ['data_06-08-21_19-18-07-814772.npy']
+data_to_load = ['french_plots/data_06-24-21_16-46-53-557580.npy']
 where_to_save = 'french_plots'
 single_values = {'y_eye_mult':1, 'h_mult':0.43,
                'z_ratio':0.42, 'plant_labels':False,
@@ -19,6 +19,7 @@ plant_labels = [False]
 text_offset = 0.3
 colors_dicts = [single_values['color_dict']]
 shuffle_colors = True
+save_value = False
 
 def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labels=True, save=True,
                 where_to_save=False):
@@ -44,6 +45,9 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         x_g = (r*np.cos(theta)) + x
         y_g = (r*np.sin(theta)) + y
         z_g = v
+        x_g = np.vstack((np.full(x_g.shape, x), x_g, np.full(x_g.shape, x)))
+        y_g = np.vstack((np.full(y_g.shape, y), y_g, np.full(y_g.shape, x)))
+        z_g = np.vstack((np.full(z_g.shape, 0), z_g, np.full(z_g.shape, h)))
         return x_g, y_g, z_g
 
     def boundary_circle(r, h, x, y, nt=20, nr=2):
@@ -83,9 +87,6 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
 
         xc, yc, zc = cylinder(r, h_mult * r, x, y)
 
-        xcircl, ycircl, zcircl = boundary_circle(r, 0, x, y, nr=3)
-        xcirch, ycirch, zcirch = boundary_circle(r, h_mult * r, x, y, nr=3)
-
         '''
         cyl = go.Surface(x=xc, y=yc, z=zc,
                          colorscale=colorscale,
@@ -106,7 +107,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
                            hoverinfo='none',
                            contours=contours)
         '''
-        to_plot[plant_index].extend([[xcircl, ycircl, zcircl], [xc, yc, zc], [xcirch, ycirch, zcirch]])
+        to_plot[plant_index].append([xc, yc, zc])
 
     x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
     y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
@@ -202,7 +203,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
 
     if save:
         if where_to_save:
-            fig.write_image(where_to_save + "/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
+            fig.write_image("3d_plot.png") #.format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
         else:
             fig.write_image("3d_plots/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
     else:
@@ -224,5 +225,8 @@ def main(mode):
                         single_values['color_dict'],
                         plant_labels=False,
                         data=loaded_data,
-                        where_to_save=where_to_save)
+                        where_to_save=where_to_save,
+                        save=save_value)
 
+if __name__ == '__main__':
+    main('single')
