@@ -8,9 +8,9 @@ import combine_plotly_surfaces
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
 # best h_hult: 0.43
-data_to_load = ['french_plots/data_06-24-21_16-46-53-557580.npy']
+data_to_load = ['french_plots/data_06-24-21_16-54-29-226489.npy']
 where_to_save = 'french_plots'
-single_values = {'y_eye_mult':1, 'h_mult':0.43,
+single_values = {'y_eye_mult':10, 'h_mult':0.43,
                'z_ratio':0.42, 'plant_labels':False,
                'color_dict':garden_constants.colors_of_plants_hcl_v2}
 hms = [single_values['h_mult']]
@@ -45,28 +45,11 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
         x_g = (r*np.cos(theta)) + x
         y_g = (r*np.sin(theta)) + y
         z_g = v
-        x_g = np.vstack((np.full(x_g.shape, x), x_g, np.full(x_g.shape, x)))
-        y_g = np.vstack((np.full(y_g.shape, y), y_g, np.full(y_g.shape, x)))
-        z_g = np.vstack((np.full(z_g.shape, 0), z_g, np.full(z_g.shape, h)))
+        x_g = np.vstack((np.full((1, x_g.shape[1]), x), x_g, np.full((1, x_g.shape[1]), x)))
+        y_g = np.vstack((np.full((1, y_g.shape[1]), y), y_g, np.full((1, y_g.shape[1]), y)))
+        z_g = np.vstack((np.full((1, z_g.shape[1]), 0), z_g, np.full((1, z_g.shape[1]), h)))
         return x_g, y_g, z_g
 
-    def boundary_circle(r, h, x, y, nt=20, nr=2):
-        """
-        r - boundary circle radius
-        h - height above xOy-plane where the circle is included
-        x, y - centerpoint
-        returns the circle parameterization
-        """
-        if nr == 3:
-            r = [0, 0.01, r]
-        else:
-            r = np.linspace(0, r, nr)
-        theta = np.linspace(0, 2 * np.pi, nt)
-        theta, r = np.meshgrid(theta, r)
-        x_g = (r * np.cos(theta)) + x
-        y_g = (r * np.sin(theta)) + y
-        z_g = h*np.ones(theta.shape)
-        return x_g, y_g, z_g
 
     if data is None:
         data = np.load('test_plots/plotted_graph_data_05-25-21_22-50-47-167517.npy', allow_pickle=True)
@@ -154,12 +137,10 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
     etp = list(enumerate(to_plot))
     print(colors_dict)
     for i, t in etp:
-        '''
-        x, y, z, custom_colorscale = \
-            combine_plotly_surfaces.combine_all_surfaces_in_one(t, colors_dict[i])
-            '''
-        for s in t:
-            surfaces.append(go.Surface(x=s[0], y=s[1], z=s[2],
+        if len(t) > 0:
+            x, y, z, custom_colorscale = \
+                combine_plotly_surfaces.combine_all_surfaces_in_one(t, colors_dict[i])
+            surfaces.append(go.Surface(x=x, y=y, z=z,
                                      colorscale=make_colorscale(colors_dict[i]), showscale=False,
                                      opacity=1,
                                      hoverinfo='none',
@@ -206,7 +187,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
 
     if save:
         if where_to_save:
-            fig.write_image("3d_plot.png") #.format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
+            fig.write_image("3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
         else:
             fig.write_image("3d_plots/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
     else:

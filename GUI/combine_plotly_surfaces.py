@@ -55,9 +55,9 @@ def combine_all_surfaces_in_one(XYZ, color):
         X = next_surf[0]
         Y = next_surf[1]
         Z = next_surf[2]
-        combined_X = np.vstack([combined_X, combined_X[-1], X[0], X[0], X])
-        combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y[0], Y])
-        combined_Z = np.vstack([combined_Z, combined_Z[-1], transparen_link, Z[0], Z])
+        combined_X = np.vstack([combined_X, combined_X[-1], X[0], X])
+        combined_Y = np.vstack([combined_Y, combined_Y[-1], Y[0], Y])
+        combined_Z = np.vstack([combined_Z, transparen_link, transparen_link, Z])
 
     return combined_X, combined_Y, combined_Z, custom_colorscale
 
