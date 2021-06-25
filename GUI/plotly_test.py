@@ -62,7 +62,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
                 z=go.surface.contours.Z(highlight=False),
             )
 
-    to_plot = [[] for _ in range(10)]
+    to_plot = []
     for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         x, y = loc
@@ -120,21 +120,10 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
         center=dict(x=0, y=0, z=0),
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
-    surfaces = [soil]
-    etp = list(enumerate(to_plot))
-    for i, t in etp:
-        if len(t) > 0:
-            x, y, z, custom_colorscale = \
-                combine_plotly_surfaces.combine_all_surfaces_in_one(t, colors_dict[i])
-            surfaces.append(go.Surface(x=x, y=y, z=z,
-                                     colorscale=make_colorscale(colors_dict[i]), showscale=False,
-                                     opacity=1,
-                                     hoverinfo='none',
-                                     contours=contours
-                                     ))
+    to_plot.append(soil)
 
     # opacity =0.9 - many overlaped areas, better witot it
-    fig = go.Figure(data=surfaces, layout=layout)
+    fig = go.Figure(data=to_plot, layout=layout)
 
     if plant_labels:
         def get_x_labels(data):
