@@ -122,7 +122,6 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
     )
     surfaces = [soil]
     etp = list(enumerate(to_plot))
-    print(colors_dict)
     for i, t in etp:
         if len(t) > 0:
             x, y, z, custom_colorscale = \
