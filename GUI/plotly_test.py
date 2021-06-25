@@ -154,14 +154,17 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=False, plant_labe
     etp = list(enumerate(to_plot))
     print(colors_dict)
     for i, t in etp:
+        '''
         x, y, z, custom_colorscale = \
             combine_plotly_surfaces.combine_all_surfaces_in_one(t, colors_dict[i])
-        surfaces.append(go.Surface(x=x, y=y, z=z, cmin=0, cmax=1,
-                                 colorscale=custom_colorscale, showscale=False,
-                                 opacity=1,
-                                 hoverinfo='none',
-                                 contours=contours
-                                 ))
+            '''
+        for s in t:
+            surfaces.append(go.Surface(x=s[0], y=s[1], z=s[2],
+                                     colorscale=make_colorscale(colors_dict[i]), showscale=False,
+                                     opacity=1,
+                                     hoverinfo='none',
+                                     contours=contours
+                                     ))
 
     # opacity =0.9 - many overlaped areas, better witot it
     fig = go.Figure(data=surfaces, layout=layout)
