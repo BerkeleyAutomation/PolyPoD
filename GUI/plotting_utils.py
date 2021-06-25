@@ -14,9 +14,9 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     utility_func, generate_plotly, test_util_exp=0,
-                                     data=False, save_plotly=True, save=True):
-    if data is None:
+                                     utility_func, test_util_exp=0,
+                                     data=None, save_plotly=True, show=False, save=True):
+    if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
