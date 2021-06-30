@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from matplotlib.lines import Line2D
 
 garden_x_len = 150
 garden_y_len = 150
@@ -59,16 +60,16 @@ plant_radii = {
 }
 
 plantid2name = {
-9:'kale',
-8:'turnip',
-7:'borage',
-6:'swiss_chard',
-5:'radicchio',
-4:'arugula',
-3:'green_lettuce',
-2:'red_lettuce',
-1:'cilantro',
-0:'sorrel'
+9:'kale', # red
+8:'turnip', # fuchsia
+7:'borage', # orange
+6:'swiss_chard', # gold
+5:'radicchio', # lime
+4:'arugula', # darkgreen
+3:'green_lettuce', # blue
+2:'red_lettuce', # darkviolet
+1:'cilantro', # brown
+0:'sorrel' # black
 }
 SRV = -1.0
 PLANTS_RELATION = {
@@ -83,9 +84,43 @@ PLANTS_RELATION = {
         "swiss_chard":  {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": SRV, "turnip": 0.0},
         "turnip":       {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": -1.0, "swiss_chard": 1.0, "turnip": SRV}
 }
+plantid2name = {
+9:'kale', # red
+8:'turnip', # fuchsia
+7:'borage', # orange
+6:'swiss_chard', # gold
+5:'radicchio', # lime
+4:'arugula', # darkgreen
+3:'green_lettuce', # blue
+2:'red_lettuce', # darkviolet
+1:'cilantro', # brown
+0:'sorrel' # black
+}
+legend_elements = [Line2D([0], [0], marker='o', color='red', label='kale',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='fuchsia', label='turnip',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='orange', label='borage',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='gold', label='swiss chard',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='lime', label='radicchio',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='darkgreen', label='arugula',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='blue', label='green lettuce',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='darkviolet', label='red lettuce',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='brown', label='cilantro',
+                          markerfacecolor='g', markersize=15),
+                   Line2D([0], [0], marker='o', color='black', label='sorrel',
+                          markerfacecolor='g', markersize=15)
+                   ]
+ax.legend(handles=legend_elements, loc='center')
 
-
-def companionship_score(p, plant_type, points, added_points, self_multiplier):
+# added points is list of ten lists, one for each plant type!
+def point_companionship_score(p, plant_type, added_points):
     cum_comp = 0
     p_name = plantid2name[plant_type]
     for t in range(num_plants):
@@ -95,12 +130,24 @@ def companionship_score(p, plant_type, points, added_points, self_multiplier):
         if not c == 0:
             for o in added_points[t]:
                 o_loc = o[0]
-                t_comp += (c / (math.dist(p, o_loc) ** 2))
-            if t == p:
-                t_comp *= self_multiplier
+                if math.dist(p, o_loc) > 0:
+                    t_comp += (c / (math.dist(p, o_loc) ** 2))
             cum_comp += t_comp
-    print('p ', p, '\ncum_comp ', cum_comp, '\n')
     return cum_comp
+
+def garden_companionship_score(added_points):
+    garden_comp = 0
+    temp = [[] for _ in range(10)]
+    for p in added_points:
+        loc, t = p
+        temp[int(t)].append(p)
+    added_points = temp
+    #print('added points\n', added_points)
+    for type_list in added_points:
+            for point in type_list:
+                loc, t = point
+                garden_comp += point_companionship_score(loc, t, added_points)
+    return garden_comp
 
 def comp_pd_postprocessing(pd, exp):
     probs = [p[1] for p in pd]

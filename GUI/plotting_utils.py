@@ -4,6 +4,7 @@ import garden_constants
 import numpy as np
 from datetime import datetime
 import plotly_test as pt
+import re
 
 
 """
@@ -13,16 +14,23 @@ garden_constants.dims, garden_constants.cellsize,
                 bounds_map_creator_args=[u, l, bounds, num_checks]
                 
 """
+def num_to_str(num):
+    a = "{:.2f}".format(num)
+    str_a = str(a)
+    list_str_a = re.split(r'\.', str_a)
+    if len(list_str_a) == 2:
+        str_a = list_str_a[0] + "," + list_str_a[1]
+    return str_a
+
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     utility_func, utility_postprocessing_func, test_util_exp=0, self_multiplier=1,
+                                     next_point_selector,
                                      num_each_plant=None, trialno=-1,
                                      data=None, generate_plotly=True, save_plotly=True, save=True):
     if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
-                                   fill_final=fill_final, utility_func=utility_func,
-                                   utility_postprocessing_func=utility_postprocessing_func,
+                                   fill_final=fill_final, next_point_selector=next_point_selector,
                                    num_each_plant=num_each_plant)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
@@ -52,30 +60,24 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
-    ax.table(cellText=table_text,
-              rowLabels=row_labels,
-              loc='bottom')
-    plt.subplots_adjust(hspace=0.4)
-    plt.title('beta: {}; trial: {}; num plants: {}'.format(beta, trialno, data.shape[0]))
-    if data.shape[0] >= 20:
-        print('FOUND: beta: {}; trial: {}; num plants: {}'.format(beta, trialno, data.shape[0]))
-    else:
-        print('beta: {}; trial: {}; num plants: {}'.format(beta, trialno, data.shape[0]))
+    ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1.1, 1))
+    garden_comp_score = garden_constants.garden_companionship_score(data)
+    plt.title('trial: {}; garden companionship score: {}'.format(trialno, garden_comp_score))
     if save:
         if data.shape[0] >= 20:
-            fig_filename = "ag-main-winners-images/compexp_{}_selfmultiplier_{}_beta_{}_trialno_{}_numplants_{}_2d_plot_{}"\
-                .format(test_util_exp, self_multiplier, int(beta * 10), trialno, data.shape[0],
+            fig_filename = "comp-optimize-era/rnd4_winners-images/compscore_{}_trialno_{}_2d_plot_{}"\
+                .format(num_to_str(garden_comp_score), trialno,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "ag-main-winners-data/compexp_{}_selfmultiplier_{}_beta_{}_trialno_{}_numplants_{}_data_{}"\
-                .format(test_util_exp, self_multiplier, int(beta * 10), trialno, data.shape[0],
+            data_filename = "comp-optimize-era/rnd4_winners-data/compscore_{}_trialno_{}_data_{}"\
+                .format(num_to_str(garden_comp_score), trialno,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         else:
-            fig_filename = "ag-main-demos/numplants_{}_beta_{}_compexp_{}_selfmultiplier_{}_trialno_{}_2d_plot_{}"\
-                .format(data.shape[0],
-                int(beta * 10), test_util_exp, self_multiplier, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "ag-main-demos/numplants_{}_beta_{}_compexp_{}_selfmultiplier_{}_trialno_{}_data_{}"\
-                .format(data.shape[0],
-                int(beta * 10), test_util_exp, self_multiplier, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+            fig_filename = "comp-optimize-era/rnd4_losers-images/compscore_{}_trialno_{}_2d_plot_{}"\
+                .format(num_to_str(garden_comp_score), trialno,
+                        datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+            data_filename = "comp-optimize-era/rnd4_losers-data/compscore_{}_trialno_{}_data_{}"\
+                .format(num_to_str(garden_comp_score), trialno,
+                        datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
         np.save(data_filename, data)
         plt.close()
