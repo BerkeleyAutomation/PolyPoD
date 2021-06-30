@@ -5,8 +5,8 @@ import garden_constants
 import math
 import numpy as np
 
-betas = [0.7, 0.8, 0.9, 1]
-num_trials = 30
+betas = [0.9, 1]
+num_trials = 10
 num_p_selector = poi.weighted_round_or_one
 fill_final = True
 data = None #np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
@@ -15,8 +15,8 @@ save_plotly=False
 save=True
 # util_func = False
 num_each_plant = 2
-comp_exps = [1]
-self_multipliers = [1]
+comp_exps = [-1, -3, -8]
+self_multipliers = [1, 3, 8]
 
 #bounds_map_creator_args = french_gardens_utils.french_demo_bac()
 #bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]

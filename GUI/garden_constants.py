@@ -96,6 +96,7 @@ def companionship_score(p, plant_type, points, added_points, exp, self_multiplie
             for o in added_points[t]:
                 o_loc = o[0]
                 t_comp += (c / (math.dist(p, o_loc) ** 2))
+            if t_comp > 0:
             if t == p:
                 t_comp = t_comp ** (exp * self_multiplier)
             else:

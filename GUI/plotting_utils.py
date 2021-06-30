@@ -62,18 +62,18 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     if save:
         if data.shape[0] >= 20:
             fig_filename = "ag-main-winners-images/compexp_{}_selfmultiplier_{}_beta_{}_trialno_{}_numplants_{}_2d_plot_{}"\
-                .format(test_util_exp, self_multiplier, beta, trialno, data.shape[0],
+                .format(test_util_exp, self_multiplier, int(beta * 10), trialno, data.shape[0],
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
             data_filename = "ag-main-winners-data/compexp_{}_selfmultiplier_{}_beta_{}_trialno_{}_numplants_{}_data_{}"\
-                .format(test_util_exp, self_multiplier, beta, trialno, data.shape[0],
+                .format(test_util_exp, self_multiplier, int(beta * 10), trialno, data.shape[0],
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         else:
-            fig_filename = "ag-main-demos/{}_numplants_beta_{}_compexp_{}_selfmultiplier_{}_trialno_{}_2d_plot_{}"\
+            fig_filename = "ag-main-demos/numplants_{}_beta_{}_compexp_{}_selfmultiplier_{}_trialno_{}_2d_plot_{}"\
                 .format(data.shape[0],
-                beta, test_util_exp, self_multiplier, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "ag-main-demos/{}_numplants_beta_{}_compexp_{}_selfmultiplier_{}_trialno_{}_data_{}"\
+                int(beta * 10), test_util_exp, self_multiplier, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+            data_filename = "ag-main-demos/numplants_{}_beta_{}_compexp_{}_selfmultiplier_{}_trialno_{}_data_{}"\
                 .format(data.shape[0],
-                beta, test_util_exp, self_multiplier, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+                int(beta * 10), test_util_exp, self_multiplier, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
         np.save(data_filename, data)
         plt.close()
