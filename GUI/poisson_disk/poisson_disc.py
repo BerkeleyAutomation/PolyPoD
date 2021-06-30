@@ -264,29 +264,8 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            if utility_func:
-                cand_points = [[p[0], p[1]] for p in candidates]
-                probability_distribution = np.array([[[p[0], p[1]], utility_func([p[0], p[1]], plant_type,
-                                                     points, added_points)] for p in candidates])
-                np.save('pd/init_prob_dist', probability_distribution)
-                probability_distribution = utility_postprocessing_func(probability_distribution)
-                np.save('pd/postprocessed_prob_dist', probability_distribution)
-                postprocessed_probs = np.array([p[1] for p in probability_distribution])
-                pd_sum = postprocessed_probs.sum()
-                if pd_sum > 0:
-                    postprocessed_probs = postprocessed_probs/pd_sum
-                    np.save('pd/normalized_prob_dist', zip(cand_points, postprocessed_probs))
-                else:
-                    probability_distribution = np.ones(probability_distribution.shape) / probability_distribution.shape
-
-                # debug
-                assert False
-
-                selection_array = np.arange(len(candidates))
-                draw_num = choice(selection_array, 1,
-                              p=probability_distribution)
-                draw = candidates[draw_num]
-                to_add = [draw[0][0], draw[0][1]]
+            draw = next_point_selector(candidates)
+            to_add = [draw[0][0], draw[0][1]]
             else:
                 draw = candidates[rng.integers(candidates.shape[0])]
                 to_add = [draw[0], draw[1]]
