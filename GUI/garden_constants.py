@@ -119,7 +119,7 @@ legend_elements = [Line2D([0], [0], marker='o', color='k', label='kale',
                    ]
 
 # added points is list of ten lists, one for each plant type!
-def point_companionship_score(p, plant_type, added_points):
+def point_companionship_score(p, plant_type, added_points, self_multiplier=1):
     cum_comp = 0
     p_name = plantid2name[plant_type]
     for t in range(num_plants):
@@ -130,7 +130,11 @@ def point_companionship_score(p, plant_type, added_points):
             for o in added_points[t]:
                 o_loc = o[0]
                 if math.dist(p, o_loc) > 0:
-                    t_comp += (c / ((math.dist(p, o_loc) / 100) ** 2)) # divide by 100: cm -> m
+                    p_o_score = (c / ((math.dist(p, o_loc)) ** 2))
+                    if plant_type == t:
+                        t_comp += p_o_score * self_multiplier
+                    else:
+                        t_comp += p_o_score
             cum_comp += t_comp
     return cum_comp
 
@@ -146,13 +150,16 @@ def garden_companionship_score(added_points):
             for point in type_list:
                 loc, t = point
                 garden_comp += point_companionship_score(loc, t, added_points)
-    return garden_comp
+    return garden_comp * 10000 # cm to m
 
 def comp_pd_postprocessing(pd, exp):
+    '''
     probs = [p[1] for p in pd]
     postprocessed_probs = exp ** (probs - np.min(probs)) - 1
     points = [p[0] for p in pd]
     return np.array(list(zip(points, postprocessed_probs)))
+    '''
+    return exp ** (pd - np.min(pd)) - 1
 def point_unpacker(p):
     loc, plant_index = p
     plant_index = int(plant_index)

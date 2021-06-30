@@ -212,7 +212,6 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             starting_num_p = [len([p for p in starting_plants if p[1] == t])
                                        for t in range(garden_constants.num_plants)]
             num_p = num_p - starting_num_p
-            print(num_p)
 
         # custom bounds functions
         def line_following(function, input_range):
@@ -259,6 +258,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             return criteria
 
         def next_point(plant_type):
+            #print('NEXT PLANT')
             scm = standard_criteria(plant_type)
             if bmca == False:
                 criteria = scm
@@ -287,7 +287,6 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                     points.set_cb(mx, my, db)
             points.mark_plant(xc, yc, plant_type)
             added_points[plant_type].append([choice, plant_type])
-
         plant_index = garden_constants.num_plants - 1
 
         # Inner Control (Plant Adding) Loop
