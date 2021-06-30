@@ -84,7 +84,7 @@ class Points:
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
 def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final,
-                    utility_func, num_each_plant):
+                    utility_func, utility_postprocessing_func, num_each_plant):
     # Preprocessing / Setup
     start = time.time()
     added_points = [[] for _ in range(garden_constants.num_plants)]
@@ -196,6 +196,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             if utility_func:
                 probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
                                                      points, added_points) for p in candidates])
+                probability_distribution = utility_postprocessing_func(probability_distribution)
                 pd_sum = probability_distribution.sum()
                 if pd_sum > 0:
                     probability_distribution = probability_distribution/pd_sum
@@ -210,6 +211,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                 draw = candidates[rng.integers(candidates.shape[0])]
                 to_add = [draw[0], draw[1]]
             add_point(to_add, plant_type)
+            print('Planting: ', to_add, '~\n\n\n')
             return True
 
         def add_point(choice, plant_type):

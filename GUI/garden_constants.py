@@ -85,7 +85,7 @@ PLANTS_RELATION = {
 }
 
 
-def companionship_score(p, plant_type, points, added_points, exp, self_multiplier):
+def companionship_score(p, plant_type, points, added_points, self_multiplier):
     cum_comp = 0
     p_name = plantid2name[plant_type]
     for t in range(num_plants):
@@ -96,14 +96,14 @@ def companionship_score(p, plant_type, points, added_points, exp, self_multiplie
             for o in added_points[t]:
                 o_loc = o[0]
                 t_comp += (c / (math.dist(p, o_loc) ** 2))
-            if t_comp > 0:
             if t == p:
-                t_comp = t_comp ** (exp * self_multiplier)
-            else:
-                t_comp = t_comp ** exp
+                t_comp *= self_multiplier
             cum_comp += t_comp
+    print('p ', p, '\ncum_comp ', cum_comp, '\n')
     return cum_comp
 
+def comp_pd_postprocessing(pd, exp):
+    return exp ** (pd - np.min(pd)) - 1
 def point_unpacker(p):
     loc, plant_index = p
     plant_index = int(plant_index)

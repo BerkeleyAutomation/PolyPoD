@@ -14,13 +14,15 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     utility_func, test_util_exp=0, self_multiplier=1, num_each_plant=None, trialno=-1,
+                                     utility_func, utility_postprocessing_func, test_util_exp=0, self_multiplier=1,
+                                     num_each_plant=None, trialno=-1,
                                      data=None, generate_plotly=True, save_plotly=True, save=True):
     if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
                                    fill_final=fill_final, utility_func=utility_func,
+                                   utility_postprocessing_func=utility_postprocessing_func,
                                    num_each_plant=num_each_plant)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
