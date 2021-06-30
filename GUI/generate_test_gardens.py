@@ -6,7 +6,7 @@ import math
 import numpy as np
 
 beta = 1
-num_trials = 10
+num_trials = 25
 num_p_selector = poi.weighted_round_or_one
 fill_final = True
 data = None #np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
@@ -16,7 +16,7 @@ save=True
 # util_func = False
 num_each_plant = np.full(10, 2, dtype='int')
 #num_each_plant[9] = 2
-comp_exps = [10 ** 8] #[2, 4, 8]
+comp_exps = [8, 10 ** 8]
 self_multipliers = [8] #[2, 4, 8]
 from numpy.random import default_rng
 from numpy.random import choice
@@ -25,15 +25,45 @@ rng = default_rng()
 #bounds_map_creator_args = french_gardens_utils.french_demo_bac()
 #bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]
 bounds_map_creator_args = False
-
+starting_plants_dict = {0: [],
+                   1: [[[75, 75], 9]],
+                   2: [[[35, 35], 9], [[115, 115], 9]],
+                   3: [[[35, 55], 9], [[115, 95], 9]],
+                   4: [[[55, 55], 9], [[95, 95], 9]]
+                   }
+starting_configs = [0]
 def random_ps(candidates, plant_type, added_points):
     draw = candidates[rng.integers(candidates.shape[0])]
     return [draw[0], draw[1]]
-def next_point_selector(added_points):
-    pass
-for t in range(num_trials):
-    plotting_utils.generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                                    data=data, generate_plotly=generate_plotly,
-                                                    next_point_selector=random_ps,
-                                                    save_plotly=save_plotly, save=save,
-                                                    num_each_plant=num_each_plant, trialno=t)
+
+utility_func = garden_constants.point_companionship_score
+utility_postprocessing_func = lambda pd: garden_constants.comp_pd_postprocessing(pd, exp)
+def comp_ps(candidates, plant_type, added_points):
+    probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
+                                                      added_points) for p in candidates])
+    if utility_postprocessing_func is not None:
+        probability_distribution = utility_postprocessing_func(probability_distribution)
+    pd_sum = probability_distribution.sum()
+    if pd_sum > 0:
+        probability_distribution = probability_distribution / pd_sum
+    else:
+        probability_distribution = np.ones(probability_distribution.shape) / probability_distribution.shape
+    selection_array = np.arange(len(candidates))
+    draw_num = choice(selection_array, 1,
+                      p=probability_distribution)
+    draw = candidates[draw_num]
+    to_add = [draw[0][0], draw[0][1]]
+for comp_exp in comp_exps:
+    for self_multiplier in self_multipliers:
+        for sp_index in starting_configs:
+            for t in range(num_trials):
+                print('sp_index ', sp_index, '; t: ', t)
+                starting_plants = starting_plants_dict[sp_index]
+                plotting_utils.generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
+                                                                data=data, generate_plotly=generate_plotly,
+                                                                util_exp=exp,
+                                                                next_point_selector=random_ps,
+                                                                save_plotly=save_plotly, save=save,
+                                                                num_each_plant=num_each_plant, trialno=t,
+                                                                starting_plants=starting_plants,
+                                                                sp_index=sp_index)

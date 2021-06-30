@@ -23,12 +23,14 @@ def num_to_str(num):
     return str_a
 
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     next_point_selector,
+                                     next_point_selector, util_exp=0, starting_plants=[],
+                                     sp_index=-1,
                                      num_each_plant=None, trialno=-1,
                                      data=None, generate_plotly=True, save_plotly=True, save=True):
     if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
+                                   starting_plants=starting_plants,
                                    bounds_map_creator_args=bounds_map_creator_args,
                                    fill_final=fill_final, next_point_selector=next_point_selector,
                                    num_each_plant=num_each_plant)
@@ -65,18 +67,18 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     plt.title('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)))
     if save:
         if data.shape[0] >= 20:
-            fig_filename = "comp-optimize-era/rnd4_winners-images/compscore_{}_trialno_{}_2d_plot_{}"\
-                .format(num_to_str(garden_comp_score), trialno,
+            fig_filename = "comp-optimize-era/winners-images/compscore_{}_spindex_{}_trialno_{}_utilexp_{}_2d_plot_{}"\
+                .format(num_to_str(garden_comp_score), sp_index, trialno, util_exp,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "comp-optimize-era/rnd4_winners-data/compscore_{}_trialno_{}_data_{}"\
-                .format(num_to_str(garden_comp_score), trialno,
+            data_filename = "comp-optimize-era/winners-data/compscore_{}_spindex_{}_trialno_{}_utilexp_{}_data_{}"\
+                .format(num_to_str(garden_comp_score), sp_index, trialno, util_exp,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         else:
-            fig_filename = "comp-optimize-era/rnd4_losers-images/compscore_{}_trialno_{}_2d_plot_{}"\
-                .format(num_to_str(garden_comp_score), trialno,
+            fig_filename = "comp-optimize-era/losers-images/compscore_{}_spindex_{}_trialno_{}_utilexp_{}_2d_plot_{}"\
+                .format(num_to_str(garden_comp_score), sp_index, trialno, util_exp,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "comp-optimize-era/rnd4_losers-data/compscore_{}_trialno_{}_data_{}"\
-                .format(num_to_str(garden_comp_score), trialno,
+            data_filename = "comp-optimize-era/losers-data/compscore_{}_spindex_{}_trialno_{}_utilexp_{}_data_{}"\
+                .format(num_to_str(garden_comp_score), sp_index, trialno, util_exp,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
         np.save(data_filename, data)
