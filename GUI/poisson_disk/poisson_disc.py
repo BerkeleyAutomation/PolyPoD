@@ -196,7 +196,11 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             if utility_func:
                 probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
                                                      points, added_points) for p in candidates])
-                probability_distribution = probability_distribution/probability_distribution.sum()
+                pd_sum = probability_distribution.sum()
+                if pd_sum > 0:
+                    probability_distribution = probability_distribution/pd_sum
+                else:
+                    probability_distribution = np.ones(probability_distribution.shape) / probability_distribution.shape
                 selection_array = np.arange(len(candidates))
                 draw_num = choice(selection_array, 1,
                               p=probability_distribution)
