@@ -14,13 +14,14 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     utility_func, test_util_exp=0,
-                                     data=None, save_plotly=True, show=False, save=True):
+                                     utility_func, test_util_exp=0, num_each_plant=None, trialno=-1,
+                                     data=None, generate_plotly=True, save_plotly=True, show=False, save=True):
     if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
                                    beta=beta, num_p_selector=num_p_selector,
                                    bounds_map_creator_args=bounds_map_creator_args,
-                                   fill_final=fill_final, utility_func=utility_func)
+                                   fill_final=fill_final, utility_func=utility_func,
+                                   num_each_plant=num_each_plant)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)
@@ -30,6 +31,14 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
         loc, plant_index, r = garden_constants.point_unpacker(p)
         color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
         ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
+
+        num_plants_arr[plant_index] += 1
+    num_plants_arr_txt = [str(int(x)) for x in num_plants_arr]
+    plant_index_arr = np.arange(garden_constants.num_plants)
+    plant_index_arr_txt = [str(x) for x in plant_index_arr]
+    table_text = [plant_index_arr_txt, num_plants_arr_txt]
+    row_labels = ['plant type', 'num plant']
+
     locdata = np.array([p[0] for p in data])
     datax, datay = locdata[:,0], locdata[:,1]
 
@@ -41,14 +50,29 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
-    plt.title('num plants: {0}; time to generate: {1}s; test_util_exp: {2}'.format(
-        data.shape[0], "{:.4f}".format(time_elapsed), test_util_exp))
+    ax.table(cellText=table_text,
+              rowLabels=row_labels,
+              loc='bottom')
+    plt.subplots_adjust(hspace=0.4)
+    plt.title('beta: {}; trial: {}; num plants: {}'.format(beta, trialno, data.shape[0]))
+    if data.shape[0] >= 20:
+        print('FOUND: beta: {}; trial: {}; num plants: {}'.format(beta, trialno, data.shape[0]))
+    else:
+        print('beta: {}; trial: {}; num plants: {}'.format(beta, trialno, data.shape[0]))
     if save:
-        fig_filename = "french_plots/2d_plot_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+        if data.shape[0] >= 20:
+            fig_filename = "ag-main-winners-images/beta_{}_trialno_{}_numplants_{}_2d_plot_{0}"\
+                .format(beta, trialno, data.shape[0], datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+            data_filename = "ag-main-winners-data/beta_{}_trialno_{}_numplants_{}_data_{}"\
+                .format(beta, trialno, data.shape[0], datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+        fig_filename = "ag-main-demos/{}_numplants_beta_{}_trialno_{}_2d_plot_{0}".format(data.shape[0],
+            beta, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         plt.savefig(fig_filename, dpi=200)
-        data_filename = "french_plots/data_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+        data_filename = "ag-main-demos/{}_numplants_beta_{}_trialno_{}_data_{}".format(data.shape[0],
+            beta, trialno, datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
         np.save(data_filename, data)
-    if generate_plotly:
+        plt.close()
+    elif generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],
                        pt.single_values['h_mult'],

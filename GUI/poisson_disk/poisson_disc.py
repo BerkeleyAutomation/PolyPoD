@@ -84,7 +84,7 @@ class Points:
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
 def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final,
-                    utility_func):
+                    utility_func, num_each_plant):
     # Preprocessing / Setup
     start = time.time()
     added_points = [[] for _ in range(garden_constants.num_plants)]
@@ -119,23 +119,25 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
             bounds = [num / cellsize for num in bounds]
             low_x_bound, high_x_bound, low_y_bound, high_y_bound = bounds
+        if num_each_plant is None:
+            def a_func(beta_arg):
+                o = garden_constants.a_func_offset
+                m = garden_constants.a_func_multiplier
+                b = garden_constants.a_func_exp_base
+                return (o - m) + m * (b ** beta_arg)
 
-        def a_func(beta_arg):
-            o = garden_constants.a_func_offset
-            m = garden_constants.a_func_multiplier
-            b = garden_constants.a_func_exp_base
-            return (o - m) + m * (b ** beta_arg)
+            a = a_func(beta)
 
-        a = a_func(beta)
-
-        garden_area = np.prod(dims)
-        est_area = a * garden_area
-        frac_tot_area_p = np.full(garden_constants.num_plants, 1 / garden_constants.num_plants)
-        est_tot_area_p = frac_tot_area_p * est_area
-        area_p = [math.pi * (inhibition_radius(p) ** 2)
-                  for p in range(garden_constants.num_plants)]
-        num_p = est_tot_area_p / area_p
-        num_p = np.array([num_p_selector(n) for n in num_p], dtype=int)
+            garden_area = np.prod(dims)
+            est_area = a * garden_area
+            frac_tot_area_p = np.full(garden_constants.num_plants, 1 / garden_constants.num_plants)
+            est_tot_area_p = frac_tot_area_p * est_area
+            area_p = [math.pi * (inhibition_radius(p) ** 2)
+                      for p in range(garden_constants.num_plants)]
+            num_p = est_tot_area_p / area_p
+            num_p = np.array([num_p_selector(n) for n in num_p], dtype=int)
+        else:
+            num_p = np.full(garden_constants.num_plants, num_each_plant)
 
         # custom bounds functions
         def line_following(function, input_range):
@@ -247,7 +249,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             ucv = np.array([circ_up_helper(cv, r) for cv in cvx])
             lcv = np.array([circ_low_helper(cv, r) for cv in cvx])
 
-            if plant_index > 0:
+            if plant_index > 0 or num_each_plant is not None:
                 for _ in range(num_p[plant_index]):
                     n = next_point(plant_index)
                     if not n:
