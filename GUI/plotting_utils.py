@@ -15,7 +15,7 @@ garden_constants.dims, garden_constants.cellsize,
                 
 """
 def num_to_str(num):
-    a = "{:.2f}".format(num)
+    a = "{:.4f}".format(num)
     str_a = str(a)
     list_str_a = re.split(r'\.', str_a)
     if len(list_str_a) == 2:
@@ -60,9 +60,9 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
-    ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1.1, 1))
+    ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1, 1))
     garden_comp_score = garden_constants.garden_companionship_score(data)
-    plt.title('trial: {}; garden companionship score: {}'.format(trialno, garden_comp_score))
+    plt.title('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)))
     if save:
         if data.shape[0] >= 20:
             fig_filename = "comp-optimize-era/rnd4_winners-images/compscore_{}_trialno_{}_2d_plot_{}"\

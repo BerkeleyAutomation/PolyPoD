@@ -96,28 +96,27 @@ plantid2name = {
 1:'cilantro', # brown
 0:'sorrel' # black
 }
-legend_elements = [Line2D([0], [0], marker='o', color='red', label='kale',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='fuchsia', label='turnip',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='orange', label='borage',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='gold', label='swiss chard',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='lime', label='radicchio',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='darkgreen', label='arugula',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='blue', label='green lettuce',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='darkviolet', label='red lettuce',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='brown', label='cilantro',
-                          markerfacecolor='g', markersize=15),
-                   Line2D([0], [0], marker='o', color='black', label='sorrel',
-                          markerfacecolor='g', markersize=15)
+legend_elements = [Line2D([0], [0], marker='o', color='k', label='kale',
+                          markerfacecolor='red', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='turnip',
+                          markerfacecolor='fuchsia', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='borage',
+                          markerfacecolor='orange', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='swiss chard',
+                          markerfacecolor='gold', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='radicchio',
+                          markerfacecolor='lime', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='arugula',
+                          markerfacecolor='darkgreen', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='green lettuce',
+                          markerfacecolor='blue', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='red lettuce',
+                          markerfacecolor='darkviolet', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='cilantro',
+                          markerfacecolor='brown', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='sorrel',
+                          markerfacecolor='black', markersize=12)
                    ]
-ax.legend(handles=legend_elements, loc='center')
 
 # added points is list of ten lists, one for each plant type!
 def point_companionship_score(p, plant_type, added_points):
@@ -131,7 +130,7 @@ def point_companionship_score(p, plant_type, added_points):
             for o in added_points[t]:
                 o_loc = o[0]
                 if math.dist(p, o_loc) > 0:
-                    t_comp += (c / (math.dist(p, o_loc) ** 2))
+                    t_comp += (c / ((math.dist(p, o_loc) / 100) ** 2)) # divide by 100: cm -> m
             cum_comp += t_comp
     return cum_comp
 

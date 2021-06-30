@@ -264,11 +264,7 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            draw = next_point_selector(candidates)
-            to_add = [draw[0][0], draw[0][1]]
-            else:
-                draw = candidates[rng.integers(candidates.shape[0])]
-                to_add = [draw[0], draw[1]]
+            to_add = next_point_selector(candidates, plant_type, added_points)
             add_point(to_add, plant_type)
             print('Planting: ', to_add, '~\n\n\n')
             return True
@@ -294,8 +290,12 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         # Inner Control (Plant Adding) Loop
         master_break = False
 
+        '''
         # debugging
         add_point([35, 35], 9)
+        add_point([100, 35], 9)
+        add_point([100, 100], 5)
+        '''
         while plant_index >= 0 and not master_break:
             r = inhibition_radius(plant_index)
             def circ_up_helper(d_px_i, r):
@@ -375,7 +375,6 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                 draw = candidates[rng.integers(candidates.shape[0])]
                 to_add = [draw[0], draw[1]]
             add_point(to_add, plant_type)
-            print('Planting: ', to_add, '~\n\n\n')
             return True
 
         def add_point(choice, plant_type):
@@ -399,8 +398,9 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
         # Inner Control (Plant Adding) Loop
         master_break = False
 
-        # debugging
+        # debugging # todo delete this later
         add_point([35, 35], 9)
+        add_point([100, 35], 9)
         while plant_index >= 0 and not master_break:
             r = inhibition_radius(plant_index)
             def circ_up_helper(d_px_i, r):
