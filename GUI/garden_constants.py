@@ -103,7 +103,10 @@ def companionship_score(p, plant_type, points, added_points, self_multiplier):
     return cum_comp
 
 def comp_pd_postprocessing(pd, exp):
-    return exp ** (pd - np.min(pd)) - 1
+    probs = [p[1] for p in pd]
+    postprocessed_probs = exp ** (probs - np.min(probs)) - 1
+    points = [p[0] for p in pd]
+    return np.array(list(zip(points, postprocessed_probs)))
 def point_unpacker(p):
     loc, plant_index = p
     plant_index = int(plant_index)

@@ -194,14 +194,23 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             if len(candidates) == 0:
                 return False
             if utility_func:
-                probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
-                                                     points, added_points) for p in candidates])
+                cand_points = [[p[0], p[1]] for p in candidates]
+                probability_distribution = np.array([[[p[0], p[1]], utility_func([p[0], p[1]], plant_type,
+                                                     points, added_points)] for p in candidates])
+                np.save('pd/init_prob_dist', probability_distribution)
                 probability_distribution = utility_postprocessing_func(probability_distribution)
-                pd_sum = probability_distribution.sum()
+                np.save('pd/postprocessed_prob_dist', probability_distribution)
+                postprocessed_probs = np.array([p[1] for p in probability_distribution])
+                pd_sum = postprocessed_probs.sum()
                 if pd_sum > 0:
-                    probability_distribution = probability_distribution/pd_sum
+                    postprocessed_probs = postprocessed_probs/pd_sum
+                    np.save('pd/normalized_prob_dist', zip(cand_points, postprocessed_probs))
                 else:
                     probability_distribution = np.ones(probability_distribution.shape) / probability_distribution.shape
+
+                # debug
+                assert False
+
                 selection_array = np.arange(len(candidates))
                 draw_num = choice(selection_array, 1,
                               p=probability_distribution)
@@ -234,6 +243,9 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
 
         # Inner Control (Plant Adding) Loop
         master_break = False
+
+        # debugging
+        add_point([35, 35], 9)
         while plant_index >= 0 and not master_break:
             r = inhibition_radius(plant_index)
             def circ_up_helper(d_px_i, r):

@@ -15,7 +15,7 @@ save_plotly=False
 save=True
 # util_func = False
 num_each_plant = 2
-comp_exps = [8] #[2, 4, 8]
+comp_exps = [10 ** 8] #[2, 4, 8]
 self_multipliers = [8] #[2, 4, 8]
 
 #bounds_map_creator_args = french_gardens_utils.french_demo_bac()
