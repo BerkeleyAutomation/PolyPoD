@@ -30,10 +30,79 @@ colors_of_plants_hcl_v2 = ["#004800", "#005100", "#005A00",
 soil_color = "#50371f"
 num_plants = 10
 alpha = 1
-plant_radii = {}
-for p, r in enumerate(np.linspace(plant_min_radius, plant_max_radius, num_plants)):
-    plant_radii[p] = r
+'''
+plant_radii = {
+ 'swiss_chard': 27, #31
+ 'kale': 35, #35
+ 'green_lettuce': 16, #(18,1)
+ 'cilantro': 12,
+ 'red_lettuce': 13,#15
+ 'borage': 29, #(60,5) 
+ 'sorrel': 9,
+ 'radicchio': 24,#29
+ 'arugula': 21, #(25,1)
+ 'turnip': 31 #33
+}
+'''
+plant_radii = {
+9:35, # kale
+8:31, # turnip
+7:29, # borage
+6:27, # swiss_chard
+5:24, # radicchio
+4:21, # arugula
+3:16, # green_lettuce
+2:13, # red_lettuce
+1:12, # cilantro
+0:9   # sorrel
+}
 
+plantid2name = {
+9:'kale',
+8:'turnip',
+7:'borage',
+6:'swiss_chard',
+5:'radicchio',
+4:'arugula',
+3:'green_lettuce',
+2:'red_lettuce',
+1:'cilantro',
+0:'sorrel'
+}
+SRV = -1.0
+PLANTS_RELATION = {
+        "borage":       {"borage": SRV, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 1.0, "arugula": 0.0, "swiss_chard": 1.0, "turnip": 0.0},
+        "sorrel":       {"borage": 0.0, "sorrel": SRV,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": 0.0, "turnip": 0.0},
+        "cilantro":     {"borage": -1.0, "sorrel": 0.0,  "cilantro": SRV, "radicchio": 0.0, "kale": -1.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": 0.0, "turnip": 0.0},
+        "radicchio":    {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": SRV, "kale": 0.0, "green_lettuce":-1.0, "red_lettuce":-1.0, "arugula": 0.0, "swiss_chard":-1.0, "turnip": 0.0},
+        "kale":         {"borage": -1.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 1.0, "kale": SRV, "green_lettuce": -1.0, "red_lettuce": -1.0, "arugula": -1.0, "swiss_chard": 0.0, "turnip": 0.0},
+        "green_lettuce":{"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": SRV, "red_lettuce": -1.0, "arugula": 0.0, "swiss_chard": -1.0, "turnip": 0.0},
+        "red_lettuce":  {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": -1.0, "kale": -1.0, "green_lettuce": -1.0, "red_lettuce": SRV, "arugula": 0.0, "swiss_chard": 0.0, "turnip": 0.0},
+        "arugula":      {"borage": 0.0, "sorrel": 1.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 1.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": SRV, "swiss_chard": 0.0, "turnip": -1.0},
+        "swiss_chard":  {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": SRV, "turnip": 0.0},
+        "turnip":       {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": -1.0, "swiss_chard": 1.0, "turnip": SRV}
+}
+
+
+def companionship_score(p, plant_type, points, added_points, self_multiplier):
+    cum_comp = 0
+    p_name = plantid2name[plant_type]
+    for t in range(num_plants):
+        t_name = plantid2name[t]
+        c = PLANTS_RELATION[p_name][t_name]
+        t_comp = 0
+        if not c == 0:
+            for o in added_points[t]:
+                o_loc = o[0]
+                t_comp += (c / (math.dist(p, o_loc) ** 2))
+            if t == p:
+                t_comp *= self_multiplier
+            cum_comp += t_comp
+    print('p ', p, '\ncum_comp ', cum_comp, '\n')
+    return cum_comp
+
+def comp_pd_postprocessing(pd, exp):
+    return exp ** (pd - np.min(pd)) - 1
 def point_unpacker(p):
     loc, plant_index = p
     plant_index = int(plant_index)
