@@ -27,8 +27,20 @@ rng = default_rng()
 #bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]
 bounds_map_creator_args = False
 # Probably should place both void plants! [type 0]
+def void_centers(r):
+    p2 = 141.42 - (2/3) * r
+    p1 = (1/2) * p2 - r
+    c1 = p1 + r
+    c2 = p2 + r
+    c1_xy = c1 / math.sqrt(2)
+    c2_xy = c2 / math.sqrt(2)
+    centers = [[c1_xy, c1_xy], [c2_xy, c2_xy]]
+    return centers
+
+v_centers = void_centers(garden_constants.void_radius)
+
 starting_plants_dict = {-1: [],
-                    0: [[[44.5, 44.5], 0], [[105.51, 105.51], 0]],
+                    0: [[v_centers[0], 0], [v_centers[1], 0]],
                    1: [[[75, 75], 9]],
                    2: [[[35, 35], 9], [[115, 115], 9]],
                    3: [[[35, 55], 9], [[115, 95], 9]],

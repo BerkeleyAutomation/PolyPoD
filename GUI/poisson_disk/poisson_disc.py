@@ -194,8 +194,8 @@ def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
             c2 = cbm > r
             c3 = dist_to_border >= r
             c4 = crm_same_plant > ((1 - self_beta) * r)
-            c5 = crm_void > inhibition_radius(0)
-            criteria = (c1 & c2 & c3 & c4)
+            c5 = crm_void > r
+            criteria = (c1 & c2 & c3 & c4 & c5)
             return criteria
 
         def next_point(plant_type):
@@ -230,13 +230,14 @@ def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
                     points.set_cr_of_plant(plant_type, mx, my, dr) # todo
             points.mark_plant(xc, yc, plant_type)
             added_points[plant_type].append([choice, plant_type])
-        plant_index = garden_constants.num_plants - 1
 
         # Inner Control (Plant Adding) Loop
+        plant_index = garden_constants.num_plants - 1
         master_break = False
 
         for p in starting_plants:
             add_point(p[0], p[1])
+            num_p[p[1]] -= 1
         while plant_index >= 0 and not master_break:
             r = inhibition_radius(plant_index)
             def circ_up_helper(d_px_i, r):
