@@ -56,7 +56,9 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     datax, datay = locdata[:,0], locdata[:,1]
 
     ax.scatter(datax, datay, s=1, color='k')
-
+    ax.table(cellText=table_text,
+              rowLabels=row_labels,
+              loc='top')
     gxl = garden_constants.garden_x_len
     gyl = garden_constants.garden_y_len
     garden_vecs = [[0,0], [gxl, 0], [gxl, gyl], [0, gyl]]
@@ -65,7 +67,7 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     ax.set_aspect(1)
     ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1, 1))
     garden_comp_score = garden_constants.garden_companionship_score(data)
-    plt.title('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)))
+    plt.suptitle('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)), y=1)
     if save:
         if data.shape[0] >= 18:
             fig_filename = "comp-optimize-era/winners-images/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_2d_plot_{}"\

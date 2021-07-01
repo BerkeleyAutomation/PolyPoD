@@ -189,10 +189,12 @@ def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
             crm = points.get_cr_map()
             cbm = points.get_cb_map()
             crm_same_plant = points.get_cr_of_plant_map(plant_type) # todo
+            crm_void = points.get_cr_of_plant_map(0)
             c1 = crm > ((1 - beta) * r)
             c2 = cbm > r
             c3 = dist_to_border >= r
             c4 = crm_same_plant > ((1 - self_beta) * r)
+            c5 = crm_void > inhibition_radius(0)
             criteria = (c1 & c2 & c3 & c4)
             return criteria
 

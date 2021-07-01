@@ -14,6 +14,8 @@ assert plant_min_radius / cellsize >= 2
 a_func_multiplier = 0.328
 a_func_offset = 0.663
 a_func_exp_base = 3.71
+average_other_radii = 23.275
+void_radius = 10
 
 colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
                     "#7fae7e", "#455127", '#32C822']
@@ -54,7 +56,7 @@ plant_radii = {
 3:16, # green_lettuce
 2:13, # red_lettuce
 1:12, # cilantro
-0: 23.375, # VOID
+0: void_radius, # VOID
 }
 
 num_plants = len(plant_radii)
@@ -83,23 +85,23 @@ PLANTS_RELATION = {
         "VOID":         {"borage": 0.0, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "swiss_chard": 0.0, "turnip": 0.0, "VOID": 0.0},
 }
 
-legend_elements = [Line2D([0], [0], marker='o', color='k', label='kale',
+legend_elements = [Line2D([0], [0], marker='o', color='k', label='8 kale',
                           markerfacecolor='red', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='turnip',
+                   Line2D([0], [0], marker='o', color='k', label='7 turnip',
                           markerfacecolor='fuchsia', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='borage',
+                   Line2D([0], [0], marker='o', color='k', label='6 borage',
                           markerfacecolor='orange', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='swiss chard',
+                   Line2D([0], [0], marker='o', color='k', label='5 swiss chard',
                           markerfacecolor='gold', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='radicchio',
+                   Line2D([0], [0], marker='o', color='k', label='4 radicchio',
                           markerfacecolor='lime', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='green lettuce',
+                   Line2D([0], [0], marker='o', color='k', label='3 green lettuce',
                           markerfacecolor='darkgreen', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='red lettuce',
+                   Line2D([0], [0], marker='o', color='k', label='2 red lettuce',
                           markerfacecolor='blue', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='cilantro',
+                   Line2D([0], [0], marker='o', color='k', label='1 cilantro',
                           markerfacecolor='darkviolet', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='VOID',
+                   Line2D([0], [0], marker='o', color='k', label='0 VOID',
                           markerfacecolor='black', markersize=12)
                    ]
 
