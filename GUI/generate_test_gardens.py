@@ -6,7 +6,8 @@ import math
 import numpy as np
 
 beta = 1
-num_trials = 25
+self_beta = 0
+num_trials = 100
 num_p_selector = poi.weighted_round_or_one
 fill_final = True
 data = None #np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
@@ -14,7 +15,7 @@ generate_plotly=False
 save_plotly=False
 save=True
 # util_func = False
-num_each_plant = np.full(10, 2, dtype='int')
+num_each_plant = np.full(9, 2, dtype='int')
 #num_each_plant[9] = 2
 comp_exps = [2]
 self_multipliers = [1] #[2, 4, 8]
@@ -25,7 +26,9 @@ rng = default_rng()
 #bounds_map_creator_args = french_gardens_utils.french_demo_bac()
 #bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]
 bounds_map_creator_args = False
-starting_plants_dict = {0: [],
+# Probably should place both void plants! [type 0]
+starting_plants_dict = {-1: [],
+                    0: [[[44.5, 44.5], 0], [[105.51, 105.51], 0]],
                    1: [[[75, 75], 9]],
                    2: [[[35, 35], 9], [[115, 115], 9]],
                    3: [[[35, 55], 9], [[115, 95], 9]],
@@ -74,6 +77,7 @@ for comp_exp in comp_exps:
                     return [draw[0][0], draw[0][1]]
 
                 plotting_utils.generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
+                                                                self_beta=self_beta,
                                                                 data=data, generate_plotly=generate_plotly,
                                                                 comp_exp=comp_exp, self_multiplier=self_multiplier,
                                                                 next_point_selector=comp_ps,

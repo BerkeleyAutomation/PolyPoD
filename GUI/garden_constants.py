@@ -17,7 +17,7 @@ a_func_exp_base = 3.71
 
 colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
                     "#7fae7e", "#455127", '#32C822']
-colors_of_plants_hi_contrast = ['black', 'brown', 'darkviolet', 'blue', 'darkgreen', 'lime',
+colors_of_plants_hi_contrast = ['black', 'darkviolet', 'blue', 'darkgreen', 'lime',
                                 'gold', 'orange', 'fuchsia', 'red']
 
 colors_of_plants_shibui = ['#00af42', '#00a265', '#00B146',
@@ -30,7 +30,6 @@ colors_of_plants_hcl_v2 = ["#004800", "#005100", "#005A00",
                            "#1C7F00", "#278900", "#33921E",
                            "#3E9B1F"]
 soil_color = "#50371f"
-num_plants = 10
 alpha = 1
 '''
 plant_radii = {
@@ -47,55 +46,43 @@ plant_radii = {
 }
 '''
 plant_radii = {
-9:35, # kale
-8:31, # turnip
-7:29, # borage
-6:27, # swiss_chard
-5:24, # radicchio
-4:21, # arugula
+8:35, # kale
+7:31, # turnip
+6:29, # borage
+5:27, # swiss_chard
+4:24, # radicchio
 3:16, # green_lettuce
 2:13, # red_lettuce
 1:12, # cilantro
-0:9   # sorrel
+0: 23.375, # VOID
 }
 
+num_plants = len(plant_radii)
 plantid2name = {
-9:'kale', # red
-8:'turnip', # fuchsia
-7:'borage', # orange
-6:'swiss_chard', # gold
-5:'radicchio', # lime
-4:'arugula', # darkgreen
-3:'green_lettuce', # blue
-2:'red_lettuce', # darkviolet
-1:'cilantro', # brown
-0:'sorrel' # black
+8:'kale', # red
+7:'turnip', # fuchsia
+6:'borage', # orange
+5:'swiss_chard', # gold
+4:'radicchio', # lime
+3:'green_lettuce', # darkgreen
+2:'red_lettuce', # blue
+1:'cilantro', # darkviolet
+0: 'VOID' # black
 }
+
 SRV = -1.0
 PLANTS_RELATION = {
-        "borage":       {"borage": SRV, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 1.0, "arugula": 0.0, "swiss_chard": 1.0, "turnip": 0.0},
-        "sorrel":       {"borage": 0.0, "sorrel": SRV,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": 0.0, "turnip": 0.0},
-        "cilantro":     {"borage": -1.0, "sorrel": 0.0,  "cilantro": SRV, "radicchio": 0.0, "kale": -1.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": 0.0, "turnip": 0.0},
-        "radicchio":    {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": SRV, "kale": 0.0, "green_lettuce":-1.0, "red_lettuce":-1.0, "arugula": 0.0, "swiss_chard":-1.0, "turnip": 0.0},
-        "kale":         {"borage": -1.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 1.0, "kale": SRV, "green_lettuce": -1.0, "red_lettuce": -1.0, "arugula": -1.0, "swiss_chard": 0.0, "turnip": 0.0},
-        "green_lettuce":{"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": SRV, "red_lettuce": -1.0, "arugula": 0.0, "swiss_chard": -1.0, "turnip": 0.0},
-        "red_lettuce":  {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": -1.0, "kale": -1.0, "green_lettuce": -1.0, "red_lettuce": SRV, "arugula": 0.0, "swiss_chard": 0.0, "turnip": 0.0},
-        "arugula":      {"borage": 0.0, "sorrel": 1.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 1.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": SRV, "swiss_chard": 0.0, "turnip": -1.0},
-        "swiss_chard":  {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": 0.0, "swiss_chard": SRV, "turnip": 0.0},
-        "turnip":       {"borage": 0.0, "sorrel": 0.0,  "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "arugula": -1.0, "swiss_chard": 1.0, "turnip": SRV}
+        "borage":       {"borage": SRV, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 1.0, "swiss_chard": 1.0, "turnip": 0.0, "VOID": 0.0},
+        "cilantro":     {"borage": -1.0, "cilantro": SRV, "radicchio": 0.0, "kale": -1.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "swiss_chard": 0.0, "turnip": 0.0, "VOID": 0.0},
+        "radicchio":    {"borage": 0.0, "cilantro": 0.0, "radicchio": SRV, "kale": 0.0, "green_lettuce":-1.0, "red_lettuce":-1.0, "swiss_chard":-1.0, "turnip": 0.0, "VOID": 0.0},
+        "kale":         {"borage": -1.0, "cilantro": 0.0, "radicchio": 1.0, "kale": SRV, "green_lettuce": -1.0, "red_lettuce": -1.0, "swiss_chard": 0.0, "turnip": 0.0, "VOID": 0.0},
+        "green_lettuce":{"borage": 0.0, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": SRV, "red_lettuce": -1.0, "swiss_chard": -1.0, "turnip": 0.0, "VOID": 0.0},
+        "red_lettuce":  {"borage": 0.0, "cilantro": 0.0, "radicchio": -1.0, "kale": -1.0, "green_lettuce": -1.0, "red_lettuce": SRV, "swiss_chard": 0.0, "turnip": 0.0, "VOID": 0.0},
+        "swiss_chard":  {"borage": 0.0, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "swiss_chard": SRV, "turnip": 0.0, "VOID": 0.0},
+        "turnip":       {"borage": 0.0, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "swiss_chard": 1.0, "turnip": SRV, "VOID": 0.0},
+        "VOID":         {"borage": 0.0, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "swiss_chard": 0.0, "turnip": 0.0, "VOID": 0.0},
 }
-plantid2name = {
-9:'kale', # red
-8:'turnip', # fuchsia
-7:'borage', # orange
-6:'swiss_chard', # gold
-5:'radicchio', # lime
-4:'arugula', # darkgreen
-3:'green_lettuce', # blue
-2:'red_lettuce', # darkviolet
-1:'cilantro', # brown
-0:'sorrel' # black
-}
+
 legend_elements = [Line2D([0], [0], marker='o', color='k', label='kale',
                           markerfacecolor='red', markersize=12),
                    Line2D([0], [0], marker='o', color='k', label='turnip',
@@ -106,15 +93,13 @@ legend_elements = [Line2D([0], [0], marker='o', color='k', label='kale',
                           markerfacecolor='gold', markersize=12),
                    Line2D([0], [0], marker='o', color='k', label='radicchio',
                           markerfacecolor='lime', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='arugula',
-                          markerfacecolor='darkgreen', markersize=12),
                    Line2D([0], [0], marker='o', color='k', label='green lettuce',
-                          markerfacecolor='blue', markersize=12),
+                          markerfacecolor='darkgreen', markersize=12),
                    Line2D([0], [0], marker='o', color='k', label='red lettuce',
-                          markerfacecolor='darkviolet', markersize=12),
+                          markerfacecolor='blue', markersize=12),
                    Line2D([0], [0], marker='o', color='k', label='cilantro',
-                          markerfacecolor='brown', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='sorrel',
+                          markerfacecolor='darkviolet', markersize=12),
+                   Line2D([0], [0], marker='o', color='k', label='VOID',
                           markerfacecolor='black', markersize=12)
                    ]
 

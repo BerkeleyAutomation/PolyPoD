@@ -37,14 +37,15 @@ def memoize(f):
 global_time_elapsed = 0
 class Points:
     def __init__(self, dims, ndim):
-        self.points = np.full(np.append(dims, ndim + 3), np.nan, dtype=np.float32)
+        self.points = np.full(np.append(dims, ndim + 3 + garden_constants.num_plants),
+                              np.nan, dtype=np.float32)
         it = np.nditer(self.points, flags=["multi_index", "refs_ok"])
         for _ in it:
             if it.multi_index[2] == 0:
                 self.points[it.multi_index] = it.multi_index[0]
             elif it.multi_index[2] == 1:
                 self.points[it.multi_index] = it.multi_index[1]
-            elif it.multi_index[2] == 2 or it.multi_index[2] == 3:
+            elif it.multi_index[2] == 2 or it.multi_index[2] == 3 or it.multi_index[2] > 4:
                 self.points[it.multi_index] = np.inf
 
     def get_points_array(self):
@@ -61,11 +62,17 @@ class Points:
     def get_plant_type(self, p):
         return p[4]
 
+    def get_cr_of_plant(self, plant_type, p):
+        return p[plant_type + 5]
+
     def set_cr(self, x, y, cr):
         self.points[int(x), int(y), 2] = cr
 
     def set_cb(self, x, y, cb):
         self.points[int(x), int(y), 3] = cb
+
+    def set_cr_of_plant(self, plant_type, x, y, cr):
+        self.points[int(x), int(y), plant_type + 5] = cr
 
     def mark_plant(self, x, y, t):
         self.points[int(x), int(y), 4] = t
@@ -76,6 +83,9 @@ class Points:
     def get_cb_map(self):
         return self.points[:, :, 3]
 
+    def get_cr_of_plant_map(self, plant_type):
+        return self.points[:, :, plant_type + 5]
+
     def get_point_list(self):
         return self.points.reshape(self.points.shape[0] * self.points.shape[1], self.points.shape[2])
 
@@ -83,7 +93,8 @@ class Points:
         pointlist = self.get_point_list()
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
-def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_args, fill_final,
+def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
+                    bounds_map_creator_args, fill_final,
                     next_point_selector, num_each_plant, starting_plants):
     # Preprocessing / Setup
     start = time.time()
@@ -177,84 +188,12 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
             r = inhibition_radius(plant_type)
             crm = points.get_cr_map()
             cbm = points.get_cb_map()
+            crm_same_plant = points.get_cr_of_plant_map(plant_type) # todo
             c1 = crm > ((1 - beta) * r)
             c2 = cbm > r
             c3 = dist_to_border >= r
-            criteria = (c1 & c2 & c3)
-            return criteria
-        if not bmca == False:
-            upper, lower, bounds = bmca
-            upper = memoize(upper)
-            lower = memoize(lower)
-            upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
-            lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
-            bounds = [num / cellsize for num in bounds]
-            low_x_bound, high_x_bound, low_y_bound, high_y_bound = bounds
-        if num_each_plant is None:
-            def a_func(beta_arg):
-                o = garden_constants.a_func_offset
-                m = garden_constants.a_func_multiplier
-                b = garden_constants.a_func_exp_base
-                return (o - m) + m * (b ** beta_arg)
-
-            a = a_func(beta)
-
-            garden_area = np.prod(dims)
-            est_area = a * garden_area
-            frac_tot_area_p = np.full(garden_constants.num_plants, 1 / garden_constants.num_plants)
-            est_tot_area_p = frac_tot_area_p * est_area
-            area_p = [math.pi * (inhibition_radius(p) ** 2)
-                      for p in range(garden_constants.num_plants)]
-            num_p = est_tot_area_p / area_p
-            num_p = np.array([num_p_selector(n) for n in num_p], dtype=int)
-        else:
-            num_p = num_each_plant
-            starting_num_p = [len([p for p in starting_plants if p[1] == t])
-                                       for t in range(garden_constants.num_plants)]
-            num_p = num_p - starting_num_p
-
-        # custom bounds functions
-        def line_following(function, input_range):
-            pass
-
-        def bounds_map_creator(upper, lower, plant_type):
-            def in_bounds(p):
-                loc, plant_index, r = point_unpacker_internal(p)
-                px = loc[0]
-                py = loc[1]
-
-                circ_up = ucv + py
-                circ_low = lcv + py
-
-                adjusted_cv = cvx + px
-                upper_at_cv = np.array([upper(i) for i in adjusted_cv])
-                lower_at_cv = np.array([lower(i) for i in adjusted_cv])
-
-                upper_diff = upper_at_cv - circ_up
-                if np.amin(upper_diff) < 0:
-                    return False
-                lower_diff = circ_low - lower_at_cv
-                if np.amin(lower_diff) < 0:
-                    return False
-                in_left_right_bounds = (px - r) > low_x_bound and (px + r) < high_x_bound
-                if not in_left_right_bounds:
-                    return False
-                return True
-
-            bounds_map = np.full(dims, 0, dtype=bool)
-            for x in range(math.ceil(low_x_bound), math.floor(high_x_bound)):
-                for y in range(math.ceil(low_y_bound), math.floor(high_y_bound)):
-                    bounds_map[x, y] = in_bounds([[x, y], plant_type])
-            return bounds_map
-
-        def standard_criteria(plant_type):
-            r = inhibition_radius(plant_type)
-            crm = points.get_cr_map()
-            cbm = points.get_cb_map()
-            c1 = crm > ((1 - beta) * r)
-            c2 = cbm > r
-            c3 = dist_to_border >= r
-            criteria = (c1 & c2 & c3)
+            c4 = crm_same_plant > ((1 - self_beta) * r)
+            criteria = (c1 & c2 & c3 & c4)
             return criteria
 
         def next_point(plant_type):
@@ -285,6 +224,8 @@ def generate_garden(dims, cellsize, beta, num_p_selector, bounds_map_creator_arg
                     points.set_cr(mx, my, dr)
                 if db < points.get_cb(m):
                     points.set_cb(mx, my, db)
+                if dr < points.get_cr_of_plant(plant_type, m): # todo
+                    points.set_cr_of_plant(plant_type, mx, my, dr) # todo
             points.mark_plant(xc, yc, plant_type)
             added_points[plant_type].append([choice, plant_type])
         plant_index = garden_constants.num_plants - 1

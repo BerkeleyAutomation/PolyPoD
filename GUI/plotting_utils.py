@@ -23,13 +23,14 @@ def num_to_str(num):
     return str_a
 
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     next_point_selector, comp_exp=0, self_multiplier=0, util_exp=0, starting_plants=[],
+                                     next_point_selector, self_beta, comp_exp=0,
+                                     self_multiplier=0, util_exp=0, starting_plants=[],
                                      sp_index=-1,
                                      num_each_plant=None, trialno=-1,
                                      data=None, generate_plotly=True, save_plotly=True, save=True):
     if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
-                                   beta=beta, num_p_selector=num_p_selector,
+                                   beta=beta, self_beta=self_beta, num_p_selector=num_p_selector,
                                    starting_plants=starting_plants,
                                    bounds_map_creator_args=bounds_map_creator_args,
                                    fill_final=fill_final, next_point_selector=next_point_selector,
@@ -66,7 +67,7 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     garden_comp_score = garden_constants.garden_companionship_score(data)
     plt.title('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)))
     if save:
-        if data.shape[0] >= 20:
+        if data.shape[0] >= 18:
             fig_filename = "comp-optimize-era/winners-images/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_2d_plot_{}"\
                 .format(num_to_str(garden_comp_score), sp_index, comp_exp, self_multiplier, trialno,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
@@ -83,6 +84,7 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
         plt.savefig(fig_filename, dpi=200)
         np.save(data_filename, data)
         plt.close()
+        print('trial ', trialno, 'num plants ', data.shape[0])
     elif generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],
