@@ -23,18 +23,19 @@ def num_to_str(num):
     return str_a
 
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                     next_point_selector, self_beta, comp_exp=0,
+                                     next_point_selector, self_beta, void_beta, planting_order, comp_exp=0,
                                      self_multiplier=0, util_exp=0, starting_plants=[],
                                      sp_index=-1,
                                      num_each_plant=None, trialno=-1,
-                                     data=None, generate_plotly=True, save_plotly=True, save=True):
+                                     data=None, generate_plotly=True, save_plotly=True, save=True,
+                                     ):
     if data == None:
         data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
-                                   beta=beta, self_beta=self_beta, num_p_selector=num_p_selector,
+                                   beta=beta, self_beta=self_beta, void_beta=void_beta, num_p_selector=num_p_selector,
                                    starting_plants=starting_plants,
                                    bounds_map_creator_args=bounds_map_creator_args,
                                    fill_final=fill_final, next_point_selector=next_point_selector,
-                                   num_each_plant=num_each_plant)
+                                   num_each_plant=num_each_plant, planting_order=planting_order)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)

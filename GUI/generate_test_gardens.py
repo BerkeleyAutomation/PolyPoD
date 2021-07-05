@@ -7,7 +7,8 @@ import numpy as np
 
 beta = 1
 self_beta = 0
-num_trials = 100
+void_beta = -6
+num_trials = 1000
 num_p_selector = poi.weighted_round_or_one
 fill_final = True
 data = None #np.load('french_plots/data_06-08-21_19-18-07-814772.npy', allow_pickle=True)
@@ -16,6 +17,7 @@ save_plotly=False
 save=True
 # util_func = False
 num_each_plant = np.full(9, 2, dtype='int')
+planting_order = [0, 8, 7, 6, 5, 4, 3, 2, 1]
 #num_each_plant[9] = 2
 comp_exps = [2]
 self_multipliers = [1] #[2, 4, 8]
@@ -46,7 +48,7 @@ starting_plants_dict = {-1: [],
                    3: [[[35, 55], 9], [[115, 95], 9]],
                    4: [[[55, 55], 9], [[95, 95], 9]]
                    }
-starting_configs = [0]
+starting_configs = [-1]
 def random_ps(candidates, plant_type, added_points):
     draw = candidates[rng.integers(candidates.shape[0])]
     return [draw[0], draw[1]]
@@ -88,12 +90,14 @@ for comp_exp in comp_exps:
                     draw = candidates[draw_num]
                     return [draw[0][0], draw[0][1]]
 
-                plotting_utils.generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
-                                                                self_beta=self_beta,
+                plotting_utils.generate_garden_scatter_and_area(beta=beta, num_p_selector=num_p_selector,
+                                                                bounds_map_creator_args=bounds_map_creator_args,
+                                                                fill_final=fill_final,
+                                                                self_beta=self_beta, void_beta=void_beta,
                                                                 data=data, generate_plotly=generate_plotly,
                                                                 comp_exp=comp_exp, self_multiplier=self_multiplier,
                                                                 next_point_selector=comp_ps,
                                                                 save_plotly=save_plotly, save=save,
                                                                 num_each_plant=num_each_plant, trialno=t,
                                                                 starting_plants=starting_plants,
-                                                                sp_index=sp_index)
+                                                                sp_index=sp_index, planting_order=planting_order)

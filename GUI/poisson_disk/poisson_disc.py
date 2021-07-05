@@ -93,9 +93,10 @@ class Points:
         pointlist = self.get_point_list()
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
-def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
+def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
                     bounds_map_creator_args, fill_final,
-                    next_point_selector, num_each_plant, starting_plants):
+                    next_point_selector, num_each_plant, starting_plants,
+                    planting_order):
     # Preprocessing / Setup
     start = time.time()
     added_points = [[] for _ in range(garden_constants.num_plants)]
@@ -195,6 +196,9 @@ def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
             c3 = dist_to_border >= r
             c4 = crm_same_plant > ((1 - self_beta) * r)
             c5 = crm_void > r
+            if plant_type == 0:
+                c1 = crm > ((1 - void_beta) * r)
+                c3 = dist_to_border >= garden_constants.void_dist_to_border
             criteria = (c1 & c2 & c3 & c4 & c5)
             return criteria
 
@@ -232,13 +236,14 @@ def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
             added_points[plant_type].append([choice, plant_type])
 
         # Inner Control (Plant Adding) Loop
-        plant_index = garden_constants.num_plants - 1
+        plant_order_index = 0
         master_break = False
 
         for p in starting_plants:
             add_point(p[0], p[1])
             num_p[p[1]] -= 1
-        while plant_index >= 0 and not master_break:
+        while plant_order_index < len(planting_order) and not master_break:
+            plant_index = planting_order[plant_order_index]
             r = inhibition_radius(plant_index)
             def circ_up_helper(d_px_i, r):
                 return math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
@@ -264,7 +269,7 @@ def generate_garden(dims, cellsize, beta, self_beta, num_p_selector,
                     n = next_point(plant_index)
                     if not n:
                         break
-                plant_index -= 1
+                plant_order_index += 1
             else:
                 while True:
                     n = next_point(plant_index)

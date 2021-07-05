@@ -15,7 +15,8 @@ a_func_multiplier = 0.328
 a_func_offset = 0.663
 a_func_exp_base = 3.71
 average_other_radii = 23.275
-void_radius = 10
+void_radius = 5
+void_dist_to_border = 30
 
 colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
                     "#7fae7e", "#455127", '#32C822']
