@@ -9,7 +9,7 @@ datayu = []
 dataxl = []
 datayl = []
 for bmca in b:
-    upper, lower, bounds, num_checks = bmca
+    upper, lower, bounds = bmca
     for n in np.arange(bounds[0], bounds[1], step):
         dataxu.append(n)
         datayu.append(upper(n))

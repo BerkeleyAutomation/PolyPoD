@@ -2,15 +2,11 @@ import numpy as np
 import math
 from matplotlib.lines import Line2D
 
-garden_x_len = 150
-garden_y_len = 150
-plant_max_radius = 5 # unused
-plant_min_radius = 3 # unused
-garden_dimensions = (garden_x_len, garden_y_len, plant_max_radius)
+garden_x_len = 450
+garden_y_len = 450
 dims = np.array([garden_x_len, garden_y_len])
 garden_area = np.prod(dims)
-cellsize = 1
-assert plant_min_radius / cellsize >= 2
+cellsize = 3
 a_func_multiplier = 0.328
 a_func_offset = 0.663
 a_func_exp_base = 3.71
@@ -37,6 +33,8 @@ color_atsu =  ["#8CAB6D", "#6DA54C","#4D9932","#4B8A41","#5C996C","#538B82","#53
 soil_color_atsu = "#5E534D"
 soil_color = "#50371f"
 alpha = 1
+
+
 '''
 plant_radii = {
  'swiss_chard': 27, #31

@@ -8,15 +8,16 @@ import numpy as np
 beta = 1
 self_beta = 0
 void_beta = -6
-num_trials = 20
+num_trials = 1
 num_p_selector = poi.weighted_round_or_one
-fill_final = True
+fill_final = False
 data = None#['comp-optimize-era/winners-data/data_6.npy', 'comp-optimize-era/winners-data/data_5.npy']
 generate_plotly=False
 save_plotly=False
 save_2d=True
 # util_func = False
-num_each_plant = np.full(9, 2, dtype='int')
+num_each_plant = np.full(9, 18, dtype='int')
+winner_number_plants = np.sum(num_each_plant)
 planting_order = [0, 8, 7, 6, 5, 4, 3, 2, 1]
 #num_each_plant[9] = 2
 comp_exps = [2]
@@ -26,9 +27,9 @@ from numpy.random import default_rng
 from numpy.random import choice
 rng = default_rng()
 
-#bounds_map_creator_args = french_gardens_utils.french_demo_bac()
+bounds_map_creator_args = [french_gardens_utils.french_demo_bac()]
 #bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]
-bounds_map_creator_args = False
+#bounds_map_creator_args = False
 # Probably should place both void plants! [type 0]
 def void_centers(r):
     p2 = 141.42 - (2/3) * r
@@ -57,7 +58,8 @@ def random_ps(candidates, plant_type, added_points):
 for comp_exp in comp_exps:
     for self_multiplier in self_multipliers:
         for sp_index in starting_configs:
-                for cylinder_nt in cylinder_nts:
+            for cylinder_nt in cylinder_nts:
+                for bmca in bounds_map_creator_args:
                     for t in range(num_trials):
                         #print('comp_exp: ', comp_exp, '; self_multiplier: ', self_multiplier,
                         #      '; sp_index ', sp_index, '; trial: ', t)
@@ -93,7 +95,7 @@ for comp_exp in comp_exps:
                             return [draw[0][0], draw[0][1]]
 
                         plotting_utils.generate_garden_scatter_and_area(beta=beta, num_p_selector=num_p_selector,
-                                                                        bounds_map_creator_args=bounds_map_creator_args,
+                                                                        bounds_map_creator_args=bmca,
                                                                         fill_final=fill_final,
                                                                         cylinder_nt=cylinder_nt,
                                                                         self_beta=self_beta, void_beta=void_beta,
@@ -103,4 +105,5 @@ for comp_exp in comp_exps:
                                                                         save_plotly=save_plotly, save_2d=save_2d,
                                                                         num_each_plant=num_each_plant, trialno=t,
                                                                         starting_plants=starting_plants,
-                                                                        sp_index=sp_index, planting_order=planting_order)
+                                                                        sp_index=sp_index, planting_order=planting_order,
+                                                                        winner_number_plants=winner_number_plants)

@@ -24,7 +24,7 @@ def num_to_str(num):
 
 def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_args, fill_final,
                                      next_point_selector, self_beta, void_beta, planting_order,
-                                     cylinder_nt, comp_exp=0,
+                                     cylinder_nt, winner_number_plants, comp_exp=0,
                                      self_multiplier=0, util_exp=0, starting_plants=[],
                                      sp_index=-1,
                                      num_each_plant=None, trialno=-1,
@@ -71,7 +71,7 @@ def generate_garden_scatter_and_area(beta, num_p_selector, bounds_map_creator_ar
     garden_comp_score = garden_constants.garden_companionship_score(data)
     plt.suptitle('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)), y=1)
     if save_2d:
-        if data.shape[0] >= 18:
+        if data.shape[0] >= winner_number_plants:
             fig_filename = "size_demos/winners-images/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_2d_plot_{}"\
                 .format(num_to_str(garden_comp_score), sp_index, comp_exp, self_multiplier, trialno,
                         datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))

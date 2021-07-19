@@ -1,5 +1,6 @@
 import plotting_utils
 import poisson_disk.poisson_disc as poi
+import garden_constants
 import plotting_utils
 import numpy as np
 import math
@@ -7,17 +8,17 @@ import math
 
 # upper, lower, bounds, num_checks = bmca
 
-corner_width = 2
-corner_length = 6
-circle_radius = 3
-rectangle_width = 4
-rectangle_length = 10 - rectangle_width / 2
+corner_width = 50
+corner_length = 200
+circle_radius = 40
+rectangle_width = 30
+rectangle_length = garden_constants.garden_x_len / 2 - rectangle_width / 2
 rectangle_indent = 0
 
 def french_demo_bac():
     bounds_map_creator_args = []
-    def flip(a):
-        return -a + 20
+    def flip(a): # todo make a flip_x and flip_y if ever considering non-square gardens
+        return -a + garden_constants.garden_x_len
 
     b_corner1 = [0, corner_length, 0, corner_length]
     def u_corner1(a):
@@ -28,22 +29,22 @@ def french_demo_bac():
     def l_corner1(a):
         return 0
 
-    b_circle1 = [5 - circle_radius, 5 + circle_radius, 5 - circle_radius, 5 + circle_radius]
-    def circle_shift5(a):
-        return math.sqrt(math.fabs(circle_radius ** 2 - (a - 5) ** 2))
+    b_circle1 = [garden_constants.garden_x_len / 4 - circle_radius, garden_constants.garden_x_len / 4 + circle_radius, garden_constants.garden_x_len / 4 - circle_radius, garden_constants.garden_x_len / 4 + circle_radius]
+    def circle_shift(a):
+        return math.sqrt(math.fabs(circle_radius ** 2 - (a - garden_constants.garden_x_len / 4) ** 2))
     def u_circle1(a):
-        return circle_shift5(a) + 5
+        return circle_shift(a) + garden_constants.garden_x_len / 4
     def l_circle1(a):
-        return -circle_shift5(a) + 5
+        return -circle_shift(a) + garden_constants.garden_x_len / 4
 
-    b_rectl = [rectangle_indent, rectangle_length, 10 - rectangle_width / 2,
-               10 + rectangle_width / 2]
+    b_rectl = [rectangle_indent, rectangle_length, garden_constants.garden_x_len / 2 - rectangle_width / 2,
+               garden_constants.garden_x_len / 2 + rectangle_width / 2]
     def u_rectl(a):
-        return 10 + rectangle_width / 2
+        return garden_constants.garden_x_len / 2 + rectangle_width / 2
     def l_rectl(a):
-        return 10 - rectangle_width / 2
+        return garden_constants.garden_x_len / 2 - rectangle_width / 2
 
-    b_rectd = [10 - rectangle_width / 2, 10 + rectangle_width / 2, rectangle_indent,
+    b_rectd = [garden_constants.garden_x_len / 2 - rectangle_width / 2, garden_constants.garden_x_len / 2 + rectangle_width / 2, rectangle_indent,
                rectangle_length]
     def u_rectd(a):
         return rectangle_length
@@ -75,7 +76,7 @@ def french_demo_bac():
         if not only_vertical and not only_horizontal:
             bounds_map_creator_args.append([un4, ln4, bn4])
     four_reflections(b_corner1, u_corner1, l_corner1)
-    four_reflections(b_circle1, u_circle1, l_circle1)
-    four_reflections(b_rectl, u_rectl, l_rectl, only_horizontal=True)
-    four_reflections(b_rectd, u_rectd, l_rectd, only_vertical=True)
+    #four_reflections(b_circle1, u_circle1, l_circle1)
+    #four_reflections(b_rectl, u_rectl, l_rectl, only_horizontal=True)
+    #four_reflections(b_rectd, u_rectd, l_rectd, only_vertical=True)
     return bounds_map_creator_args

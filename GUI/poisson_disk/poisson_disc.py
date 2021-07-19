@@ -230,8 +230,8 @@ def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
                     points.set_cr(mx, my, dr)
                 if db < points.get_cb(m):
                     points.set_cb(mx, my, db)
-                if dr < points.get_cr_of_plant(plant_type, m): # todo
-                    points.set_cr_of_plant(plant_type, mx, my, dr) # todo
+                if dr < points.get_cr_of_plant(plant_type, m):
+                    points.set_cr_of_plant(plant_type, mx, my, dr)
             points.mark_plant(xc, yc, plant_type)
             added_points[plant_type].append([choice, plant_type])
 
