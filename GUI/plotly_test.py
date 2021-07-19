@@ -9,10 +9,11 @@ import combine_plotly_surfaces
 # best z_ratio: 0.375
 # best h_hult: 0.43
 data_to_load = ['french_plots/data_06-24-21_16-46-53-557580.npy']
-where_to_save = 'french_plots'
+where_to_save = 'height_width_testing/'
 single_values = {'y_eye_mult':10, 'h_mult':0.43,
                'z_ratio':0.42, 'plant_labels':False,
-               'color_dict':garden_constants.colors_of_plants_hcl_v2}
+               'color_dict':garden_constants.color_atsu}
+color_of_soil = garden_constants.soil_color_atsu
 hms = [single_values['h_mult']]
 z_ratios = [single_values['z_ratio']]
 plant_labels = [False]
@@ -20,9 +21,13 @@ text_offset = 0.3
 colors_dicts = [single_values['color_dict']]
 shuffle_colors = True
 save_value = False
+dpi_scales = [4]
+heights = []
+widths = []
+no_height_width = True
 
-def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_labels=True, save=True,
-                where_to_save=False):
+
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, data=None, plant_labels=True, save=True):
     if shuffle_colors:
         copy = [x for x in range(len(colors_dict))]
         for r in range(3):
@@ -35,7 +40,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
     def make_colorscale(color):
         return [[0, color], [1, color]]
 
-    def cylinder(r, h, x, y, nt=20, nv=2):
+    def cylinder(r, h, x, y, nt=cylinder_nt, nv=2):
         """
         parametrize the cylinder of radius r, height h, base point a
         """
@@ -84,7 +89,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
     z_soil = np.array([[0,0], [0,0]])
 
     soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
-                     colorscale=make_colorscale(garden_constants.soil_color),
+                     colorscale=make_colorscale(color_of_soil),
                      showscale=False,
                      opacity=1,
                      hoverinfo='none',
@@ -109,6 +114,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
             aspectmode='data'
     )
     layout = go.Layout(scene=scene,
+                       margin={'l': 0, 'r': 0, 't': 0, 'b': 0},
                        scene_xaxis_visible=False,
                        scene_yaxis_visible=False,
                        scene_zaxis_visible=False)
@@ -161,10 +167,17 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, data=None, plant_label
     fig.layout.scene.camera.projection.type = "orthographic" #commenting this line you get a fig with perspective proj
 
     if save:
-        if where_to_save:
-            fig.write_image("3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
-        else:
-            fig.write_image("3d_plots/3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")))
+        for dpi_scale in dpi_scales:
+            if no_height_width:
+                fig.write_image(where_to_save + "no_height_width_3d_plot_{0}.png".format(
+                    datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")),
+                                scale=dpi_scale)
+            for height in heights:
+                for width in widths:
+                    fig.write_image(where_to_save + "height{1}_width_{2}_3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"),
+                                                                                                 height, width),
+                                    scale=dpi_scale, height=height, width=width)
+
     else:
         fig.show()
 
