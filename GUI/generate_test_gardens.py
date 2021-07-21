@@ -21,7 +21,7 @@ utility_postprocessing_func = None
 def random_ps(candidates, plant_type, added_points):
     draw = candidates[rng.integers(candidates.shape[0])]
     return [draw[0], draw[1]]
-def next_point_selector(candidates, plant_type, added_points, utility_func, utility_postprocessing_func):
+def next_point_selector_with_utility_func(candidates, plant_type, added_points, utility_func, utility_postprocessing_func):
     if utility_func is None:
         return random_ps(candidates, plant_type, added_points)
     probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
@@ -63,19 +63,36 @@ def self_beta_func(d, v):
         return d['beta']
 all_variables.append([self_beta_name, self_beta_values, include_self_beta, self_beta_func])
 
-utility_func = 'utility_func'
-utility_func_values = ['same', 'pairs', 'none']
-def include_utility_func(d, v):
-    return True
-def utility_func_type_func(d, v):
-    if v == 'none':
-        return None
-    elif v == 'same':
-
-
-
 utility_func_exponent_name = 'utility_func_exponent'
-utility_func_exponent_values = [-8, -5, -4, -3]
+utility_func_exponent_values = [-8, -5, -4, -3, None]
+def include_utility_func_exponent(d, v):
+    return True
+def utility_func_exponent_func(d, v):
+    return v
+all_variables.append([utility_func_exponent_name, utility_func_exponent_values, include_utility_func_exponent, utility_func_exponent_func])
+
+next_point_selector_name = 'next_point_selector'
+next_point_selector_values = ['same', 'pairs', 'none']
+def include_next_point_selector(d, v):
+    return True
+def next_point_selector_func(d, v):
+    def clustering_utility_func(p, plant_type, other_plant_type, points, added_points):
+        cum_dist = 0
+        for o in added_points[other_plant_type]:
+            pass
+            o_loc = o[0]
+            cum_dist += math.dist(p, o_loc)
+        if cum_dist == 0:
+            return 1
+        else:
+            return cum_dist ** d['utility_func_exponent']
+    if v == 'none':
+        return random_ps
+    elif v == 'same':
+        return lambda
+
+
+
 
 
 fill_final = False
