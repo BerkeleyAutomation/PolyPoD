@@ -8,7 +8,7 @@ import math
 
 # upper, lower, bounds, num_checks = bmca
 
-corner_width = 50
+corner_width = 55
 corner_length = 200
 circle_radius = 40
 rectangle_width = 30
@@ -76,7 +76,7 @@ def french_demo_bac():
         if not only_vertical and not only_horizontal:
             bounds_map_creator_args.append([un4, ln4, bn4])
     four_reflections(b_corner1, u_corner1, l_corner1)
-    #four_reflections(b_circle1, u_circle1, l_circle1)
-    #four_reflections(b_rectl, u_rectl, l_rectl, only_horizontal=True)
-    #four_reflections(b_rectd, u_rectd, l_rectd, only_vertical=True)
+    four_reflections(b_circle1, u_circle1, l_circle1)
+    four_reflections(b_rectl, u_rectl, l_rectl, only_horizontal=True)
+    four_reflections(b_rectd, u_rectd, l_rectd, only_vertical=True)
     return bounds_map_creator_args

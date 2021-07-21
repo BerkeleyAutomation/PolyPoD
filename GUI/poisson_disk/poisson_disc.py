@@ -234,14 +234,15 @@ def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
                     points.set_cr_of_plant(plant_type, mx, my, dr)
             points.mark_plant(xc, yc, plant_type)
             added_points[plant_type].append([choice, plant_type])
+            num_p[plant_type] -= 1
 
         # Inner Control (Plant Adding) Loop
         plant_order_index = 0
         master_break = False
 
-        for p in starting_plants:
-            add_point(p[0], p[1])
-            num_p[p[1]] -= 1
+        if first_pass:
+            for p in starting_plants:
+                add_point(p[0], p[1])
         while plant_order_index < len(planting_order) and not master_break:
             plant_index = planting_order[plant_order_index]
             r = inhibition_radius(plant_index)
@@ -257,25 +258,18 @@ def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
                     c.extend([2, -2])
                 else:
                     mid = r / math.sqrt(2)
-                    mf, mc =math.floor(mid), math.ceil(mid)
+                    mf, mc = math.floor(mid), math.ceil(mid)
                     c.extend([mf, mc, -mf, -mc])
                 return np.array(c)
             cvx = checking_values_x(r)
             ucv = np.array([circ_up_helper(cv, r) for cv in cvx])
             lcv = np.array([circ_low_helper(cv, r) for cv in cvx])
 
-            if plant_index > 0 or num_each_plant is not None:
-                for _ in range(num_p[plant_index]):
-                    n = next_point(plant_index)
-                    if not n:
-                        break
-                plant_order_index += 1
-            else:
-                while True:
-                    n = next_point(plant_index)
-                    if not n:
-                        master_break = True
-                        break
+            for _ in range(num_p[plant_index]):
+                n = next_point(plant_index)
+                if not n:
+                    break
+            plant_order_index += 1
 
         # to cartesian
         final_points = points.get_plant_list()
@@ -287,12 +281,14 @@ def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
 
     # Master Control Loop
     b_garden_points = None
+    first_pass = True
     if bounds_map_creator_args == False:
         fill_final = True
     else:
         for bmca in bounds_map_creator_args:
             b_garden_points, points = generate_garden_cluster(
                 beta, bmca, b_garden_points, points)
+            first_pass = False
     if fill_final:
         b_garden_points, new_points_arr = generate_garden_cluster(
             beta, False, b_garden_points, points)

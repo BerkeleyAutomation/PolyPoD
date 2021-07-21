@@ -8,7 +8,7 @@ import numpy as np
 beta = 1
 self_beta = 0
 void_beta = -6
-num_trials = 1
+num_trials = 5
 num_p_selector = poi.weighted_round_or_one
 fill_final = False
 data = None#['comp-optimize-era/winners-data/data_6.npy', 'comp-optimize-era/winners-data/data_5.npy']
@@ -16,7 +16,8 @@ generate_plotly=False
 save_plotly=False
 save_2d=True
 # util_func = False
-num_each_plant = np.full(9, 18, dtype='int')
+num_each_plant = np.full(9, 100, dtype='int')
+num_each_plant[0] = 0
 winner_number_plants = np.sum(num_each_plant)
 planting_order = [0, 8, 7, 6, 5, 4, 3, 2, 1]
 #num_each_plant[9] = 2
