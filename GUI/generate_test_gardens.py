@@ -18,7 +18,12 @@ save_plotly=True
 save_2d=True
 void_beta = -6
 utility_postprocessing_func = None
+def random_ps(candidates, plant_type, added_points):
+    draw = candidates[rng.integers(candidates.shape[0])]
+    return [draw[0], draw[1]]
 def next_point_selector(candidates, plant_type, added_points, utility_func, utility_postprocessing_func):
+    if utility_func is None:
+        return random_ps(candidates, plant_type, added_points)
     probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
                                                       added_points) for p in candidates])
     if utility_postprocessing_func is not None:
@@ -34,7 +39,6 @@ def next_point_selector(candidates, plant_type, added_points, utility_func, util
                       p=probability_distribution)
     draw = candidates[draw_num]
     return [draw[0][0], draw[0][1]]
-
 
 # LIST OF ALL EXPERIMENTAL VARIABLES
 all_variables = []
@@ -59,11 +63,15 @@ def self_beta_func(d, v):
         return d['beta']
 all_variables.append([self_beta_name, self_beta_values, include_self_beta, self_beta_func])
 
-utility_func_type_name = 'utility_func_type'
-utility_func_type_values = ['same', 'pairs', 'none']
-def include_utility_func_type(d, v):
+utility_func = 'utility_func'
+utility_func_values = ['same', 'pairs', 'none']
+def include_utility_func(d, v):
     return True
-def utility_func_func(d, v):
+def utility_func_type_func(d, v):
+    if v == 'none':
+        return None
+    elif v == 'same':
+
 
 
 utility_func_exponent_name = 'utility_func_exponent'
@@ -97,9 +105,6 @@ for variable in all_variables:
     l = variable_adder(l, variable)
 
 
-def random_ps(candidates, plant_type, added_points):
-    draw = candidates[rng.integers(candidates.shape[0])]
-    return [draw[0], draw[1]]
 def utility_func(p, t, added_points):
     pass
 
