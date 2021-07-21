@@ -4,96 +4,110 @@ import poisson_disk.poisson_disc as poi
 import garden_constants
 import math
 import numpy as np
-
-beta = 1
-self_beta = 0
-void_beta = -6
-num_trials = 5
-num_p_selector = poi.weighted_round_or_one
-fill_final = False
-data = None#['comp-optimize-era/winners-data/data_6.npy', 'comp-optimize-era/winners-data/data_5.npy']
-generate_plotly=False
-save_plotly=False
-save_2d=True
-# util_func = False
-num_each_plant = np.full(9, 100, dtype='int')
-num_each_plant[0] = 0
-winner_number_plants = np.sum(num_each_plant)
-planting_order = [0, 8, 7, 6, 5, 4, 3, 2, 1]
-#num_each_plant[9] = 2
-comp_exps = [2]
-self_multipliers = [1] #[2, 4, 8]
-cylinder_nts = [70]
 from numpy.random import default_rng
 from numpy.random import choice
 rng = default_rng()
 
+# GENERAL VARIABLES: SET
+num_trials = 5
+num_p_selector = poi.weighted_round_or_one
+data = None
+cylinder_nt = 70
+generate_plotly=True
+save_plotly=True
+save_2d=True
+void_beta = -6
+utility_postprocessing_func = None
+def next_point_selector(candidates, plant_type, added_points, utility_func, utility_postprocessing_func):
+    probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
+                                                      added_points) for p in candidates])
+    if utility_postprocessing_func is not None:
+        probability_distribution = utility_postprocessing_func(probability_distribution)
+    pd_sum = probability_distribution.sum()
+    if pd_sum > 0:
+        probability_distribution = probability_distribution / pd_sum
+    else:
+        probability_distribution = np.ones(
+            probability_distribution.shape) / probability_distribution.shape
+    selection_array = np.arange(len(candidates))
+    draw_num = choice(selection_array, 1,
+                      p=probability_distribution)
+    draw = candidates[draw_num]
+    return [draw[0][0], draw[0][1]]
+
+
+# LIST OF ALL EXPERIMENTAL VARIABLES
+all_variables = []
+
+# EXPERIMENTAL VARIABLE INITIATION
+beta_name = 'beta'
+beta_values = [0, 0.2, 0.4, 0.6, 0.8, 1]
+def include_beta(d, v):
+    return True
+def beta_func(d, v):
+    return v
+all_variables.append([beta_name, beta_values, include_beta, beta_func])
+
+self_beta_name = 'self_beta'
+self_beta_values = [0, 'same']
+def include_self_beta(d, v):
+    return True
+def self_beta_func(d, v):
+    if v == 0:
+        return 0
+    else:
+        return d['beta']
+all_variables.append([self_beta_name, self_beta_values, include_self_beta, self_beta_func])
+
+utility_func_type_name = 'utility_func_type'
+utility_func_type_values = ['same', 'pairs', 'none']
+def include_utility_func_type(d, v):
+    return True
+def utility_func_func(d, v):
+
+
+utility_func_exponent_name = 'utility_func_exponent'
+utility_func_exponent_values = [-8, -5, -4, -3]
+
+
+fill_final = False
+num_each_plant = np.full(9, 100, dtype='int')
+num_each_plant[0] = 0
+winner_number_plants = np.sum(num_each_plant)
+planting_order = [0, 8, 7, 6, 5, 4, 3, 2, 1]
 bounds_map_creator_args = [french_gardens_utils.french_demo_bac()]
-#bounds_map_creator_args = [[lambda x: 4, lambda x: 0, [0, 4, 0, 4]]]
-#bounds_map_creator_args = False
-# Probably should place both void plants! [type 0]
-def void_centers(r):
-    p2 = 141.42 - (2/3) * r
-    p1 = (1/2) * p2 - r
-    c1 = p1 + r
-    c2 = p2 + r
-    c1_xy = c1 / math.sqrt(2)
-    c2_xy = c2 / math.sqrt(2)
-    centers = [[c1_xy, c1_xy], [c2_xy, c2_xy]]
-    return centers
 
-v_centers = void_centers(garden_constants.void_radius)
+# GENERAL VARIABLE ADDER FUNCTION
+def variable_adder(l, variable):
+    variable_name, variable_values, include_variable, variable_func = variable
+    nl = []
+    for d in l:
+        for v in variable_values:
+            if include_variable(d, v):
+                d = d.copy()
+                d[variable_name] = variable_func(d, v)
+                nl.append(d)
+    return nl
 
-starting_plants_dict = {-1: [],
-                    0: [[v_centers[0], 0], [v_centers[1], 0]],
-                   1: [[[75, 75], 9]],
-                   2: [[[35, 35], 9], [[115, 115], 9]],
-                   3: [[[35, 55], 9], [[115, 95], 9]],
-                   4: [[[55, 55], 9], [[95, 95], 9]]
-                   }
-starting_configs = [-1]
+# THE COMBO LIST
+l = [{}]
+
+# ADDING VARIABLES TO COMBO LIST
+for variable in all_variables:
+    l = variable_adder(l, variable)
+
+
 def random_ps(candidates, plant_type, added_points):
     draw = candidates[rng.integers(candidates.shape[0])]
     return [draw[0], draw[1]]
+def utility_func(p, t, added_points):
+    pass
 
-for comp_exp in comp_exps:
-    for self_multiplier in self_multipliers:
-        for sp_index in starting_configs:
-            for cylinder_nt in cylinder_nts:
                 for bmca in bounds_map_creator_args:
                     for t in range(num_trials):
                         #print('comp_exp: ', comp_exp, '; self_multiplier: ', self_multiplier,
                         #      '; sp_index ', sp_index, '; trial: ', t)
                         starting_plants = starting_plants_dict[sp_index]
-
-                        utility_func = lambda p, plant_type, added_points: garden_constants.point_companionship_score(
-                            p, plant_type, added_points, self_multiplier
-                        )
-                        utility_postprocessing_func = lambda pd: garden_constants.comp_pd_postprocessing(pd, comp_exp)
-                        def comp_ps(candidates, plant_type, added_points):
-                            probability_distribution = np.array([utility_func([p[0], p[1]], plant_type,
-                                                                              added_points) for p in candidates])
-                            if utility_postprocessing_func is not None:
-                                #print('1 probability distribution before postprocessing: {}'.format(probability_distribution))
-                                probability_distribution = utility_postprocessing_func(probability_distribution)
-                                #print('2 probability distribution after postprocessing: {}'.format(probability_distribution))
-                            pd_sum = probability_distribution.sum()
-                            if pd_sum > 0:
-                                #print('3 probability distribution before dividing by pd_sum. pd_sum: {}; probability distribution: {}'
-                                #      .format(pd_sum, probability_distribution))
-                                probability_distribution = probability_distribution / pd_sum
-                                #print('4 probability distribution after dividing by pd_sum. pd_sum: {}; probability distribution: {}'
-                                #      .format(pd_sum, probability_distribution))
-                            else:
-                                probability_distribution = np.ones(
-                                    probability_distribution.shape) / probability_distribution.shape
-                            selection_array = np.arange(len(candidates))
-                            #print('candidates {}\nplant type {}\nadded_points {}\nprobability distribution {}\n~\n'.format(
-                            #    candidates, plant_type, added_points, probability_distribution))
-                            draw_num = choice(selection_array, 1,
-                                              p=probability_distribution)
-                            draw = candidates[draw_num]
-                            return [draw[0][0], draw[0][1]]
 
                         plotting_utils.generate_garden_scatter_and_area(beta=beta, num_p_selector=num_p_selector,
                                                                         bounds_map_creator_args=bmca,
