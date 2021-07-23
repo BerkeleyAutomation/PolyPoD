@@ -58,7 +58,7 @@ plant_radii = {
 3:16, # green_lettuce
 2:13, # red_lettuce
 1:12, # cilantro
-0: void_radius, # VOID
+0: -1, # VOID: Variable radius!
 }
 
 num_plants = len(plant_radii)
