@@ -15,9 +15,10 @@ rectangle_width = 30
 rectangle_length = garden_constants.garden_x_len / 2 - rectangle_width / 2
 rectangle_indent = 0
 
+def bac('')
 def french_demo_bac():
     bounds_map_creator_args = []
-    def flip(a): # todo make a flip_x and flip_y if ever considering non-square gardens
+    def flip(a):
         return -a + garden_constants.garden_x_len
 
     b_corner1 = [0, corner_length, 0, corner_length]

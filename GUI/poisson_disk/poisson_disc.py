@@ -93,10 +93,17 @@ class Points:
         pointlist = self.get_point_list()
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
-def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
-                    bounds_map_creator_args, fill_final,
-                    next_point_selector, num_each_plant, starting_plants,
-                    planting_order):
+def generate_garden(d, dims, cellsize, void_beta):
+    # Argument unpacking
+    beta = d['beta']
+    num_p_selector = d['num_p_selector']
+    bounds_map_creator_args = d['bmca']
+    self_beta = d['self_beta']
+    next_point_selector = d['next_point_selector']
+    planting_groups = d['planting_groups']
+    void_size = d['void_size']
+    void_number = d['void_number']
+
     # Preprocessing / Setup
     start = time.time()
     added_points = [[] for _ in range(garden_constants.num_plants)]
@@ -240,9 +247,6 @@ def generate_garden(dims, cellsize, beta, self_beta, void_beta, num_p_selector,
         plant_order_index = 0
         master_break = False
 
-        if first_pass:
-            for p in starting_plants:
-                add_point(p[0], p[1])
         while plant_order_index < len(planting_order) and not master_break:
             plant_index = planting_order[plant_order_index]
             r = inhibition_radius(plant_index)

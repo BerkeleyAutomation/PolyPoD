@@ -1,8 +1,8 @@
-import french_gardens_utils
+import bmca_utils
 import numpy as np
 import matplotlib.pyplot as plt
 
-b = french_gardens_utils.french_demo_bac()
+b = bmca_utils.french_demo_bac()
 step = 0.1
 dataxu = []
 datayu = []

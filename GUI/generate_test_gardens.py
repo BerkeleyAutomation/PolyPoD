@@ -1,4 +1,4 @@
-import french_gardens_utils
+import bmca_utils
 import plotting_utils
 import poisson_disk.poisson_disc as poi
 import garden_constants
@@ -171,26 +171,9 @@ for variable in all_variables:
     l = variable_adder(l, variable)
 
 # UNDER DEVELOPMENT
-'''
-def utility_func(p, t, added_points):
-    pass
-
-                    for t in range(num_trials):
-                        #print('comp_exp: ', comp_exp, '; self_multiplier: ', self_multiplier,
-                        #      '; sp_index ', sp_index, '; trial: ', t)
-                        starting_plants = starting_plants_dict[sp_index]
-
-                        plotting_utils.generate_garden_scatter_and_area(beta=beta, num_p_selector=num_p_selector,
-                                                                        bounds_map_creator_args=bmca,
-                                                                        fill_final=fill_final,
-                                                                        cylinder_nt=cylinder_nt,
-                                                                        self_beta=self_beta, void_beta=void_beta,
-                                                                        data=None, generate_plotly=generate_plotly,
-                                                                        comp_exp=comp_exp, self_multiplier=self_multiplier,
-                                                                        next_point_selector=comp_ps,
-                                                                        save_plotly=save_plotly, save_2d=save_2d,
-                                                                        num_each_plant=num_each_plant, trialno=t,
-                                                                        starting_plants=starting_plants,
-                                                                        sp_index=sp_index, planting_order=planting_order,
-                                                                        winner_number_plants=winner_number_plants)
-'''
+for d in l:
+    for t in range(num_trials):
+                        plotting_utils.generate_garden_scatter_and_area(d=d,
+                                                                        cylinder_nt=cylinder_nt, data=None, void_beta=void_beta,
+                                                                        generate_plotly=generate_plotly,
+                                                                        save_plotly=save_plotly, save_2d=save_2d, trialno=t)
