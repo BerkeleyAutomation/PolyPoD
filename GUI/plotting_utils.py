@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 import plotly_test as pt
 import re
+import pickle
 
 
 """
@@ -22,7 +23,8 @@ def num_to_str(num):
         str_a = list_str_a[0] + "," + list_str_a[1]
     return str_a
 
-def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, trialno=-1, data=None, generate_plotly=True,
+dataset_no = 1
+def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
                                      save_plotly=True, save_2d=True,
                                      ):
     if data is None:
@@ -62,23 +64,12 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, trialno=-1, data
     garden_comp_score = garden_constants.garden_companionship_score(data)
     plt.suptitle('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)), y=1)
     if save_2d:
-            fig_filename = "size_demos/winners-images/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_2d_plot_{}"\
-                .format(num_to_str(garden_comp_score), sp_index, comp_exp, self_multiplier, trialno,
-                        datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "size_demos/winners-data/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_data_{}"\
-                .format(num_to_str(garden_comp_score), sp_index, comp_exp, self_multiplier, trialno,
-                        datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-        else:
-            fig_filename = "size_demos/losers-images/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_2d_plot_{}"\
-                .format(num_to_str(garden_comp_score), sp_index, comp_exp, self_multiplier, trialno,
-                        datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-            data_filename = "size_demos/losers-data/compscore_{}_spindex_{}_compexp_{}_selfmult_{}_trialno_{}_data_{}"\
-                .format(num_to_str(garden_comp_score), sp_index, comp_exp, self_multiplier, trialno,
-                        datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
-        plt.savefig(fig_filename, dpi=200)
-        np.save(data_filename, data)
+        filename = f"datasets/dataset{dataset_no}/image_id_{image_id}_dataset_{dataset_no}"
+        plt.savefig(filename, dpi=200)
+        d['data'] = data
+        pickle.dump(data, open(filename, "wb" ))
         plt.close()
-        print('trial ', trialno, 'num plants ', data.shape[0])
+        print(f'image_id {image_id} out of {num_images}')
     elif generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],

@@ -5,8 +5,22 @@ import plotting_utils
 import numpy as np
 import math
 
-
+def default_bac():
+    return [None, None, None, np.full(9, 2),
+            [[0], [8], [7], [6], [5], [4], [3], [2], [1]]]
 # upper, lower, bounds, num_checks = bmca
+
+# LIST OF ALL EXPERIMENTAL VARIABLES
+all_variables = []
+
+# EXPERIMENTAL VARIABLE INITIATION
+fill_final_name = 'fill_final'
+fill_final_values = [True, False]
+def include_fill_final(d, v):
+    return True
+def fill_final_func(d, v):
+    return v
+all_variables.append([fill_final_name, fill_final_values, include_fill_final, fill_final_func])
 
 corner_width = 55
 corner_length = 200
@@ -15,7 +29,6 @@ rectangle_width = 30
 rectangle_length = garden_constants.garden_x_len / 2 - rectangle_width / 2
 rectangle_indent = 0
 
-def bac('')
 def french_demo_bac():
     bounds_map_creator_args = []
     def flip(a):

@@ -9,12 +9,12 @@ from numpy.random import choice
 rng = default_rng()
 
 # GENERAL VARIABLES: SET
-num_trials = 5
+num_trials = 1
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
-generate_plotly=True
-save_plotly=True
+generate_plotly=False
+save_plotly=False
 save_2d=True
 void_beta = -6
 def random_ps(candidates, plant_type, added_points):
@@ -52,7 +52,7 @@ all_variables.append([beta_name, beta_values, include_beta, beta_func])
 self_beta_name = 'self_beta'
 self_beta_values = [0, 'same']
 def include_self_beta(d, v):
-    return True
+    return not (d['beta'] == 0 and v == 'same')
 def self_beta_func(d, v):
     if v == 0:
         return 0
@@ -120,14 +120,6 @@ def next_point_selector_func(d, v):
 all_variables.append([next_point_selector_name, next_point_selector_values, include_next_point_selector,
                       next_point_selector_func])
 
-void_size_name = 'void_size'
-void_size_values = [5, 10, 15]
-def include_void_size(d, v):
-    return True
-def void_size_func(d, v):
-    return v
-all_variables.append([void_size_name, void_size_values, include_void_size, void_size_func])
-
 void_number_name = 'void_number'
 void_number_values = [0, 1, 2, 3, 4]
 def include_void_number(d, v):
@@ -136,20 +128,23 @@ def void_number_func(d, v):
     return v
 all_variables.append([void_number_name, void_number_values, include_void_number, void_number_func])
 
-fill_final_name = 'fill_final'
-fill_final_values = [True, False]
-def include_fill_final(d, v):
-    return True
-def fill_final_func(d, v):
+void_size_name = 'void_size'
+void_size_values = [5, 10, 15]
+def include_void_size(d, v):
+    if not d['void_number'] == 0:
+        return True
+    return False
+def void_size_func(d, v):
     return v
-all_variables.append([fill_final_name, fill_final_values, include_fill_final, fill_final_func])
+all_variables.append([void_size_name, void_size_values, include_void_size, void_size_func])
 
-print(len(all_variables))
-assert False
-num_each_plant = np.full(9, 100, dtype='int')
-num_each_plant[0] = 0
-winner_number_plants = np.sum(num_each_plant)
-bounds_map_creator_args = [french_gardens_utils.french_demo_bac()]
+bmca_name = 'bmca'
+bmca_values = [bmca_utils.default_bac()]
+def include_bmca(d, v):
+    return True
+def bmca_func(d, v):
+    return v
+all_variables.append([bmca_name, bmca_values, include_bmca, bmca_func])
 
 # GENERAL VARIABLE ADDER FUNCTION
 def variable_adder(l, variable):
@@ -166,14 +161,20 @@ def variable_adder(l, variable):
 # THE COMBO LIST
 l = [{}]
 
+# DEBUGGING
+#all_variables = [all_variables[0], all_variables[1], all_variables[2]]
+
 # ADDING VARIABLES TO COMBO LIST
 for variable in all_variables:
     l = variable_adder(l, variable)
-
+print('len l', len(l))
+print([x[0] for x in all_variables])
+print(l)
 # UNDER DEVELOPMENT
-for d in l:
+num_images = len(l)
+for image_id, d in enumerate(l):
     for t in range(num_trials):
-                        plotting_utils.generate_garden_scatter_and_area(d=d,
+                        plotting_utils.generate_garden_scatter_and_area(d=d, image_id=image_id, num_images=num_images,
                                                                         cylinder_nt=cylinder_nt, data=None, void_beta=void_beta,
                                                                         generate_plotly=generate_plotly,
                                                                         save_plotly=save_plotly, save_2d=save_2d, trialno=t)

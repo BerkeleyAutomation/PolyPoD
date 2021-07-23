@@ -96,9 +96,8 @@ class Points:
 def generate_garden(d, dims, cellsize, void_beta):
     # Argument unpacking
     beta = d['beta']
-    num_p_selector = d['num_p_selector']
-    bounds_map_creator_args = d['bmca']
     self_beta = d['self_beta']
+    bounds_map_creator_args = d['bmca']
     next_point_selector = d['next_point_selector']
     planting_groups = d['planting_groups']
     void_size = d['void_size']
@@ -129,9 +128,9 @@ def generate_garden(d, dims, cellsize, void_beta):
         return loc, plant_index, r
 
     # Main Helper Function
-    def generate_garden_cluster(beta, bmca, starting_plants_cluster, points):
-        if not bmca == False:
-            upper, lower, bounds = bmca
+    def generate_garden_cluster(bmca, points):
+        upper, lower, bounds, num_each_plant, planting_groups = bmca
+        if not upper is None:
             upper = memoize(upper)
             lower = memoize(lower)
             upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
@@ -212,7 +211,7 @@ def generate_garden(d, dims, cellsize, void_beta):
         def next_point(plant_type):
             #print('NEXT PLANT')
             scm = standard_criteria(plant_type)
-            if bmca == False:
+            if upper is None:
                 criteria = scm
             else:
                 bounds_map = bounds_map_creator(upper_grid, lower_grid, plant_type)
@@ -245,35 +244,39 @@ def generate_garden(d, dims, cellsize, void_beta):
 
         # Inner Control (Plant Adding) Loop
         plant_order_index = 0
-        master_break = False
+        n = True
+        def continuing_condition(group):
+            for plant_index in group:
+                if num_p[plant_index] > 0:
+                    return True
+            return False
 
-        while plant_order_index < len(planting_order) and not master_break:
-            plant_index = planting_order[plant_order_index]
-            r = inhibition_radius(plant_index)
-            def circ_up_helper(d_px_i, r):
-                return math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
+        for group in planting_groups:
+            while continuing_condition(group):
+                for plant_index in group:
+                    if num_p[plant_index] > 0:
+                        r = inhibition_radius(plant_index)
+                        def circ_up_helper(d_px_i, r):
+                            return math.sqrt(math.fabs(r ** 2 - d_px_i ** 2))
 
-            def circ_low_helper(d_px_i, r):
-                return -circ_up_helper(d_px_i, r)
+                        def circ_low_helper(d_px_i, r):
+                            return -circ_up_helper(d_px_i, r)
 
-            def checking_values_x(r):
-                c = [0, -r, r]
-                if r == 3:
-                    c.extend([2, -2])
-                else:
-                    mid = r / math.sqrt(2)
-                    mf, mc = math.floor(mid), math.ceil(mid)
-                    c.extend([mf, mc, -mf, -mc])
-                return np.array(c)
-            cvx = checking_values_x(r)
-            ucv = np.array([circ_up_helper(cv, r) for cv in cvx])
-            lcv = np.array([circ_low_helper(cv, r) for cv in cvx])
-
-            for _ in range(num_p[plant_index]):
-                n = next_point(plant_index)
-                if not n:
-                    break
-            plant_order_index += 1
+                        def checking_values_x(r):
+                            c = [0, -r, r]
+                            if r == 3:
+                                c.extend([2, -2])
+                            else:
+                                mid = r / math.sqrt(2)
+                                mf, mc = math.floor(mid), math.ceil(mid)
+                                c.extend([mf, mc, -mf, -mc])
+                            return np.array(c)
+                        cvx = checking_values_x(r)
+                        ucv = np.array([circ_up_helper(cv, r) for cv in cvx])
+                        lcv = np.array([circ_low_helper(cv, r) for cv in cvx])
+                        n = next_point(plant_index)
+                        if not n:
+                            num_p[plant_index] = 0
 
         # to cartesian
         final_points = points.get_plant_list()
@@ -285,17 +288,8 @@ def generate_garden(d, dims, cellsize, void_beta):
 
     # Master Control Loop
     b_garden_points = None
-    first_pass = True
-    if bounds_map_creator_args == False:
-        fill_final = True
-    else:
-        for bmca in bounds_map_creator_args:
-            b_garden_points, points = generate_garden_cluster(
-                beta, bmca, b_garden_points, points)
-            first_pass = False
-    if fill_final:
-        b_garden_points, new_points_arr = generate_garden_cluster(
-            beta, False, b_garden_points, points)
+    for bmca in bounds_map_creator_args:
+        b_garden_points, points = generate_garden_cluster(bmca, points)
     # Timing
     stop = time.time()
     time_elapsed = stop - start
