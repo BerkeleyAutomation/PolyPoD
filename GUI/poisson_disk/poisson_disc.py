@@ -95,13 +95,15 @@ class Points:
 
 def generate_garden(d, dims, cellsize, void_beta):
     # Argument unpacking
+    num_p = d['num_plants']
     beta = d['beta']
-    self_beta = d['self_beta']
     bounds_map_creator_args = d['bmca']
     next_point_selector = d['next_point_selector']
-    planting_groups = d['planting_groups']
     void_size = d['void_size']
-    void_number = d['void_number']
+    symmetry = d['symmetry']
+
+    # SET VARIABLES
+    self_beta = beta
 
     # Preprocessing / Setup
     start = time.time()
@@ -117,8 +119,24 @@ def generate_garden(d, dims, cellsize, void_beta):
         dtbs_list = [xp, dimx - xp, yp, dimy - yp]
         dist_to_border[it.multi_index] = min(dtbs_list)
 
+    dist_to_center_vert = np.empty(dims)
+    it = np.nditer(dist_to_center_vert, flags=["multi_index", "refs_ok"])
+    for _ in it:
+        xp, yp = it.multi_index
+        centerline = dims[0] / 2
+        dist_to_center_vert[it.multi_index] = abs(xp - centerline)
+
+    dist_to_center_horz = np.empty(dims)
+    it = np.nditer(dist_to_center_horz, flags=["multi_index", "refs_ok"])
+    for _ in it:
+        xp, yp = it.multi_index
+        centerline = dims[1] / 2
+        dist_to_center_horz[it.multi_index] = abs(yp - centerline)
+
     points = Points(dims, ndim)
     def inhibition_radius(plant_type):
+        if plant_type == 0:
+            return void_size / cellsize
         return garden_constants.plant_radii[plant_type] / cellsize
 
     def point_unpacker_internal(p):
@@ -137,6 +155,8 @@ def generate_garden(d, dims, cellsize, void_beta):
             lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
             bounds = [num / cellsize for num in bounds]
             low_x_bound, high_x_bound, low_y_bound, high_y_bound = bounds
+        '''
+        # Never the case anymore 
         if num_each_plant is None:
             def a_func(beta_arg):
                 o = garden_constants.a_func_offset
@@ -156,7 +176,7 @@ def generate_garden(d, dims, cellsize, void_beta):
             num_p = np.array([num_p_selector(n) for n in num_p], dtype=int)
         else:
             num_p = num_each_plant
-
+        '''
         # custom bounds functions
         def line_following(function, input_range):
             pass
@@ -206,6 +226,19 @@ def generate_garden(d, dims, cellsize, void_beta):
                 c1 = crm > ((1 - void_beta) * r)
                 c3 = dist_to_border >= garden_constants.void_dist_to_border
             criteria = (c1 & c2 & c3 & c4 & c5)
+            if symmetry == 'left-right':
+                c6 = dist_to_center_vert > ((1 - beta / 2) * r)
+                c7 = dist_to_center_vert  == 0
+                c8 = np.flip(criteria, 0) & criteria
+                criteria = (criteria & (c6 | c7) & c8)
+            elif symmetry == 'left-right-up-down':
+                c6 = dist_to_center_vert > ((1 - beta / 2) * r)
+                c7 = dist_to_center_vert == 0
+                c8 = np.flip(criteria, 1) & criteria
+                c9 = dist_to_center_horz > ((1 - beta / 2) * r)
+                c10 = dist_to_center_horz == 0
+                c11 = np.flip(criteria, 0) & criteria
+                criteria = (criteria & (c6 | c7) & c8 & (c9 | c10) & c11)
             return criteria
 
         def next_point(plant_type):
@@ -219,8 +252,15 @@ def generate_garden(d, dims, cellsize, void_beta):
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            to_add = next_point_selector(candidates, plant_type, added_points)
+            to_add = next_point_selector(candidates, plant_type, added_points, planting_groups)
             add_point(to_add, plant_type)
+            if symmetry == 'left-right' or symmetry == 'left-right-up-down':
+
+                add_point([garden_constants.garden_x_len / cellsize - to_add[0], to_add[1]], plant_type)
+            if symmetry == 'left-right-up-down':
+                add_point([to_add[0], garden_constants.garden_y_len / cellsize - to_add[1]], plant_type)
+                add_point([garden_constants.garden_x_len / cellsize - to_add[0],
+                           garden_constants.garden_y_len / cellsize - to_add[1]], plant_type)
             return True
 
         def add_point(choice, plant_type):
