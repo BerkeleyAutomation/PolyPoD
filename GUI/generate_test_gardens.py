@@ -40,43 +40,45 @@ def next_point_selector_with_utility_func(candidates, plant_type, added_points, 
 
 # EXPERIMENTAL VARIABLE INITIATION
 density = {'name':'density',
-           'values':['medium', 'low', 'high']}
+           'values':['low', 'medium', 'high']}
 distribution = {'name':'distribution',
-                'values':['even', 'uneven 2', 'uneven 3']}
+                'values':['even']}
 void_size = {'name':'void_size',
-             'values':[17.5, 10, 25]}
+             'values':[10, 17.5, 25]}
 void_number = {'name':'void_number',
                'values':[0, 4, 8]}
 beta = {'name':'beta',
-        'values':[0.6, 0.2, 0.4, 0.8, 1]}
+        'values':[0.6]}
 same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
-                    'values':[0, -6, -12, -100]}
+                    'values':[0]}
 pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
-                    'values':[0, -6, -12, -100]}
+                    'values':[0]}
 symmetry = {'name':'symmetry',
-             'values':['neither', 'left-right', 'left-right-up-down']}
+             'values':['neither']}
 
 # LIST OF ALL VARIABLES
 all_variables = [density, distribution, void_size, void_number, beta, same_plant_utility_func_exponent,
                  pairs_utility_func_exponent, symmetry]
 
+combos = [{}]
+def variable_adder(l, variable):
+    nl = []
+    for d in l:
+        for val in variable['values']:
+            d = d.copy()
+            d[variable['name']] = val
+            nl.append(d)
+    return nl
+for var in all_variables:
+    combos = variable_adder(combos, var)
 # DICT OF QUERIES
 queries = {}
 for x in range(42):
     queries[x] = {100 + x:{}, 200 + x:{}} # todo hard coded
 #print(queries)
 # GENERAL VARIABLE ADDER FUNCTION: assumes queries is length 42, variable has 3 values. # todo hard coded
-def add_variable(queries, variable):
-    combos = [[0, 0], [0, 1], [0, 2], [1, 1], [1, 2], [2, 2]]
-    indices = [x for x in range(42)] # todo hard coded
-    for combo in combos:
-        s = random.sample(indices, 7) # todo hard coded
-        for i in s:
-            indices.remove(i) # todo in progress
-            queries[i]['left'][variable['name']] = variable['values'][combo[0]]
-            queries[i]['right'][variable['name']] = variable['values'][combo[1]]
-    return queries
 
+'''
 # INDEPENDENT TESTING OF THE VARIABLE
 independent = []
 default_dictionary = {}
@@ -99,7 +101,7 @@ def independent_add_variable(l, variable):
     l.append(dc)
     return l
 
-# ADDING VARIABLES TO INDEPENDANT
+ADDING VARIABLES TO INDEPENDANT
 for variable in [symmetry]:
     independent = independent_add_variable(independent, variable)
 
@@ -107,7 +109,7 @@ for c, i in enumerate(independent):
     print(c)
     for v in i:
         print(f'\t{v} {i[v]}')
-'''
+
 # ADDING VARIABLES TO QUERIES
 for variable in all_variables:
     queries = add_variable(queries, variable)
@@ -192,12 +194,12 @@ def add_d_to_garden(garden):
     garden['d'] = d
     return garden
 
-for garden in independent:
+for garden in combos:
     add_d_to_garden(garden)
 
-for c, garden in enumerate(independent):
+for c, garden in enumerate(combos):
     for t in range(num_trials):
-                        plotting_utils.generate_garden_scatter_and_area(d=garden['d'], image_id=c, num_images=0,
+                        plotting_utils.generate_garden_scatter_and_area(d=garden['d'], image_id=c, num_images=len(combos),
                                                                         cylinder_nt=cylinder_nt, data=None, void_beta=void_beta,
                                                                         generate_plotly=generate_plotly,
                                                                         save_plotly=save_plotly, save_2d=save_2d, trialno=t)

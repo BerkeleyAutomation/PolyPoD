@@ -24,6 +24,7 @@ def num_to_str(num):
     return str_a
 
 dataset_no = 2
+timestamp = True
 def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
                                      save_plotly=True, save_2d=True,
                                      ):
@@ -64,7 +65,10 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_im
     garden_comp_score = garden_constants.garden_companionship_score(data)
     plt.suptitle('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)), y=1)
     if save_2d:
-        filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
+        if timestamp:
+            filename = f'datasets/dataset{dataset_no}/{dataset_no}_{image_id}_{datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")}'
+        else:
+            filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
         plt.savefig(filename, dpi=200)
         d['data'] = data
         pickle.dump(data, open(f'{filename}.npy', "wb" ))
