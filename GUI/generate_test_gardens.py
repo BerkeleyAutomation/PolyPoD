@@ -18,8 +18,8 @@ generate_plotly=False
 save_plotly=False
 save_2d=True
 void_beta = -6
-def random_ps(candidates, plant_type, added_points):
-    draw = candidates[rng.integers(candidates.shape[0])]
+def random_ps(candidates, plant_type, added_points, planting_groups):
+    draw = candidates[rng.integers(len(candidates))]
     return [draw[0], draw[1]]
 def next_point_selector_with_utility_func(candidates, plant_type, added_points, utility_func):
     if utility_func is None:
@@ -40,15 +40,15 @@ def next_point_selector_with_utility_func(candidates, plant_type, added_points, 
 
 # EXPERIMENTAL VARIABLE INITIATION
 density = {'name':'density',
-           'values':['low', 'medium', 'high']}
+           'values':['low']}
 distribution = {'name':'distribution',
-                'values':['even']}
+                'values':['uneven 2']}
 void_size = {'name':'void_size',
-             'values':[10, 17.5, 25]}
+             'values':[0]}
 void_number = {'name':'void_number',
-               'values':[0, 4, 8]}
+               'values':[0]}
 beta = {'name':'beta',
-        'values':[0.6]}
+        'values':[0.2, 0.4]}
 same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
                     'values':[0]}
 pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
@@ -169,7 +169,7 @@ def add_d_to_garden(garden):
 
     def nps(candidates, plant_type, added_points, planting_groups):
         if plant_type == 0:
-            utility_func = random_ps
+            return random_ps(candidates, plant_type, added_points, planting_groups)
         else:
             other_plant_type = None
             for g in planting_groups:
@@ -197,6 +197,7 @@ def add_d_to_garden(garden):
 for garden in combos:
     add_d_to_garden(garden)
 
+print(f'num images: {len(combos)}')
 for c, garden in enumerate(combos):
     for t in range(num_trials):
                         plotting_utils.generate_garden_scatter_and_area(d=garden['d'], image_id=c, num_images=len(combos),

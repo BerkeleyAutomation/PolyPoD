@@ -39,7 +39,8 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_im
     for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
-        ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
+        if not plant_index == 0:
+            ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
 
         num_plants_arr[plant_index] += 1
     num_plants_arr_txt = [str(int(x)) for x in num_plants_arr]
@@ -48,7 +49,7 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_im
     table_text = [plant_index_arr_txt, num_plants_arr_txt]
     row_labels = ['plant type', 'num plant']
 
-    locdata = np.array([p[0] for p in data])
+    locdata = np.array([p[0] for p in data if not p[1] == 0])
     datax, datay = locdata[:,0], locdata[:,1]
 
     ax.scatter(datax, datay, s=1, color='k')
