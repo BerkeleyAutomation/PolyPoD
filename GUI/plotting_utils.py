@@ -64,24 +64,25 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_im
     ax.set_aspect(1)
     ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1, 1))
     garden_comp_score = garden_constants.garden_companionship_score(data)
-    plt.suptitle('trial: {}; garden companionship score: {}'.format(trialno, round(garden_comp_score, 4)), y=1)
+    plt.suptitle('imageid: {}; garden companionship score: {}'.format(image_id, round(garden_comp_score, 4)), y=1)
+    if timestamp:
+        filename = f'datasets/dataset{dataset_no}/{dataset_no}_{image_id}_{datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")}'
+    else:
+        filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
     if save_2d:
-        if timestamp:
-            filename = f'datasets/dataset{dataset_no}/{dataset_no}_{image_id}_{datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")}'
-        else:
-            filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
         plt.savefig(filename, dpi=200)
         d['data'] = data
         pickle.dump(data, open(f'{filename}.npy', "wb" ))
         plt.close()
         print(f'image_id {image_id} out of {num_images}')
-    elif generate_plotly:
+    if generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],
                        pt.single_values['h_mult'],
                        pt.single_values['color_dict'],
                        cylinder_nt=cylinder_nt,
-                       data=data, plant_labels=False, save=save_plotly)
+                       data=data, plant_labels=False, save=save_plotly,
+                       where_to_save=filename)
     else:
         plt.show()
     return fig, ax

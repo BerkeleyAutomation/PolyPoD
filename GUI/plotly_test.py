@@ -27,7 +27,7 @@ widths = []
 no_height_width = True
 
 
-def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, data=None, plant_labels=True, save=True):
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_save, data=None, plant_labels=True, save=True):
     if shuffle_colors:
         copy = [x for x in range(len(colors_dict))]
         for r in range(3):
@@ -68,6 +68,12 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, data=None
             )
 
     to_plot = []
+
+    # RESCALING: SO THAT PLOT DOES NOT GET CUT OFF
+    scale_factor = 2/3
+    data = [[[x[0][0] * scale_factor, x[0][1] * scale_factor], x[1]] for x in data]
+    scaled_garden_len = garden_constants.garden_x_len * scale_factor
+
     for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         x, y = loc
@@ -84,8 +90,8 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, data=None
                          contours=contours)
         to_plot.append(cyl)
 
-    x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
-    y_soil = np.array([[0, 0], [garden_constants.garden_y_len, garden_constants.garden_y_len]])
+    x_soil = np.array([[0, scaled_garden_len], [0, scaled_garden_len]])
+    y_soil = np.array([[0, 0], [scaled_garden_len, scaled_garden_len]])
     z_soil = np.array([[0,0], [0,0]])
 
     soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
@@ -119,11 +125,9 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, data=None
                        scene_yaxis_visible=False,
                        scene_zaxis_visible=False)
 
-    y_eye = y_eye_mult * garden_constants.garden_x_len
+    y_eye = y_eye_mult * scaled_garden_len
     z_eye = y_eye * z_ratio
     camera = dict(
-        up=dict(x=0, y=0, z=1),
-        center=dict(x=0, y=0, z=0),
         eye=dict(x=0, y=-y_eye, z=z_eye)
     )
     to_plot.append(soil)
@@ -168,16 +172,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, data=None
 
     if save:
         for dpi_scale in dpi_scales:
-            if no_height_width:
-                fig.write_image(where_to_save + "no_height_width_3d_plot_{0}.png".format(
-                    datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")),
-                                scale=dpi_scale)
-            for height in heights:
-                for width in widths:
-                    fig.write_image(where_to_save + "height{1}_width_{2}_3d_plot_{0}.png".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"),
-                                                                                                 height, width),
-                                    scale=dpi_scale, height=height, width=width)
-
+            fig.write_image(where_to_save + '_3d.png', scale=dpi_scale)
     else:
         fig.show()
 

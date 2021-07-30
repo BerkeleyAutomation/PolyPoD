@@ -8,14 +8,15 @@ from numpy.random import default_rng
 from numpy.random import choice
 rng = default_rng()
 import random
+import copy
 
 # GENERAL VARIABLES: SET
 num_trials = 1
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
-generate_plotly=False
-save_plotly=False
+generate_plotly=True
+save_plotly=True
 save_2d=True
 void_beta = -6
 def random_ps(candidates, plant_type, added_points, planting_groups):
@@ -38,7 +39,26 @@ def next_point_selector_with_utility_func(candidates, plant_type, added_points, 
     draw = candidates[draw_num]
     return [draw[0][0], draw[0][1]]
 
-# EXPERIMENTAL VARIABLE INITIATION
+# EXPERIMENTAL VARIABLE DEFAULT VALUES: DO NOT CHANGE
+density = {'name':'density',
+           'values':['medium', 'low', 'high']}
+distribution = {'name':'distribution',
+                'values':['even', 'uneven 2', 'uneven 3']}
+void_size = {'name':'void_size',
+             'values':[17.5, 10, 25]}
+void_number = {'name':'void_number',
+               'values':[0, 4, 8]}
+beta = {'name':'beta',
+        'values':[0.6, 0.2, 0.4, 0.8, 1]}
+same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
+                    'values':[0, -6, -12, -100]}
+pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
+                    'values':[0, -6, -12, -100]}
+symmetry = {'name':'symmetry',
+             'values':['neither', 'left-right', 'left-right-up-down']}
+
+# EXPERIMENTAL VARIABLE EXPERIMENTAL VARIABLES: CAN CHANGE
+num_trials = 1
 density = {'name':'density',
            'values':['low']}
 distribution = {'name':'distribution',
@@ -48,7 +68,7 @@ void_size = {'name':'void_size',
 void_number = {'name':'void_number',
                'values':[0]}
 beta = {'name':'beta',
-        'values':[0.2, 0.4]}
+        'values':[0.2]}
 same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
                     'values':[0]}
 pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
@@ -197,10 +217,11 @@ def add_d_to_garden(garden):
 for garden in combos:
     add_d_to_garden(garden)
 
-print(f'num images: {len(combos)}')
+print(f'num images: {len(combos) * num_trials}')
 for c, garden in enumerate(combos):
     for t in range(num_trials):
-                        plotting_utils.generate_garden_scatter_and_area(d=garden['d'], image_id=c, num_images=len(combos),
-                                                                        cylinder_nt=cylinder_nt, data=None, void_beta=void_beta,
-                                                                        generate_plotly=generate_plotly,
-                                                                        save_plotly=save_plotly, save_2d=save_2d, trialno=t)
+        next_garden = copy.deepcopy(garden)
+        plotting_utils.generate_garden_scatter_and_area(d=next_garden['d'], image_id=c * num_trials + t, num_images=len(combos) * num_trials,
+                                                        cylinder_nt=cylinder_nt, data=None, void_beta=void_beta,
+                                                        generate_plotly=generate_plotly,
+                                                        save_plotly=save_plotly, save_2d=save_2d)

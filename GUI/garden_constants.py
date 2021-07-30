@@ -30,7 +30,7 @@ colors_of_plants_hcl_v2 = ["#004800", "#005100", "#005A00",
                            "#3E9B1F"]
 
 color_atsu =  ["#8CAB6D", "#6DA54C","#4D9932","#4B8A41","#5C996C","#538B82","#537960","#6E8236","#40785B","#516758"]
-soil_color_atsu = "#5E534D"
+soil_color_atsu = "#3d2b1f"
 soil_color = "#50371f"
 alpha = 1
 
