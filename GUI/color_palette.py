@@ -4,7 +4,7 @@ import garden_constants
 from datetime import datetime
 
 fig, ax = plt.subplots()
-color_dicts = [garden_constants.colors_of_plants_hcl_v2]
+color_dicts = [garden_constants.color_custom_order]
 
 def color_palette(color_dict):
     y_len = (len(color_dict) - 1) // 3 + 1
@@ -17,7 +17,7 @@ def color_palette(color_dict):
 
     plt.xlim(0, 3)
     plt.ylim(0, y_len)
-    fig_filename = "color_palette_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
+    fig_filename = "color_testing/color_palette_{0}".format(datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f"))
     plt.savefig(fig_filename, dpi=200)
 
 def main():

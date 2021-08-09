@@ -11,14 +11,14 @@ import random
 import copy
 
 # GENERAL VARIABLES: SET
-num_trials = 1
+num_trials = 5
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
-generate_plotly=True
-save_plotly=True
+generate_plotly=False
+save_plotly=False
 save_2d=True
-void_beta = -6
+void_beta = -3
 def random_ps(candidates, plant_type, added_points, planting_groups):
     draw = candidates[rng.integers(len(candidates))]
     return [draw[0], draw[1]]
@@ -45,7 +45,7 @@ density = {'name':'density',
 distribution = {'name':'distribution',
                 'values':['even', 'uneven 2', 'uneven 3']}
 void_size = {'name':'void_size',
-             'values':[17.5, 10, 25]}
+             'values':[15, 35, 50, 100]}
 void_number = {'name':'void_number',
                'values':[0, 4, 8]}
 beta = {'name':'beta',
@@ -58,17 +58,16 @@ symmetry = {'name':'symmetry',
              'values':['neither', 'left-right', 'left-right-up-down']}
 
 # EXPERIMENTAL VARIABLE EXPERIMENTAL VARIABLES: CAN CHANGE
-num_trials = 1
 density = {'name':'density',
-           'values':['low']}
+           'values':['high']}
 distribution = {'name':'distribution',
-                'values':['uneven 2']}
+                'values':['even']}
 void_size = {'name':'void_size',
-             'values':[0]}
+             'values':[25]}
 void_number = {'name':'void_number',
                'values':[0]}
 beta = {'name':'beta',
-        'values':[0.2]}
+        'values':[0]}
 same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
                     'values':[0]}
 pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
@@ -147,12 +146,13 @@ def add_d_to_garden(garden):
     # EXTRA SET VARIABLES FOR d
     d['bmca'] = [bmca_utils.default_bac()]
 
-    if garden['density'] == 'low':
-        d['num_plants'] = np.full(9, 10)
-    elif garden['density'] == 'medium':
-        d['num_plants'] = np.full(9, 16)
-    elif garden['density'] == 'high':
-        d['num_plants'] = np.full(9, 22)
+    # DEFAULT HI-DENSITY PLANT NUMS FOR EVEN DISTRIBUTION, NO VOIDS
+    intersect = 9
+    slope = 15
+    d['num_plants'] = np.full(9, intersect + garden['beta'] * slope)
+    d['beta'] = garden['beta']
+
+    # DISTRIBUTION ADJUSTMENT
     if garden['distribution'] == 'uneven 2':
         for i in range(1, len(d['num_plants'])):
             if i == 4 or i == 5:
@@ -165,9 +165,22 @@ def add_d_to_garden(garden):
                 d['num_plants'][i] += 5
             else:
                 d['num_plants'][i] -= 3
+
+    # VOID NUMBER AND SIZE
     d['num_plants'][0] = garden['void_number']
+    vs = garden['void_size']
+    d['void_beta'] = -4 if vs == 15 else 0 if vs == 100 else -2
+
+    # SPACE TAKEN UP BY VOIDS
+    # todo
+    # VOID ADJUSTMENT
+    # todo
     d['void_size'] = garden['void_size']
-    d['beta'] = garden['beta']
+
+    # DENSITY OFFSET
+    # todo
+
+    # CLUSTERING UTILTY FUNCS
     if garden['pairs_utility_func_exponent'] == 0:
         d['bmca'][0][4] = [[0], [8], [7], [6], [5], [4], [3], [2], [1]] # planting groups
     else:
@@ -205,10 +218,10 @@ def add_d_to_garden(garden):
                                     other_plant_type,
                                     added_points)
         return next_point_selector_with_utility_func(candidates, plant_type, added_points, utility_func)
-
     d['next_point_selector'] = nps
-    d['symmetry'] = garden['symmetry']
 
+    # SYMMETRY
+    d['symmetry'] = garden['symmetry']
 
     # PUT THE d DICT INTO THE QUERY DICT
     garden['d'] = d
@@ -222,6 +235,6 @@ for c, garden in enumerate(combos):
     for t in range(num_trials):
         next_garden = copy.deepcopy(garden)
         plotting_utils.generate_garden_scatter_and_area(d=next_garden['d'], image_id=c * num_trials + t, num_images=len(combos) * num_trials,
-                                                        cylinder_nt=cylinder_nt, data=None, void_beta=void_beta,
-                                                        generate_plotly=generate_plotly,
+                                                        cylinder_nt=cylinder_nt, data=None,
+                                                        generate_plotly=generate_plotly, garden=next_garden,
                                                         save_plotly=save_plotly, save_2d=save_2d)

@@ -191,6 +191,14 @@
         {
             "image": "R",
             "rating": "like"
+        },
+        {
+            "image": "L",
+            "rating": "like"
+        },
+        {
+            "image": "R",
+            "rating": "neutral"
         }
     ]
 }

@@ -23,14 +23,14 @@ def num_to_str(num):
         str_a = list_str_a[0] + "," + list_str_a[1]
     return str_a
 
-dataset_no = 2
+dataset_no = 3
 timestamp = True
-def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
+
+def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
                                      save_plotly=True, save_2d=True,
                                      ):
     if data is None:
-        data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize,
-                                   void_beta=void_beta, d=d)
+        data = poi.generate_garden(dims=garden_constants.dims, cellsize=garden_constants.cellsize, d=d)
     time_elapsed = poi.global_time_elapsed
     h = np.zeros(garden_constants.num_plants)
     num_plants_arr = np.zeros(garden_constants.num_plants)
@@ -71,8 +71,9 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_im
         filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
     if save_2d:
         plt.savefig(filename, dpi=200)
-        d['data'] = data
-        pickle.dump(data, open(f'{filename}.npy', "wb" ))
+        garden['data'] = data
+        garden.pop('d')
+        pickle.dump(garden, open(f'{filename}_data', "wb" ))
         plt.close()
         print(f'image_id {image_id} out of {num_images}')
     if generate_plotly:
@@ -82,7 +83,7 @@ def generate_garden_scatter_and_area(d, void_beta, cylinder_nt, image_id, num_im
                        pt.single_values['color_dict'],
                        cylinder_nt=cylinder_nt,
                        data=data, plant_labels=False, save=save_plotly,
-                       where_to_save=filename)
+                       where_to_save=filename, void_size=garden['void_size'])
     else:
         plt.show()
     return fig, ax

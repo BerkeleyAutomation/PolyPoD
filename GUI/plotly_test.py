@@ -8,26 +8,42 @@ import combine_plotly_surfaces
 # best y_eye_mult: doesn't make a difference if above 1
 # best z_ratio: 0.375
 # best h_hult: 0.43
-data_to_load = ['french_plots/data_06-24-21_16-46-53-557580.npy']
-where_to_save = 'height_width_testing/'
-single_values = {'y_eye_mult':10, 'h_mult':0.43,
+data_to_load = ['datasets/dataset3/3_0_08-07-21_09-52-24-828566_data']
+where_to_save = 'color_testing/'
+single_values = {'y_eye_mult':10, 'h_mult':0.5,
                'z_ratio':0.42, 'plant_labels':False,
-               'color_dict':garden_constants.color_atsu}
+               'color_dict':garden_constants.color_custom_order}
 color_of_soil = garden_constants.soil_color_atsu
-hms = [single_values['h_mult']]
-z_ratios = [single_values['z_ratio']]
-plant_labels = [False]
-text_offset = 0.3
-colors_dicts = [single_values['color_dict']]
-shuffle_colors = True
+hms = [0.5]
+z_ratios = [1]
+plant_labels = [True]
+rotate_45 = [False]
+text_offset = 3
+colors_dicts = [garden_constants.color_custom_order]
+shuffle_colors = False
 save_value = False
 dpi_scales = [4]
 heights = []
 widths = []
 no_height_width = True
+timestamp = True
+from datetime import datetime
+import re
 
+def num_to_str(num):
+    a = "{:.2f}".format(num)
+    str_a = str(a)
+    list_str_a = re.split(r'\.', str_a)
+    if len(list_str_a) == 2:
+        str_a = list_str_a[0] + "," + list_str_a[1]
+    return str_a
 
-def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_save, data=None, plant_labels=True, save=True):
+def timestamp():
+    return datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")
+
+def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, void_size, where_to_save,
+                data=None, plant_labels=True, save=True, rotate_45=False):
+    assert len(colors_dict) == garden_constants.num_plants
     if shuffle_colors:
         copy = [x for x in range(len(colors_dict))]
         for r in range(3):
@@ -69,18 +85,15 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_
 
     to_plot = []
 
-    # RESCALING: SO THAT PLOT DOES NOT GET CUT OFF
-    scale_factor = 2/3
-    data = [[[x[0][0] * scale_factor, x[0][1] * scale_factor], x[1]] for x in data]
-    scaled_garden_len = garden_constants.garden_x_len * scale_factor
-
     for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         x, y = loc
         color = colors_dict[plant_index]
         colorscale = make_colorscale(color)
-
-        xc, yc, zc = cylinder(r, h_mult * r, x, y)
+        if plant_index == 0:
+            xc, yc, zc = cylinder(void_size, 0.01, x, y)
+        else:
+            xc, yc, zc = cylinder(r, h_mult * r, x, y)
 
         cyl = go.Surface(x=xc, y=yc, z=zc,
                          colorscale=colorscale,
@@ -90,8 +103,36 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_
                          contours=contours)
         to_plot.append(cyl)
 
-    x_soil = np.array([[0, scaled_garden_len], [0, scaled_garden_len]])
-    y_soil = np.array([[0, 0], [scaled_garden_len, scaled_garden_len]])
+    # FOR SCALING PURPOSES: invisible cylinder to prevent over-zooming
+    color = colors_dict[1]
+    colorscale = make_colorscale(color)
+    scale_cyl_r = 290
+    xc, yc, zc = cylinder(scale_cyl_r, h_mult * r, garden_constants.garden_x_len / 2, garden_constants.garden_x_len / 2)
+
+    cyl = go.Surface(x=xc, y=yc, z=zc,
+                     colorscale=colorscale,
+                     showscale=False,
+                     opacity=0,
+                     hoverinfo='none',
+                     contours=contours)
+    to_plot.append(cyl)
+
+    if rotate_45:
+        scale_in = 55
+        for x in [scale_in + -garden_constants.garden_x_len / 2, -scale_in + 3 * garden_constants.garden_x_len / 2]:
+            for y in [scale_in + -garden_constants.garden_y_len / 2, -scale_in + 3 * garden_constants.garden_y_len / 2]:
+                xc, yc, zc = cylinder(1, h_mult * r, x, y)
+
+                cyl = go.Surface(x=xc, y=yc, z=zc,
+                                 colorscale=colorscale,
+                                 showscale=False,
+                                 opacity=0,
+                                 hoverinfo='none',
+                                 contours=contours)
+                to_plot.append(cyl)
+
+    x_soil = np.array([[0, garden_constants.garden_x_len], [0, garden_constants.garden_x_len]])
+    y_soil = np.array([[0, 0], [garden_constants.garden_x_len, garden_constants.garden_x_len]])
     z_soil = np.array([[0,0], [0,0]])
 
     soil = go.Surface(x=x_soil, y=y_soil, z=z_soil,
@@ -125,10 +166,11 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_
                        scene_yaxis_visible=False,
                        scene_zaxis_visible=False)
 
-    y_eye = y_eye_mult * scaled_garden_len
+    y_eye = y_eye_mult * garden_constants.garden_x_len
     z_eye = y_eye * z_ratio
+    x_eye = y_eye if rotate_45 else 0
     camera = dict(
-        eye=dict(x=0, y=-y_eye, z=z_eye)
+        eye=dict(x=x_eye, y=-y_eye, z=z_eye)
     )
     to_plot.append(soil)
 
@@ -146,7 +188,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_
             return [garden_constants.plant_radii[p[1]] * h_mult + text_offset for p in data]
 
         def get_text_labels(data):
-            return [str(p[1]) for p in data]
+            return [str(int(p[1])) for p in data]
         x_data = get_x_labels(data)
         y_data = get_y_labels(data)
         z_data = get_z_labels(data)
@@ -172,27 +214,37 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, where_to_
 
     if save:
         for dpi_scale in dpi_scales:
-            fig.write_image(where_to_save + '_3d.png', scale=dpi_scale)
+            fig.write_image(where_to_save + f'h_mult_{num_to_str(h_mult)}_z_ratio_{num_to_str(z_ratio)}_3d_{timestamp() if timestamp else ""}.png', scale=dpi_scale)
     else:
         fig.show()
 
 def main(mode):
     if mode == 'cross':
-        for hm in hms:
-            for z_ratio in z_ratios:
-                for colors_dict in colors_dicts:
-                    for plant_label in plant_labels:
-                        plotly_test(1, z_ratio, hm, colors_dict, plant_label, save=True)
+        print(f'num images: {len(data_to_load) * len(hms) * len(z_ratios) * len(colors_dicts) * len(plant_labels) * len(rotate_45)}')
+        for d in data_to_load:
+            loaded_data = np.load(d, allow_pickle=True)
+            seed_placement_data = loaded_data['data']
+            for hm in hms:
+                for z_ratio in z_ratios:
+                    for colors_dict in colors_dicts:
+                        for plant_label in plant_labels:
+                            for r in rotate_45:
+                                plotly_test(y_eye_mult=single_values['y_eye_mult'], z_ratio=z_ratio, h_mult=hm,
+                                            colors_dict=colors_dict, plant_labels=plant_label, data=seed_placement_data,
+                                    where_to_save=where_to_save,
+                                    cylinder_nt=70, void_size=loaded_data['void_size'], rotate_45=r)
     elif mode == 'single':
         for d in data_to_load:
             loaded_data = np.load(d, allow_pickle=True)
+            seed_placement_data = loaded_data['data']
             plotly_test(single_values['y_eye_mult'],
                         single_values['z_ratio'],
                         single_values['h_mult'],
                         single_values['color_dict'],
                         plant_labels=False,
-                        data=loaded_data,
-                        where_to_save=where_to_save)
+                        data=seed_placement_data,
+                        where_to_save=where_to_save,
+                        cylinder_nt=70, void_size=loaded_data['void_size'])
 
 if __name__ == '__main__':
-    main('single')
+    main('cross')

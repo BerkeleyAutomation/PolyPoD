@@ -93,7 +93,7 @@ class Points:
         pointlist = self.get_point_list()
         return pointlist[np.array([(not np.isnan(p[4])) for p in pointlist])]
 
-def generate_garden(d, dims, cellsize, void_beta):
+def generate_garden(d, dims, cellsize):
     # Argument unpacking
     num_p = d['num_plants']
     beta = d['beta']
@@ -101,6 +101,7 @@ def generate_garden(d, dims, cellsize, void_beta):
     next_point_selector = d['next_point_selector']
     void_size = d['void_size']
     symmetry = d['symmetry']
+    void_beta = d['void_beta']
 
     # SET VARIABLES
     self_beta = beta

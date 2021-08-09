@@ -13,6 +13,10 @@ a_func_exp_base = 3.71
 average_other_radii = 23.275
 void_radius = 5
 void_dist_to_border = 30
+def reverse(a):
+    ar = a[1:][::-1]
+    ar.insert(0, a[0])
+    return ar
 
 colors_of_plants = ["#7e8c3e", "#5c702f", "#92966c", "#343f33", "#919b3e", "#557554", "#b2cbb2", "#6e7d68",
                     "#7fae7e", "#455127", '#32C822']
@@ -29,9 +33,34 @@ colors_of_plants_hcl_v2 = ["#004800", "#005100", "#005A00",
                            "#1C7F00", "#278900", "#33921E",
                            "#3E9B1F"]
 
-color_atsu =  ["#8CAB6D", "#6DA54C","#4D9932","#4B8A41","#5C996C","#538B82","#537960","#6E8236","#40785B","#516758"]
-soil_color_atsu = "#3d2b1f"
-soil_color = "#50371f"
+color_atsu_orig_ordering =  ['#000000', "#8CAB6D", "#6DA54C","#4D9932",
+               "#4B8A41","#5C996C","#538B82",
+               "#537960","#6E8236","#40785B",
+               "#516758"]
+
+color_atsu_my_edit = ['#000000', "#8CAB6D", "#6DA54C", # cut 8 and 10
+                      "#4D9932", "#4B8A41","#5C996C",
+                      "#538B82", "#537960", "#40785B"]
+
+color_atsu_my_edit_reverse = color_atsu_my_edit[1:][::-1]
+color_atsu_my_edit_reverse.insert(0, color_atsu_my_edit[0])
+
+color_custom_order_ignore = ['#000000', '#5C996C', '#40785B',
+                      '#4D9932', '#8CAB6D','#6DA54C',
+                      '#537960', '#538B82', '#4B8A41']
+
+color_custom_order   = ['#000000', '#5C996C', "#6E8236",
+                        "#516758", '#8CAB6D','#6DA54C',
+                        '#537960', '#538B82', '#4B8A41']
+
+abandoned_colors = ['#073300', '094400', '#0a5200']
+'''
+color_atsu_orig_ordering.remove("#8CAB6D")
+color_atsu_orig_ordering.remove("#6DA54C")
+color_atsu_orig_ordering = color_atsu_orig_ordering[::-1]
+'''
+soil_color_atsu = "#2C1F16"
+#soil_color = "#50371f"
 alpha = 1
 
 
