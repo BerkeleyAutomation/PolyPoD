@@ -39,9 +39,9 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     for p in data:
         loc, plant_index, r = garden_constants.point_unpacker(p)
         color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
-        if not plant_index == 0:
-            ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
-
+        if plant_index == 0:
+            r = d['void_size']
+        ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
         num_plants_arr[plant_index] += 1
     num_plants_arr_txt = [str(int(x)) for x in num_plants_arr]
     plant_index_arr = np.arange(garden_constants.num_plants)
@@ -49,7 +49,7 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     table_text = [plant_index_arr_txt, num_plants_arr_txt]
     row_labels = ['plant type', 'num plant']
 
-    locdata = np.array([p[0] for p in data if not p[1] == 0])
+    locdata = np.array([p[0] for p in data])
     datax, datay = locdata[:,0], locdata[:,1]
 
     ax.scatter(datax, datay, s=1, color='k')
@@ -64,18 +64,20 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     ax.set_aspect(1)
     ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1, 1))
     garden_comp_score = garden_constants.garden_companionship_score(data)
-    plt.suptitle('imageid: {}; garden companionship score: {}'.format(image_id, round(garden_comp_score, 4)), y=1)
+    plt.suptitle('imageid: {}'.format(image_id), y=1)
     if timestamp:
         filename = f'datasets/dataset{dataset_no}/{dataset_no}_{image_id}_{datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")}'
     else:
         filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
     if save_2d:
         plt.savefig(filename, dpi=200)
+        # UPDATE VOID NUMBER TO ACTUAL NUBMER OF VOIDS
+        garden['void_number'] = sum([(1 if x[1] == 0 else 0) for x in data])
         garden['data'] = data
         garden.pop('d')
         pickle.dump(garden, open(f'{filename}_data', "wb" ))
         plt.close()
-        print(f'image_id {image_id} out of {num_images}')
+        print(f'image_id {image_id} out of {num_images - 1}')
     if generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],

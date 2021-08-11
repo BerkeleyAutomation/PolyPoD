@@ -11,16 +11,17 @@ import combine_plotly_surfaces
 data_to_load = ['datasets/dataset3/3_0_08-07-21_09-52-24-828566_data']
 where_to_save = 'color_testing/'
 single_values = {'y_eye_mult':10, 'h_mult':0.5,
-               'z_ratio':0.42, 'plant_labels':False,
-               'color_dict':garden_constants.color_custom_order}
+               'z_ratio':1, 'plant_labels':False,
+               'color_dict':garden_constants.color_v1_custom_order}
 color_of_soil = garden_constants.soil_color_atsu
 hms = [0.5]
 z_ratios = [1]
-plant_labels = [True]
+plant_labels = [False]
 rotate_45 = [False]
 text_offset = 3
-colors_dicts = [garden_constants.color_custom_order]
+colors_dicts = [garden_constants.saturation_5_brightness_10, garden_constants.saturation_10_brightness_5]
 shuffle_colors = False
+custom_mix = True
 save_value = False
 dpi_scales = [4]
 heights = []
@@ -53,6 +54,8 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, void_size
                 copy[3 * new_r + new_c] = colors_dict[3 * r + c]
         copy[9] = colors_dict[9]
         colors_dict = copy
+    if custom_mix:
+        colors_dict = [colors_dict[x] for x in garden_constants.color_custom_mix_rearrange]
     def make_colorscale(color):
         return [[0, color], [1, color]]
 

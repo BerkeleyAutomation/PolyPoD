@@ -3,7 +3,6 @@ import random
 import garden_constants
 import math
 from numpy.random import default_rng
-from numpy.random import choice
 rng = default_rng()
 import time
 
@@ -122,17 +121,17 @@ def generate_garden(d, dims, cellsize):
 
     dist_to_center_vert = np.empty(dims)
     it = np.nditer(dist_to_center_vert, flags=["multi_index", "refs_ok"])
+    vert_centerline = dims[0] / 2
+    horz_centerline = dims[1] / 2
     for _ in it:
         xp, yp = it.multi_index
-        centerline = dims[0] / 2
-        dist_to_center_vert[it.multi_index] = abs(xp - centerline)
+        dist_to_center_vert[it.multi_index] = abs(xp - vert_centerline)
 
     dist_to_center_horz = np.empty(dims)
     it = np.nditer(dist_to_center_horz, flags=["multi_index", "refs_ok"])
     for _ in it:
         xp, yp = it.multi_index
-        centerline = dims[1] / 2
-        dist_to_center_horz[it.multi_index] = abs(yp - centerline)
+        dist_to_center_horz[it.multi_index] = abs(yp - horz_centerline)
 
     points = Points(dims, ndim)
     def inhibition_radius(plant_type):
@@ -225,7 +224,7 @@ def generate_garden(d, dims, cellsize):
             c5 = crm_void > r
             if plant_type == 0:
                 c1 = crm > ((1 - void_beta) * r)
-                c3 = dist_to_border >= garden_constants.void_dist_to_border
+                c3 = c3 & (dist_to_border >= garden_constants.void_dist_to_border)
             criteria = (c1 & c2 & c3 & c4 & c5)
             if symmetry == 'left-right':
                 c6 = dist_to_center_vert > ((1 - beta / 2) * r)
@@ -253,7 +252,7 @@ def generate_garden(d, dims, cellsize):
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            to_add = next_point_selector(candidates, plant_type, added_points, planting_groups)
+            to_add = next_point_selector(candidates, plant_type, added_points, planting_groups, dims)
             add_point(to_add, plant_type)
             if symmetry == 'left-right' or symmetry == 'left-right-up-down':
 
@@ -292,7 +291,19 @@ def generate_garden(d, dims, cellsize):
                     return True
             return False
 
+        def void_adjustment():
+            # SPACE TAKEN UP BY VOIDS
+            void_area = math.pi * void_size ** 2 * len(added_points[0])
+            frac_rem_area = (garden_constants.garden_area - void_area) / garden_constants.garden_area
+            void_adjustment_offset = 0.85
+            for i in range(len(num_p)):
+                num_p[i] = num_p[i] * frac_rem_area * void_adjustment_offset
+
+        first_run = True
         for group in planting_groups:
+            if (not 0 in group) and first_run:
+                void_adjustment()
+                first_run = False
             while continuing_condition(group):
                 for plant_index in group:
                     if num_p[plant_index] > 0:

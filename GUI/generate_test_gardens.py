@@ -11,7 +11,8 @@ import random
 import copy
 
 # GENERAL VARIABLES: SET
-num_trials = 5
+mode = 'random draw' # 'random draw' or 'combos
+num_trials = 1
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
@@ -19,6 +20,7 @@ generate_plotly=False
 save_plotly=False
 save_2d=True
 void_beta = -3
+
 def random_ps(candidates, plant_type, added_points, planting_groups):
     draw = candidates[rng.integers(len(candidates))]
     return [draw[0], draw[1]]
@@ -41,43 +43,38 @@ def next_point_selector_with_utility_func(candidates, plant_type, added_points, 
 
 # EXPERIMENTAL VARIABLE DEFAULT VALUES: DO NOT CHANGE
 density = {'name':'density',
-           'values':['medium', 'low', 'high']}
+           'values':[0.25, 0.5, 0.75, 1]}
 distribution = {'name':'distribution',
                 'values':['even', 'uneven 2', 'uneven 3']}
 void_size = {'name':'void_size',
              'values':[15, 35, 50, 100]}
 void_number = {'name':'void_number',
-               'values':[0, 4, 8]}
+               'values':[0, 2, 4, 8]}
 beta = {'name':'beta',
         'values':[0.6, 0.2, 0.4, 0.8, 1]}
-same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
-                    'values':[0, -6, -12, -100]}
-pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
-                    'values':[0, -6, -12, -100]}
+utility_func_exponent = {'name':'utility_func_exponent',
+                    'values':[['same', 0], ['same', -6], ['same', -12], ['same', -100], ['pairs', -6], ['pairs', -12], ['pairs', -100]]}
 symmetry = {'name':'symmetry',
              'values':['neither', 'left-right', 'left-right-up-down']}
 
 # EXPERIMENTAL VARIABLE EXPERIMENTAL VARIABLES: CAN CHANGE
 density = {'name':'density',
-           'values':['high']}
+           'values':[1]}
 distribution = {'name':'distribution',
                 'values':['even']}
 void_size = {'name':'void_size',
-             'values':[25]}
+             'values':[15]}
 void_number = {'name':'void_number',
                'values':[0]}
 beta = {'name':'beta',
-        'values':[0]}
-same_plant_utility_func_exponent = {'name':'same_plant_utility_func_exponent',
-                    'values':[0]}
-pairs_utility_func_exponent = {'name':'pairs_utility_func_exponent',
-                    'values':[0]}
+        'values':[0.4]}
+utility_func_exponent = {'name':'utility_func_exponent',
+                    'values':[['same', 0], ['same', -6], ['same', -12], ['same', -100], ['pairs', -6], ['pairs', -12], ['pairs', -100]]}
 symmetry = {'name':'symmetry',
-             'values':['neither']}
+             'values':['neither', 'left-right', 'left-right-up-down']}
 
 # LIST OF ALL VARIABLES
-all_variables = [density, distribution, void_size, void_number, beta, same_plant_utility_func_exponent,
-                 pairs_utility_func_exponent, symmetry]
+all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry]
 
 combos = [{}]
 def variable_adder(l, variable):
@@ -147,50 +144,46 @@ def add_d_to_garden(garden):
     d['bmca'] = [bmca_utils.default_bac()]
 
     # DEFAULT HI-DENSITY PLANT NUMS FOR EVEN DISTRIBUTION, NO VOIDS
-    intersect = 9
-    slope = 15
-    d['num_plants'] = np.full(9, intersect + garden['beta'] * slope)
+    beta = garden['beta']
+    default_num_plants = 9 if beta == 0 else 10 if beta == 0.2 else 12 if beta == 0.4 else 14 if beta == 0.6 else 17 if beta == 0.8 else 21
+    small_plant_extra = 2
+
+    d['num_plants'] = np.concatenate((np.full(4, default_num_plants + small_plant_extra), np.full(5, default_num_plants)))
     d['beta'] = garden['beta']
 
     # DISTRIBUTION ADJUSTMENT
+    distribution_offset = 0.6
     if garden['distribution'] == 'uneven 2':
         for i in range(1, len(d['num_plants'])):
             if i == 4 or i == 5:
-                d['num_plants'][i] += 6
+                d['num_plants'][i] = int(d['num_plants'][i] * 5/2)
             else:
-                d['num_plants'][i] -= 2
+                d['num_plants'][i] = int(d['num_plants'][i] * 3/4 * distribution_offset)
     elif garden['distribution'] == 'uneven 3':
         for i in range(1, len(d['num_plants'])):
             if i == 3 or i == 4 or i == 5:
-                d['num_plants'][i] += 5
+                d['num_plants'][i] = int(d['num_plants'][i] * 9/4)
             else:
-                d['num_plants'][i] -= 3
+                d['num_plants'][i] = int(d['num_plants'][i] * 3/4 * distribution_offset)
 
     # VOID NUMBER AND SIZE
     d['num_plants'][0] = garden['void_number']
     vs = garden['void_size']
-    d['void_beta'] = -4 if vs == 15 else 0 if vs == 100 else -2
+    d['void_beta'] = 0 # old stuff: -4 if vs == 15 else 0 if vs == 100 else -2
 
-    # SPACE TAKEN UP BY VOIDS
-    # todo
-    # VOID ADJUSTMENT
-    # todo
     d['void_size'] = garden['void_size']
 
     # DENSITY OFFSET
-    # todo
+    d['num_plants'] = [int(x * garden['density']) for x in d['num_plants']]
 
     # CLUSTERING UTILTY FUNCS
-    if garden['pairs_utility_func_exponent'] == 0:
+    if garden['utility_func_exponent'][0] == 'same':
         d['bmca'][0][4] = [[0], [8], [7], [6], [5], [4], [3], [2], [1]] # planting groups
     else:
         d['bmca'][0][4] = [[0], [8, 4], [7, 3], [6, 2], [5, 1]] # Planting groups
 
-    def clustering_utility_func(p, plant_type, other_plant_type, added_points):
-        if plant_type == other_plant_type:
-            exp = garden['same_plant_utility_func_exponent']
-        else:
-            exp = garden['pairs_utility_func_exponent']
+    def clustering_utility_func(p, plant_type, other_plant_type, added_points, dims):
+        exp = garden['utility_func_exponent'][1]
         cum_dist = 0
         for o in added_points[other_plant_type]:
             o_loc = o[0]
@@ -200,7 +193,7 @@ def add_d_to_garden(garden):
         else:
             return cum_dist ** exp
 
-    def nps(candidates, plant_type, added_points, planting_groups):
+    def nps(candidates, plant_type, added_points, planting_groups, dims):
         if plant_type == 0:
             return random_ps(candidates, plant_type, added_points, planting_groups)
         else:
@@ -216,7 +209,7 @@ def add_d_to_garden(garden):
             assert other_plant_type is not None
             utility_func = lambda p, plant_type, added_points: clustering_utility_func(p, plant_type,
                                     other_plant_type,
-                                    added_points)
+                                    added_points, dims)
         return next_point_selector_with_utility_func(candidates, plant_type, added_points, utility_func)
     d['next_point_selector'] = nps
 
