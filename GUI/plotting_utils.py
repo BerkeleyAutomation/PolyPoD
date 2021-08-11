@@ -23,8 +23,8 @@ def num_to_str(num):
         str_a = list_str_a[0] + "," + list_str_a[1]
     return str_a
 
-dataset_no = 3
-timestamp = True
+dataset_no = 5
+timestamp = False
 
 def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
                                      save_plotly=True, save_2d=True,
@@ -70,7 +70,7 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     else:
         filename = f"datasets/dataset{dataset_no}/{dataset_no}_{image_id}"
     if save_2d:
-        plt.savefig(filename, dpi=200)
+        plt.savefig(filename + '_2d', dpi=200)
         # UPDATE VOID NUMBER TO ACTUAL NUBMER OF VOIDS
         garden['void_number'] = sum([(1 if x[1] == 0 else 0) for x in data])
         garden['data'] = data

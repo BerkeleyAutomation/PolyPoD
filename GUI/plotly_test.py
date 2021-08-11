@@ -12,7 +12,7 @@ data_to_load = ['datasets/dataset3/3_0_08-07-21_09-52-24-828566_data']
 where_to_save = 'color_testing/'
 single_values = {'y_eye_mult':10, 'h_mult':0.5,
                'z_ratio':1, 'plant_labels':False,
-               'color_dict':garden_constants.color_v1_custom_order}
+               'color_dict':garden_constants.greens_palette}
 color_of_soil = garden_constants.soil_color_atsu
 hms = [0.5]
 z_ratios = [1]
@@ -217,7 +217,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, void_size
 
     if save:
         for dpi_scale in dpi_scales:
-            fig.write_image(where_to_save + f'h_mult_{num_to_str(h_mult)}_z_ratio_{num_to_str(z_ratio)}_3d_{timestamp() if timestamp else ""}.png', scale=dpi_scale)
+            fig.write_image(where_to_save + '_3d.png', scale=dpi_scale)
     else:
         fig.show()
 

@@ -223,20 +223,17 @@ def generate_garden(d, dims, cellsize):
             c3 = dist_to_border >= r
             c4 = crm_same_plant > ((1 - self_beta) * r)
             c5 = crm_void > r
-            if plant_type == 0:
-                c1 = crm > ((1 - void_beta) * r)
-                c3 = c3 & (dist_to_border >= garden_constants.void_dist_to_border)
             criteria = (c1 & c2 & c3 & c4 & c5)
             if symmetry == 'left-right':
-                c6 = dist_to_center_vert > ((1 - beta / 2) * r)
+                c6 = dist_to_center_vert > ((1 - plant_beta / 2) * r)
                 c7 = dist_to_center_vert  == 0
                 c8 = np.flip(criteria, 0) & criteria
                 criteria = (criteria & (c6 | c7) & c8)
             elif symmetry == 'left-right-up-down':
-                c6 = dist_to_center_vert > ((1 - beta / 2) * r)
+                c6 = dist_to_center_vert > ((1 - plant_beta / 2) * r)
                 c7 = dist_to_center_vert == 0
                 c8 = np.flip(criteria, 1) & criteria
-                c9 = dist_to_center_horz > ((1 - beta / 2) * r)
+                c9 = dist_to_center_horz > ((1 - plant_beta / 2) * r)
                 c10 = dist_to_center_horz == 0
                 c11 = np.flip(criteria, 0) & criteria
                 criteria = (criteria & (c6 | c7) & c8 & (c9 | c10) & c11)
@@ -253,7 +250,7 @@ def generate_garden(d, dims, cellsize):
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False
-            to_add = next_point_selector(candidates, plant_type, added_points, planting_groups, dims)
+            to_add = next_point_selector(candidates, plant_type, added_points, planting_groups, dims, d)
             add_point(to_add, plant_type)
             if symmetry == 'left-right' or symmetry == 'left-right-up-down':
 

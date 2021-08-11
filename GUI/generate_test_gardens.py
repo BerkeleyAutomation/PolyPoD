@@ -11,15 +11,15 @@ import random
 import copy
 
 # GENERAL VARIABLES: SET
-mode = 'random jdraw' # 'random draw' or 'combos
+mode = 'random draw' # 'random draw' or 'combos
 num_trials = 1
+num_gardens_to_generate = 400
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
-generate_plotly=False
-save_plotly=False
+generate_plotly=True
+save_plotly=True
 save_2d=True
-void_beta = -3
 
 def random_ps(candidates, plant_type, added_points, planting_groups):
     draw = candidates[rng.integers(len(candidates))]
@@ -46,33 +46,33 @@ density = {'name':'density',
            'values':[0.25, 0.5, 0.75, 1]}
 distribution = {'name':'distribution',
                 'values':['even', 'uneven 2', 'uneven 3']}
-void_size = {'name':'void_size',
-             'values':[15, 35, 50, 100]}
-void_number = {'name':'void_number',
-               'values':[0, 2, 4, 8]}
 beta = {'name':'beta',
-        'values':[0.6, 0.2, 0.4, 0.8, 1]}
+        'values':[0, 0.2, 0.4, 0.6, 0.8, 1]}
+void_size = {'name':'void_size',
+             'values':[15, 35, 50, 75, 100]}
+void_number = {'name':'void_number',
+               'values':[0, 2, 4, 8, 16]}
 utility_func_exponent = {'name':'utility_func_exponent',
                     'values':[['same', 0], ['same', -6], ['same', -12], ['same', -100], ['pairs', -6], ['pairs', -12], ['pairs', -100]]}
 symmetry = {'name':'symmetry',
              'values':['neither', 'left-right', 'left-right-up-down']}
-
+'''
 # EXPERIMENTAL VARIABLE EXPERIMENTAL VARIABLES: CAN CHANGE
 density = {'name':'density',
            'values':[1]}
 distribution = {'name':'distribution',
                 'values':['even']}
 void_size = {'name':'void_size',
-             'values':[15]}
+             'values':[35, 75]}
 void_number = {'name':'void_number',
-               'values':[0]}
+               'values':[0, 4, 16]}
 beta = {'name':'beta',
-        'values':[0.4]}
+        'values':[1]}
 utility_func_exponent = {'name':'utility_func_exponent',
-                    'values':[['same', 0], ['same', -6], ['same', -12], ['same', -100], ['pairs', -6], ['pairs', -12], ['pairs', -100]]}
+                    'values':[['same', 0]]}
 symmetry = {'name':'symmetry',
-             'values':['neither', 'left-right', 'left-right-up-down']}
-
+             'values':['left-right', 'left-right-up-down']}
+'''
 # LIST OF ALL VARIABLES
 all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry]
 
@@ -89,7 +89,12 @@ if mode == 'combos':
     for var in all_variables:
         combos = variable_adder(combos, var)
 elif mode == 'random draw':
-    pass
+    combos = []
+    for n in range(num_gardens_to_generate):
+        garden = {}
+        for var in all_variables:
+            garden[var['name']] = random.choice(var['values'])
+        combos.append(garden)
 else:
     raise ValueError('mode must be combos or random draw')
 # ADD d TO GARDEN
@@ -138,18 +143,24 @@ def add_d_to_garden(garden):
     else:
         d['bmca'][0][4] = [[0], [8, 4], [7, 3], [6, 2], [5, 1]] # Planting groups
 
-    def clustering_utility_func(p, plant_type, other_plant_type, added_points, dims):
+    def clustering_utility_func(p, plant_type, other_plant_type, added_points, dims, d):
         exp = garden['utility_func_exponent'][1]
         cum_dist = 0
         for o in added_points[other_plant_type]:
             o_loc = o[0]
+            if d['symmetry'] == 'left-right':
+                if o_loc[0] > dims[1] / 2:
+                    continue
+            elif d['symmetry'] == 'left-right-up-down':
+                if o_loc[0] > dims[1] / 2 or o_loc[1] > dims[0] / 2:
+                    continue
             cum_dist += math.dist(p, o_loc)
         if cum_dist + cum_dist == 0:
             return 1
         else:
             return cum_dist ** exp
 
-    def nps(candidates, plant_type, added_points, planting_groups, dims):
+    def nps(candidates, plant_type, added_points, planting_groups, dims, d):
         if plant_type == 0:
             return random_ps(candidates, plant_type, added_points, planting_groups)
         else:
@@ -165,7 +176,7 @@ def add_d_to_garden(garden):
             assert other_plant_type is not None
             utility_func = lambda p, plant_type, added_points: clustering_utility_func(p, plant_type,
                                     other_plant_type,
-                                    added_points, dims)
+                                    added_points, dims, d)
         return next_point_selector_with_utility_func(candidates, plant_type, added_points, utility_func)
     d['next_point_selector'] = nps
 
@@ -180,11 +191,12 @@ for garden in combos:
     add_d_to_garden(garden)
 
 # GENERATE
-print(f'num images: {len(combos) * num_trials}')
+num_images = len(combos) * num_trials
+print(f'num images: {num_images}')
 for c, garden in enumerate(combos):
     for t in range(num_trials):
         next_garden = copy.deepcopy(garden)
-        plotting_utils.generate_garden_scatter_and_area(d=next_garden['d'], image_id=c * num_trials + t, num_images=len(combos) * num_trials,
+        plotting_utils.generate_garden_scatter_and_area(d=next_garden['d'], image_id=c * num_trials + t, num_images=num_images,
                                                         cylinder_nt=cylinder_nt, data=None,
                                                         generate_plotly=generate_plotly, garden=next_garden,
                                                         save_plotly=save_plotly, save_2d=save_2d)
