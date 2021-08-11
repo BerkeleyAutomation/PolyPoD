@@ -11,7 +11,7 @@ import random
 import copy
 
 # GENERAL VARIABLES: SET
-mode = 'random draw' # 'random draw' or 'combos
+mode = 'random jdraw' # 'random draw' or 'combos
 num_trials = 1
 num_p_selector = poi.weighted_round_or_one
 data = None
@@ -76,67 +76,23 @@ symmetry = {'name':'symmetry',
 # LIST OF ALL VARIABLES
 all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry]
 
-combos = [{}]
-def variable_adder(l, variable):
-    nl = []
-    for d in l:
-        for val in variable['values']:
-            d = d.copy()
-            d[variable['name']] = val
-            nl.append(d)
-    return nl
-for var in all_variables:
-    combos = variable_adder(combos, var)
-# DICT OF QUERIES
-queries = {}
-for x in range(42):
-    queries[x] = {100 + x:{}, 200 + x:{}} # todo hard coded
-#print(queries)
-# GENERAL VARIABLE ADDER FUNCTION: assumes queries is length 42, variable has 3 values. # todo hard coded
-
-'''
-# INDEPENDENT TESTING OF THE VARIABLE
-independent = []
-default_dictionary = {}
-for other in all_variables:
-    default_dictionary[other['name']] = other['values'][0]
-#independent.append(default_dictionary)
-def debugging_amend(d):
-    d['beta'] = 1
-    d['density'] = 'high'
-def independent_add_variable(l, variable):
-    d = {}
-    for other in all_variables:
-        d[other['name']] = other['values'][0]
-    d[variable['name']] = variable['values'][1]
-    debugging_amend(d)
-    l.append(d)
-    dc = d.copy()
-    dc[variable['name']] = variable['values'][2]
-    debugging_amend(dc)
-    l.append(dc)
-    return l
-
-ADDING VARIABLES TO INDEPENDANT
-for variable in [symmetry]:
-    independent = independent_add_variable(independent, variable)
-
-for c, i in enumerate(independent):
-    print(c)
-    for v in i:
-        print(f'\t{v} {i[v]}')
-
-# ADDING VARIABLES TO QUERIES
-for variable in all_variables:
-    queries = add_variable(queries, variable)
-'''
-# MAKING THE INPUT VARIABLES DICTIONARY
-def add_d_to_queries(queries):
-    for query in queries:
-        gardens = [query['left'], query['right']]
-        for garden in gardens:
-            add_d_to_garden(garden)
-
+if mode == 'combos':
+    combos = [{}]
+    def variable_adder(l, variable):
+        nl = []
+        for d in l:
+            for val in variable['values']:
+                d = d.copy()
+                d[variable['name']] = val
+                nl.append(d)
+        return nl
+    for var in all_variables:
+        combos = variable_adder(combos, var)
+elif mode == 'random draw':
+    pass
+else:
+    raise ValueError('mode must be combos or random draw')
+# ADD d TO GARDEN
 def add_d_to_garden(garden):
     d = {}
 
@@ -223,6 +179,7 @@ def add_d_to_garden(garden):
 for garden in combos:
     add_d_to_garden(garden)
 
+# GENERATE
 print(f'num images: {len(combos) * num_trials}')
 for c, garden in enumerate(combos):
     for t in range(num_trials):

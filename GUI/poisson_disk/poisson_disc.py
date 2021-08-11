@@ -212,12 +212,13 @@ def generate_garden(d, dims, cellsize):
             return bounds_map
 
         def standard_criteria(plant_type):
+            plant_beta = void_beta if plant_type == 0 else beta
             r = inhibition_radius(plant_type)
             crm = points.get_cr_map()
             cbm = points.get_cb_map()
             crm_same_plant = points.get_cr_of_plant_map(plant_type) # todo
             crm_void = points.get_cr_of_plant_map(0)
-            c1 = crm > ((1 - beta) * r)
+            c1 = crm > ((1 - plant_beta) * r)
             c2 = cbm > r
             c3 = dist_to_border >= r
             c4 = crm_same_plant > ((1 - self_beta) * r)
