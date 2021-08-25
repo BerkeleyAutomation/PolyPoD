@@ -13,7 +13,8 @@ import copy
 # GENERAL VARIABLES: SET
 mode = 'random draw' # 'random draw' or 'combos
 num_trials = 1
-num_gardens_to_generate = 400
+num_gardens_to_generate = 970
+starting_image_id = 30
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
@@ -196,7 +197,7 @@ print(f'num images: {num_images}')
 for c, garden in enumerate(combos):
     for t in range(num_trials):
         next_garden = copy.deepcopy(garden)
-        plotting_utils.generate_garden_scatter_and_area(d=next_garden['d'], image_id=c * num_trials + t, num_images=num_images,
+        plotting_utils.generate_garden_scatter_and_area(d=next_garden['d'], image_id=c * num_trials + t + starting_image_id, num_images=num_images,
                                                         cylinder_nt=cylinder_nt, data=None,
                                                         generate_plotly=generate_plotly, garden=next_garden,
                                                         save_plotly=save_plotly, save_2d=save_2d)
