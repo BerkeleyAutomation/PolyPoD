@@ -127,23 +127,23 @@ PLANTS_RELATION = {
         "VOID":         {"borage": 0.0, "cilantro": 0.0, "radicchio": 0.0, "kale": 0.0, "green_lettuce": 0.0, "red_lettuce": 0.0, "swiss_chard": 0.0, "turnip": 0.0, "VOID": 0.0},
 }
 
-legend_elements = [Line2D([0], [0], marker='o', color='k', label='8 kale',
+legend_elements = [Line2D([0], [0], marker='o', color='k', label='Kale',
                           markerfacecolor='red', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='7 turnip',
+                   Line2D([0], [0], marker='o', color='k', label='Turnip',
                           markerfacecolor='fuchsia', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='6 borage',
+                   Line2D([0], [0], marker='o', color='k', label='Borage',
                           markerfacecolor='orange', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='5 swiss chard',
+                   Line2D([0], [0], marker='o', color='k', label='Swiss Chard',
                           markerfacecolor='gold', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='4 radicchio',
+                   Line2D([0], [0], marker='o', color='k', label='Radicchio',
                           markerfacecolor='lime', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='3 green lettuce',
+                   Line2D([0], [0], marker='o', color='k', label='Green Lettuce',
                           markerfacecolor='darkgreen', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='2 red lettuce',
+                   Line2D([0], [0], marker='o', color='k', label='Red Lettuce',
                           markerfacecolor='blue', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='1 cilantro',
+                   Line2D([0], [0], marker='o', color='k', label='Cilantro',
                           markerfacecolor='darkviolet', markersize=12),
-                   Line2D([0], [0], marker='o', color='k', label='0 VOID',
+                   Line2D([0], [0], marker='o', color='k', label='VOID',
                           markerfacecolor='black', markersize=12)
                    ]
 

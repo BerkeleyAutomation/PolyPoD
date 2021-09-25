@@ -13,12 +13,12 @@ import copy
 # GENERAL VARIABLES: SET
 mode = 'random draw' # 'random draw' or 'combos
 num_trials = 1
-num_gardens_to_generate = 970
-starting_image_id = 30
+num_gardens_to_generate = 1
+starting_image_id = 1
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
-generate_plotly=True
+generate_plotly=False
 save_plotly=True
 save_2d=True
 
@@ -44,15 +44,15 @@ def next_point_selector_with_utility_func(candidates, plant_type, added_points, 
 
 # EXPERIMENTAL VARIABLE DEFAULT VALUES: DO NOT CHANGE
 density = {'name':'density',
-           'values':[0.25, 0.5, 0.75, 1]}
+           'values':[1]}
 distribution = {'name':'distribution',
                 'values':['even', 'uneven 2', 'uneven 3']}
 beta = {'name':'beta',
         'values':[0, 0.2, 0.4, 0.6, 0.8, 1]}
 void_size = {'name':'void_size',
-             'values':[15, 35, 50, 75, 100]}
+             'values':[2]}
 void_number = {'name':'void_number',
-               'values':[0, 2, 4, 8, 16]}
+               'values':[0]}
 utility_func_exponent = {'name':'utility_func_exponent',
                     'values':[['same', 0], ['same', -6], ['same', -12], ['same', -100], ['pairs', -6], ['pairs', -12], ['pairs', -100]]}
 symmetry = {'name':'symmetry',
@@ -107,8 +107,8 @@ def add_d_to_garden(garden):
 
     # DEFAULT HI-DENSITY PLANT NUMS FOR EVEN DISTRIBUTION, NO VOIDS
     beta = garden['beta']
-    default_num_plants = 9 if beta == 0 else 10 if beta == 0.2 else 12 if beta == 0.4 else 14 if beta == 0.6 else 17 if beta == 0.8 else 21
-    small_plant_extra = 2
+    default_num_plants = 0 if True else 9 if beta == 0 else 10 if beta == 0.2 else 12 if beta == 0.4 else 14 if beta == 0.6 else 17 if beta == 0.8 else 21
+    small_plant_extra = 1
 
     d['num_plants'] = np.concatenate((np.full(4, default_num_plants + small_plant_extra), np.full(5, default_num_plants)))
     d['beta'] = garden['beta']

@@ -23,8 +23,8 @@ def num_to_str(num):
         str_a = list_str_a[0] + "," + list_str_a[1]
     return str_a
 
-dataset_no = 5
-timestamp = False
+dataset_no = 6
+timestamp = True
 
 def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
                                      save_plotly=True, save_2d=True,
@@ -41,7 +41,7 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
         color = garden_constants.colors_of_plants_hi_contrast[int(plant_index)]
         if plant_index == 0:
             r = d['void_size']
-        ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
+        #ax.add_patch(plt.Circle(loc, r, color=color, fill=False, clip_on=False))
         num_plants_arr[plant_index] += 1
     num_plants_arr_txt = [str(int(x)) for x in num_plants_arr]
     plant_index_arr = np.arange(garden_constants.num_plants)
@@ -52,7 +52,7 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     locdata = np.array([p[0] for p in data])
     datax, datay = locdata[:,0], locdata[:,1]
 
-    ax.scatter(datax, datay, s=1, color='k')
+    #ax.scatter(datax, datay, s=1, color='k')
     ax.table(cellText=table_text,
               rowLabels=row_labels,
               loc='top')
@@ -62,7 +62,7 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     for i in range(-1, len(garden_vecs) - 1):
         ax.plot(garden_vecs[i], garden_vecs[i + 1], color='k')
     ax.set_aspect(1)
-    ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1, 1))
+    ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(0.25, 0.75))
     garden_comp_score = garden_constants.garden_companionship_score(data)
     plt.suptitle('imageid: {}'.format(image_id), y=1)
     if timestamp:
