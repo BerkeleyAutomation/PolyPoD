@@ -13,7 +13,7 @@ import copy
 # GENERAL VARIABLES: SET
 mode = 'random draw' # 'random draw' or 'combos
 num_trials = 1
-num_gardens_to_generate = 400
+num_gardens_to_generate = 1000
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70

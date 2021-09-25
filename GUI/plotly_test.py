@@ -94,7 +94,7 @@ def plotly_test(y_eye_mult, z_ratio, h_mult, colors_dict, cylinder_nt, void_size
         color = colors_dict[plant_index]
         colorscale = make_colorscale(color)
         if plant_index == 0:
-            xc, yc, zc = cylinder(void_size, 0.01, x, y)
+            continue
         else:
             xc, yc, zc = cylinder(r, h_mult * r, x, y)
 
