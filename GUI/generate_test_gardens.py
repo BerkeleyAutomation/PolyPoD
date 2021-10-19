@@ -13,7 +13,7 @@ import copy
 # GENERAL VARIABLES: SET
 mode = 'random draw' # 'random draw' or 'combos
 num_trials = 1
-num_gardens_to_generate = 1000
+num_gardens_to_generate = 5
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
@@ -56,23 +56,23 @@ utility_func_exponent = {'name':'utility_func_exponent',
                     'values':[['same', 0], ['same', -6], ['same', -12], ['same', -100], ['pairs', -6], ['pairs', -12], ['pairs', -100]]}
 symmetry = {'name':'symmetry',
              'values':['neither', 'left-right', 'left-right-up-down']}
-'''
+
 # EXPERIMENTAL VARIABLE EXPERIMENTAL VARIABLES: CAN CHANGE
 density = {'name':'density',
-           'values':[1]}
+           'values':[0.5]}
 distribution = {'name':'distribution',
                 'values':['even']}
 void_size = {'name':'void_size',
-             'values':[35, 75]}
+             'values':[35]}
 void_number = {'name':'void_number',
-               'values':[0, 4, 16]}
+               'values':[8]}
 beta = {'name':'beta',
         'values':[1]}
 utility_func_exponent = {'name':'utility_func_exponent',
-                    'values':[['same', 0]]}
+                    'values':[['same', -6]]}
 symmetry = {'name':'symmetry',
-             'values':['left-right', 'left-right-up-down']}
-'''
+             'values':['left-right-up-down']}
+
 # LIST OF ALL VARIABLES
 all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry]
 
