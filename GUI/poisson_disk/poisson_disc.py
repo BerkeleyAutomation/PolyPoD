@@ -5,6 +5,8 @@ import math
 from numpy.random import default_rng
 rng = default_rng()
 import time
+from shapely import geometry
+import shapely
 
 def coin_flip(p):
     r = random.random()
@@ -147,14 +149,10 @@ def generate_garden(d, dims, cellsize):
 
     # Main Helper Function
     def generate_garden_cluster(bmca, points):
-        upper, lower, bounds, num_each_plant, planting_groups = bmca
-        if not upper is None:
-            upper = memoize(upper)
-            lower = memoize(lower)
-            upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
-            lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
-            bounds = [num / cellsize for num in bounds]
-            low_x_bound, high_x_bound, low_y_bound, high_y_bound = bounds
+        polygon, num_each_plant, planting_groups = bmca
+        polygon = shapely.affinity.scale(polygon, xfact=1/cellsize, yfact=1/cellsize, origin=(0,0))
+            # upper_grid = lambda a: (1 / cellsize) * upper(cellsize * a)
+            # lower_grid = lambda a: (1 / cellsize) * lower(cellsize * a)
         '''
         # Never the case anymore 
         if num_each_plant is None:
@@ -177,37 +175,17 @@ def generate_garden(d, dims, cellsize):
         else:
             num_p = num_each_plant
         '''
-        # custom bounds functions
-        def line_following(function, input_range):
-            pass
 
-        def bounds_map_creator(upper, lower, plant_type):
+        def bounds_map_creator(polygon, plant_type):
             def in_bounds(p):
                 loc, plant_index, r = point_unpacker_internal(p)
-                px = loc[0]
-                py = loc[1]
-
-                circ_up = ucv + py
-                circ_low = lcv + py
-
-                adjusted_cv = cvx + px
-                upper_at_cv = np.array([upper(i) for i in adjusted_cv])
-                lower_at_cv = np.array([lower(i) for i in adjusted_cv])
-
-                upper_diff = upper_at_cv - circ_up
-                if np.amin(upper_diff) < 0:
-                    return False
-                lower_diff = circ_low - lower_at_cv
-                if np.amin(lower_diff) < 0:
-                    return False
-                in_left_right_bounds = (px - r) > low_x_bound and (px + r) < high_x_bound
-                if not in_left_right_bounds:
-                    return False
-                return True
+                shrunk_polygon = polygon.buffer(-r)
+                point = geometry.Point(loc)
+                return shrunk_polygon.contains(point)
 
             bounds_map = np.full(dims, 0, dtype=bool)
-            for x in range(math.ceil(low_x_bound), math.floor(high_x_bound)):
-                for y in range(math.ceil(low_y_bound), math.floor(high_y_bound)):
+            for x in range(dims[0]):
+                for y in range(dims[1]):
                     bounds_map[x, y] = in_bounds([[x, y], plant_type])
             return bounds_map
 
@@ -242,11 +220,8 @@ def generate_garden(d, dims, cellsize):
         def next_point(plant_type):
             #print('NEXT PLANT')
             scm = standard_criteria(plant_type)
-            if upper is None:
-                criteria = scm
-            else:
-                bounds_map = bounds_map_creator(upper_grid, lower_grid, plant_type)
-                criteria = scm & bounds_map
+            bounds_map = bounds_map_creator(polygon, plant_type)
+            criteria = scm & bounds_map
             candidates = points.get_points_array()[criteria]
             if len(candidates) == 0:
                 return False

@@ -4,11 +4,13 @@ import garden_constants
 import plotting_utils
 import numpy as np
 import math
+from shapely.geometry import Polygon
 
 def default_bac():
-    return [None, None, None, np.full(9, 2),
+    return [Polygon([[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],
+                     [250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]), np.full(9, 2),
             [[0], [8], [7], [6], [5], [4], [3], [2], [1]]]
-# upper, lower, bounds, num_checks = bmca
+# Polygon, num_each_plant, planting_groups = bmca
 
 # LIST OF ALL EXPERIMENTAL VARIABLES
 all_variables = []

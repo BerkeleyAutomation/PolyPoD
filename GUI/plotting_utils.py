@@ -23,7 +23,7 @@ def num_to_str(num):
         str_a = list_str_a[0] + "," + list_str_a[1]
     return str_a
 
-dataset_no = 9
+dataset_no = 10
 timestamp = False
 
 def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_images, trialno=-1, data=None, generate_plotly=True,
@@ -65,6 +65,9 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
     ax.legend(handles=garden_constants.legend_elements, loc='upper left', bbox_to_anchor=(1, 1))
     garden_comp_score = garden_constants.garden_companionship_score(data)
     plt.suptitle('imageid: {}'.format(image_id), y=1)
+    polygon = d['bmca'][0][0]
+    x, y = polygon.exterior.xy
+    plt.plot(x, y, 'r')
     if timestamp:
         filename = f'datasets/dataset{dataset_no}/{dataset_no}_{image_id}_{datetime.now().strftime("%m-%d-%y_%H-%M-%S-%f")}'
     else:

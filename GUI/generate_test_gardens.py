@@ -11,15 +11,15 @@ import random
 import copy
 
 # GENERAL VARIABLES: SET
-mode = 'random draw' # 'random draw' or 'combos
+mode = 'random draw' # 'random draw' or 'combos'
 num_trials = 1
-num_gardens_to_generate = 5
+num_gardens_to_generate = 1
 num_p_selector = poi.weighted_round_or_one
 data = None
 cylinder_nt = 70
-generate_plotly=True
+generate_plotly=False
 save_plotly=True
-save_2d=True
+save_2d=False
 
 def random_ps(candidates, plant_type, added_points, planting_groups):
     draw = candidates[rng.integers(len(candidates))]
@@ -71,7 +71,7 @@ beta = {'name':'beta',
 utility_func_exponent = {'name':'utility_func_exponent',
                     'values':[['same', -6]]}
 symmetry = {'name':'symmetry',
-             'values':['left-right-up-down']}
+             'values':['neither']}
 
 # LIST OF ALL VARIABLES
 all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry]
@@ -139,9 +139,9 @@ def add_d_to_garden(garden):
 
     # CLUSTERING UTILTY FUNCS
     if garden['utility_func_exponent'][0] == 'same':
-        d['bmca'][0][4] = [[0], [8], [7], [6], [5], [4], [3], [2], [1]] # planting groups
+        d['bmca'][0][2] = [[0], [8], [7], [6], [5], [4], [3], [2], [1]] # planting groups
     else:
-        d['bmca'][0][4] = [[0], [8, 4], [7, 3], [6, 2], [5, 1]] # Planting groups
+        d['bmca'][0][2] = [[0], [8, 4], [7, 3], [6, 2], [5, 1]] # Planting groups
 
     def clustering_utility_func(p, plant_type, other_plant_type, added_points, dims, d):
         exp = garden['utility_func_exponent'][1]
