@@ -6,6 +6,7 @@ from numpy.random import default_rng
 rng = default_rng()
 import time
 from shapely import geometry
+from shapely import affinity
 import shapely
 
 def coin_flip(p):

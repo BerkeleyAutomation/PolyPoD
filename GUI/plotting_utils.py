@@ -81,6 +81,7 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
         pickle.dump(garden, open(f'{filename}_data', "wb" ))
         plt.close()
         print(f'image_id {image_id} out of {num_images - 1}')
+    print("printing the plot")
     if generate_plotly:
         pt.plotly_test(pt.single_values['y_eye_mult'],
                        pt.single_values['z_ratio'],

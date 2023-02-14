@@ -12,6 +12,11 @@ def default_bac():
             [[0], [8], [7], [6], [5], [4], [3], [2], [1]]]
 # Polygon, num_each_plant, planting_groups = bmca
 
+def bac_with_parameters(coordinates, num_each_plant):
+    return [Polygon(coordinates), num_each_plant, [[0], [2], [1]]]
+            #[[0], [8], [7], [6], [5], [4], [3], [2], [1]]]
+
+
 # LIST OF ALL EXPERIMENTAL VARIABLES
 all_variables = []
 

@@ -11,7 +11,8 @@ import random
 import copy
 
 # GENERAL VARIABLES: SET
-mode = 'random draw' # 'random draw' or 'combos'
+#mode = 'random draw' # 'random draw' or 'combos'
+mode = 'combos'
 num_trials = 1
 num_gardens_to_generate = 1
 num_p_selector = poi.weighted_round_or_one
@@ -73,8 +74,15 @@ utility_func_exponent = {'name':'utility_func_exponent',
 symmetry = {'name':'symmetry',
              'values':['neither']}
 
+coordinates = {'name': 'coordinates',
+               'values': [[[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],[250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]]
+}
+num_each_plant = {'name': 'num_each_plant',
+               'values': np.full(9, 2)
+}
+
 # LIST OF ALL VARIABLES
-all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry]
+all_variables = [density, distribution, void_size, void_number, beta, utility_func_exponent, symmetry, coordinates, num_each_plant]
 
 if mode == 'combos':
     combos = [{}]
@@ -88,6 +96,7 @@ if mode == 'combos':
         return nl
     for var in all_variables:
         combos = variable_adder(combos, var)
+
 elif mode == 'random draw':
     combos = []
     for n in range(num_gardens_to_generate):
@@ -102,7 +111,11 @@ def add_d_to_garden(garden):
     d = {}
 
     # EXTRA SET VARIABLES FOR d
-    d['bmca'] = [bmca_utils.default_bac()]
+    #d['bmca'] = [bmca_utils.default_bac()]
+    coordinates = garden["coordinates"]
+    num_each_plant = garden["num_each_plant"]
+    
+    d['bmca'] = [bmca_utils.bac_with_parameters(coordinates, num_each_plant)]
 
     # DEFAULT HI-DENSITY PLANT NUMS FOR EVEN DISTRIBUTION, NO VOIDS
     beta = garden['beta']
@@ -185,13 +198,16 @@ def add_d_to_garden(garden):
 
     # PUT THE d DICT INTO THE QUERY DICT
     garden['d'] = d
+    
     return garden
 
 for garden in combos:
     add_d_to_garden(garden)
 
+
 # GENERATE
-num_images = len(combos) * num_trials
+#num_images = len(combos) * num_trials
+num_images = 1
 print(f'num images: {num_images}')
 for c, garden in enumerate(combos):
     for t in range(num_trials):
