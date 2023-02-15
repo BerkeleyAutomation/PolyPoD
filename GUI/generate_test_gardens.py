@@ -201,10 +201,10 @@ def add_d_to_garden(garden):
     
     return garden
 
-for garden in combos:
-    add_d_to_garden(garden)
 
 if __name__ == "__main__":
+    for garden in combos:
+        add_d_to_garden(garden)
     # GENERATE
     #num_images = len(combos) * num_trials
     num_images = 1

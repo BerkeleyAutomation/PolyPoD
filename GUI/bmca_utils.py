@@ -13,7 +13,10 @@ def default_bac():
 # Polygon, num_each_plant, planting_groups = bmca
 
 def bac_with_parameters(coordinates, num_each_plant):
-    return [Polygon(coordinates), num_each_plant, [[0], [2], [1]]]
+    planting_groups = [[0], [2], [1]]
+    print(planting_groups)
+    print(num_each_plant)
+    return [Polygon(coordinates), num_each_plant, planting_groups]
             #[[0], [8], [7], [6], [5], [4], [3], [2], [1]]]
 
 

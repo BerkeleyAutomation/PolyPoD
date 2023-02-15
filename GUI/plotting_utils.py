@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import poisson_disk.poisson_disc as poi
 import matplotlib.pyplot as plt
 import garden_constants
@@ -82,15 +84,15 @@ def generate_garden_scatter_and_area(d, garden, cylinder_nt, image_id, num_image
         plt.close()
         print(f'image_id {image_id} out of {num_images - 1}')
     print("printing the plot")
-    if generate_plotly:
-        pt.plotly_test(pt.single_values['y_eye_mult'],
-                       pt.single_values['z_ratio'],
-                       pt.single_values['h_mult'],
-                       pt.single_values['color_dict'],
-                       cylinder_nt=cylinder_nt,
-                       data=data, plant_labels=False, save=save_plotly,
-                       where_to_save=filename, void_size=garden['void_size'])
-    else:
-        plt.show()
+    # if generate_plotly:
+    #     pt.plotly_test(pt.single_values['y_eye_mult'],
+    #                    pt.single_values['z_ratio'],
+    #                    pt.single_values['h_mult'],
+    #                    pt.single_values['color_dict'],
+    #                    cylinder_nt=cylinder_nt,
+    #                    data=data, plant_labels=False, save=save_plotly,
+    #                    where_to_save=filename, void_size=garden['void_size'])
+    # else:
+    #     plt.show()
     return fig, ax
 

@@ -9,10 +9,11 @@ from shapely.geometry import Polygon
 import plotting_utils
 import generate_test_gardens
 import bmca_utils
+from flask import send_file
 
 app = Flask(__name__)
 
-garden = {}
+
 num_trials = 1
 num_gardens_to_generate = 1
 data = None
@@ -25,6 +26,7 @@ save_2d=False
 
 @app.route(f'/get_parameters', methods = ["GET"])
 def get_parameters():
+    garden = {}
     
     #get parameters
     # garden["density"] = request.args.get('density')
@@ -37,7 +39,7 @@ def get_parameters():
     # garden["coordinates"] = request.args.get('coordinates')
     # garden["num_each_plant"] = np.full(9, 2) #change later
 
-    #dummy values
+    # #dummy values
     garden["coordinates"] = [[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],[250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]
     garden["density"] = 0.75
     garden["distribution"] = 'even'
@@ -47,13 +49,19 @@ def get_parameters():
     garden["utility_func_exponent"] = ['same', -6]
     garden["symmetry"] = 'neither'
     garden["num_each_plant"] = np.full(3, 1) #change later
-    generate_test_gardens.add_d_to_garden(garden)
-    plotting_utils.generate_garden_scatter_and_area(d=garden['d'], image_id='abc', num_images=1,
+    garden = generate_test_gardens.add_d_to_garden(garden)
+    print(garden)
+
+    fig, ax = plotting_utils.generate_garden_scatter_and_area(d=garden['d'], image_id='abc', num_images=1,
                                                         cylinder_nt=cylinder_nt, data=None,
                                                         generate_plotly=generate_plotly, garden=garden,
                                                         save_plotly=save_plotly, save_2d=save_2d)
+    path = os.path.abspath("app.py")
+    fig.savefig(os.path.join(path, 'test.png'))
+    return send_file('test.png', mimetype='image/gif')
+
     
 if __name__ == "__main__":
-    app.run()
+    app.run(port = 8000, debug = True)
 
     
