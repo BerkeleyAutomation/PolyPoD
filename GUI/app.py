@@ -39,9 +39,15 @@ def get_parameters():
     # garden["coordinates"] = request.args.get('coordinates')
     # garden["num_each_plant"] = np.full(9, 2) #change later
 
+    #take user inputs
+    coordinates = [[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],[250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]
+    num_plants = 45
+    num_each_plant = [5, 5, 5, 5, 5, 5, 5, 5, 5]
+
+
     # #dummy values
     #garden["coordinates"] = [[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],[250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]
-    garden["coordinates"] = [[100, 100], [200, 100], [200, 200], [300, 200], [400, 400],[250, 250]]
+    garden["coordinates"] = coordinates
     garden["density"] = 0.75
     garden["distribution"] = 'even'
     garden["beta"] = 0.2
@@ -49,8 +55,8 @@ def get_parameters():
     garden["void_number"] = 2
     garden["utility_func_exponent"] = ['same', -6]
     garden["symmetry"] = 'neither'
-    garden["num_each_plant"] = np.full(3, 1) #change later
-    garden["num_plants"] = 8
+    garden["num_each_plant"] = num_each_plant
+    garden["num_plants"] = num_plants
     garden = generate_test_gardens.add_d_to_garden(garden)
     print(garden)
 

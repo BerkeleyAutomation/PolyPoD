@@ -121,36 +121,39 @@ def add_d_to_garden(garden):
     beta = garden['beta']
     num_plants = garden['num_plants']
     #default_num_plants = 9 if beta == 0 else 10 if beta == 0.2 else 12 if beta == 0.4 else 14 if beta == 0.6 else 17 if beta == 0.8 else 21
-    default_num_plants = int(0.7*num_plants) if beta == 0 else num_plants if beta == 0.2 else int(1.3*num_plants) if beta == 0.4 else int(1.5*num_plants) if beta == 0.6 else int(1.8*num_plants) if beta == 0.8 else 2*num_plants
+    #default_num_plants = int(0.7*num_plants) if beta == 0 else num_plants if beta == 0.2 else int(1.3*num_plants) if beta == 0.4 else int(1.5*num_plants) if beta == 0.6 else int(1.8*num_plants) if beta == 0.8 else 2*num_plants
+    default_num_plants = num_plants
     small_plant_extra = 2
 
-    d['num_plants'] = np.concatenate((np.full(4, default_num_plants + small_plant_extra), np.full(5, default_num_plants)))
+    #d['num_plants'] = np.concatenate((np.full(4, default_num_plants + small_plant_extra), np.full(5, default_num_plants)))
+    #d['num_plants'] = np.concatenate((np.full(4, default_num_plants), np.full(5, default_num_plants)))
+    d["num_plants"] = num_each_plant
     d['beta'] = garden['beta']
 
     # DISTRIBUTION ADJUSTMENT
-    distribution_offset = 0.6
-    if garden['distribution'] == 'uneven 2':
-        for i in range(1, len(d['num_plants'])):
-            if i == 4 or i == 5:
-                d['num_plants'][i] = int(d['num_plants'][i] * 5/2)
-            else:
-                d['num_plants'][i] = int(d['num_plants'][i] * 3/4 * distribution_offset)
-    elif garden['distribution'] == 'uneven 3':
-        for i in range(1, len(d['num_plants'])):
-            if i == 3 or i == 4 or i == 5:
-                d['num_plants'][i] = int(d['num_plants'][i] * 9/4)
-            else:
-                d['num_plants'][i] = int(d['num_plants'][i] * 3/4 * distribution_offset)
+    # distribution_offset = 0.6
+    # if garden['distribution'] == 'uneven 2':
+    #     for i in range(1, len(d['num_plants'])):
+    #         if i == 4 or i == 5:
+    #             d['num_plants'][i] = int(d['num_plants'][i] * 5/2)
+    #         else:
+    #             d['num_plants'][i] = int(d['num_plants'][i] * 3/4 * distribution_offset)
+    # elif garden['distribution'] == 'uneven 3':
+    #     for i in range(1, len(d['num_plants'])):
+    #         if i == 3 or i == 4 or i == 5:
+    #             d['num_plants'][i] = int(d['num_plants'][i] * 9/4)
+    #         else:
+    #             d['num_plants'][i] = int(d['num_plants'][i] * 3/4 * distribution_offset)
 
     # VOID NUMBER AND SIZE
-    d['num_plants'][0] = garden['void_number']
+    # d['num_plants'][0] = garden['void_number']
     vs = garden['void_size']
     d['void_beta'] = 0 # old stuff: -4 if vs == 15 else 0 if vs == 100 else -2
 
     d['void_size'] = garden['void_size']
 
     # DENSITY OFFSET
-    d['num_plants'] = [int(x * garden['density']) for x in d['num_plants']]
+    # d['num_plants'] = [int(x * garden['density']) for x in d['num_plants']]
 
     # CLUSTERING UTILTY FUNCS
     if garden['utility_func_exponent'][0] == 'same':
