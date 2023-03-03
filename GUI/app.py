@@ -40,7 +40,8 @@ def get_parameters():
     # garden["num_each_plant"] = np.full(9, 2) #change later
 
     # #dummy values
-    garden["coordinates"] = [[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],[250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]
+    #garden["coordinates"] = [[100, 100], [200, 100], [200, 200], [300, 200], [300, 100], [400, 100], [400, 400],[250, 250], [250, 400], [100, 400], [100, 300], [175, 250], [100, 200], [100, 100]]
+    garden["coordinates"] = [[100, 100], [200, 100], [200, 200], [300, 200], [400, 400],[250, 250]]
     garden["density"] = 0.75
     garden["distribution"] = 'even'
     garden["beta"] = 0.2
@@ -49,6 +50,7 @@ def get_parameters():
     garden["utility_func_exponent"] = ['same', -6]
     garden["symmetry"] = 'neither'
     garden["num_each_plant"] = np.full(3, 1) #change later
+    garden["num_plants"] = 8
     garden = generate_test_gardens.add_d_to_garden(garden)
     print(garden)
 
@@ -56,7 +58,7 @@ def get_parameters():
                                                         cylinder_nt=cylinder_nt, data=None,
                                                         generate_plotly=generate_plotly, garden=garden,
                                                         save_plotly=save_plotly, save_2d=save_2d)
-    path = os.path.abspath("app.py")
+    path = os.path.abspath("GUI")
     fig.savefig(os.path.join(path, 'test.png'))
     return send_file('test.png', mimetype='image/gif')
 

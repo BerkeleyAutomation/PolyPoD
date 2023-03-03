@@ -119,7 +119,9 @@ def add_d_to_garden(garden):
 
     # DEFAULT HI-DENSITY PLANT NUMS FOR EVEN DISTRIBUTION, NO VOIDS
     beta = garden['beta']
-    default_num_plants = 9 if beta == 0 else 10 if beta == 0.2 else 12 if beta == 0.4 else 14 if beta == 0.6 else 17 if beta == 0.8 else 21
+    num_plants = garden['num_plants']
+    #default_num_plants = 9 if beta == 0 else 10 if beta == 0.2 else 12 if beta == 0.4 else 14 if beta == 0.6 else 17 if beta == 0.8 else 21
+    default_num_plants = int(0.7*num_plants) if beta == 0 else num_plants if beta == 0.2 else int(1.3*num_plants) if beta == 0.4 else int(1.5*num_plants) if beta == 0.6 else int(1.8*num_plants) if beta == 0.8 else 2*num_plants
     small_plant_extra = 2
 
     d['num_plants'] = np.concatenate((np.full(4, default_num_plants + small_plant_extra), np.full(5, default_num_plants)))
