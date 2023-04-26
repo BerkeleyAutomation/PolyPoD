@@ -1,0 +1,10 @@
+Flask==2.3.1
+flask_cors==3.0.10
+matplotlib==3.7.1
+numpy==1.24.3
+Pillow==9.5.0
+Pillow==9.5.0
+plotly==5.14.1
+scipy==1.10.1
+setuptools==67.6.1
+Shapely==2.0.1
