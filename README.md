@@ -7,4 +7,4 @@ Infrastructure to generate multiple gardens at a time and automate some feature 
 
 Plotting code run by GUI/generate_test_gardens.py can be found in GUI/plotting_utils.py.
 
-The associated website can be found at: https://6479522af41ee2401a5156d3--delightful-seahorse-fb6858.netlify.app/
+The associated website can be found at: https://polypod.netlify.app/
